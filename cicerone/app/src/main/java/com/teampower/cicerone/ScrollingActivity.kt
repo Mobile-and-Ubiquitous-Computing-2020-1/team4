@@ -45,7 +45,14 @@ class ScrollingActivity : AppCompatActivity() {
                 }
             }
         }
+        val test = fusedLocationClient.lastLocation
+        test.addOnSuccessListener { lsd ->
+            Log.v(TAG, "Test successful")
+        }
 
+        test.addOnFailureListener() { except ->
+            Log.v(TAG, "Test failed: $except")
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -79,21 +86,28 @@ class ScrollingActivity : AppCompatActivity() {
         val client: SettingsClient = LocationServices.getSettingsClient(this)
         val task: Task<LocationSettingsResponse> = client.checkLocationSettings(builder.build())
 
-        task.addOnSuccessListener { locationSettingsResponse ->
-            Log.v(TAG, "All permissions OK. Enabling Location Updates")
-            requestingLocationUpdates = true
+        task.addOnSuccessListener { locSettingsResp ->
+            requestingLocationUpdates = locSettingsResp.locationSettingsStates.isGpsPresent &&
+                    locSettingsResp.locationSettingsStates.isGpsUsable &&
+                    locSettingsResp.locationSettingsStates.isLocationPresent &&
+                    locSettingsResp.locationSettingsStates.isLocationUsable
+            Log.v(TAG, "Location settings checked. Status: $requestingLocationUpdates") // TODO
+            fusedLocationClient.lastLocation
+                .addOnSuccessListener { location : Location? ->
+                    Log.v(TAG, "Location: $location")
+                }
         }
 
         task.addOnFailureListener { exception ->
             Log.v(TAG, "Permissions failed")
-//            if (exception is ResolvableApiException){
-//                try{
-//                    // Show dialog for user to allow location settings
-//                    exception.startResolutionForResult(this@Main, REQUEST_CHECK_SETTINGS)
-//                } catch (sendEx: IntentSender.SendIntentException){
-//                    // Ignore error
-//                }
-//            }
+            if (exception is ResolvableApiException){
+                try{
+                    // Show dialog for user to allow location settings
+                    exception.startResolutionForResult(this@ScrollingActivity, 1)
+                } catch (sendEx: IntentSender.SendIntentException){
+                    // Ignore error
+                }
+            }
 
         }
         return locationRequest
