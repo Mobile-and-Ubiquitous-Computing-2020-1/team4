@@ -1,16 +1,25 @@
 package com.teampower.cicerone
 
 import android.Manifest
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.app.PendingIntent
+import android.content.Context
+import android.content.Intent
 import android.content.IntentSender
 import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import android.os.Looper
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
+import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationManagerCompat
 import com.google.android.gms.common.api.ResolvableApiException
 import com.google.android.gms.location.*
 import com.google.android.gms.tasks.Task
@@ -18,14 +27,19 @@ import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.activity_scrolling.*
 
 const val MY_PERMISSIONS_REQUEST_LOCATION_ID = 99
+const val CHANNEL_ID = "CiceroneComms1337"
+const val TAG = "Cicerone"
+const val TAG_GEO = "Geofencer"
 
-
-class ScrollingActivity : AppCompatActivity() {
-    private val TAG = "Cicerone"
+class MainActivity : AppCompatActivity() {
     private lateinit var fusedLocationClient: FusedLocationProviderClient
-    private var requestingLocationUpdates = true
+    private lateinit var geofencingClient: GeofencingClient
     private lateinit var locationRequest: LocationRequest
     private lateinit var locationCallback: LocationCallback
+    private val notCon = NotificationsController()
+    private val geoCon = GeofencingController()
+    private var requestingLocationUpdates = true
+    @RequiresApi(Build.VERSION_CODES.Q)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -33,11 +47,6 @@ class ScrollingActivity : AppCompatActivity() {
         setSupportActionBar(toolbar)
 
         user_location.text = getString(R.string.user_position, "-", "-")
-
-        fab.setOnClickListener { view ->
-            Snackbar.make(view, "Fun stuff here", Snackbar.LENGTH_LONG)
-                .setAction("Action", null).show()
-        }
 
         // Setup location services
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
@@ -55,18 +64,53 @@ class ScrollingActivity : AppCompatActivity() {
                 }
             }
         }
+        // Setup geofencing services
+        geofencingClient = geoCon.getClient(this)!!
+
+        // Setup notifications
+        notCon.createNotificationChannel(this)
+
+        // Setup fab to test notifications
+        fab.setOnClickListener { view ->
+            Snackbar.make(view, "Notification sent", Snackbar.LENGTH_LONG)
+                .setAction("Action", null).show()
+            notCon.sendNotification(this, "Test notification", "Hi, I'm the notification that was sent", 1)
+        }
     }
 
+    @RequiresApi(Build.VERSION_CODES.Q)
     override fun onResume() {
         super.onResume()
         Log.v(TAG, "Activity resumed")
         enableLocationTracking()
     }
 
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        menuInflater.inflate(R.menu.menu_scrolling, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+
+        return when (item.itemId) {
+            R.id.action_settings -> true
+            else -> super.onOptionsItemSelected(item)
+        }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.Q)
     private fun enableLocationTracking() {
         // developer.android.com/training/location/request-updates#request-background-location
         val permissionAccessFineLocationApproved = ActivityCompat
             .checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) ==
+                PackageManager.PERMISSION_GRANTED
+
+        val permissionBackgroundLocationApproved = ActivityCompat
+            .checkSelfPermission(this, Manifest.permission.ACCESS_BACKGROUND_LOCATION) ==
                 PackageManager.PERMISSION_GRANTED
 
         if (!permissionAccessFineLocationApproved) {
@@ -92,6 +136,30 @@ class ScrollingActivity : AppCompatActivity() {
         } else {
             // Permission has already been granted
             Log.d(TAG, "Location permission already granted")
+            requestLocationUpdates()
+        }
+
+        if (!permissionBackgroundLocationApproved) {
+            // TODO Duplicating for now, this will have to be refactored
+            if (ActivityCompat.shouldShowRequestPermissionRationale(
+                    this,
+                    Manifest.permission.ACCESS_BACKGROUND_LOCATION
+                )
+            ) {
+                // Show an explanation to the user why we need this permission.
+                // After the user sees the explanation, try to request the permission again.
+                showLocationPermissionRationaleDialog()
+            } else {
+                // No explanation needed, we can request the permission.
+                ActivityCompat.requestPermissions(
+                    this,
+                    arrayOf(Manifest.permission.ACCESS_BACKGROUND_LOCATION),
+                    MY_PERMISSIONS_REQUEST_LOCATION_ID
+                )
+            }
+        } else {
+            // Permission has already been granted
+            Log.d(TAG, "Background location permission already granted")
             requestLocationUpdates()
         }
     }
@@ -182,7 +250,7 @@ class ScrollingActivity : AppCompatActivity() {
             if (exception is ResolvableApiException) {
                 try {
                     // Show dialog for user to allow location settings
-                    exception.startResolutionForResult(this@ScrollingActivity, 1)
+                    exception.startResolutionForResult(this@MainActivity, 1)
                 } catch (sendEx: IntentSender.SendIntentException) {
                     // Ignore error
                 }
@@ -191,20 +259,5 @@ class ScrollingActivity : AppCompatActivity() {
         return locationRequest
     }
 
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        menuInflater.inflate(R.menu.menu_scrolling, menu)
-        return true
-    }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-
-        return when (item.itemId) {
-            R.id.action_settings -> true
-            else -> super.onOptionsItemSelected(item)
-        }
-    }
 }
