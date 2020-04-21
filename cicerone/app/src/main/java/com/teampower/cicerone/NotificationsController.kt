@@ -30,7 +30,6 @@ class NotificationsController() {
         }
     }
 
-
     fun sendNotification(context: Context, title: String, content: String, notificationId: Int) {
         // Create an explicit intent for an Activity in your app
         val intent = Intent(context, MainActivity::class.java).apply {

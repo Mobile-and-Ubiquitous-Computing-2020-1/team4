@@ -10,9 +10,10 @@ import com.google.android.gms.location.GeofencingRequest
 import com.google.android.gms.location.LocationServices
 
 class GeofencingController() {
+    private lateinit var geofencingClient: GeofencingClient
+    private var geofenceList = ArrayList<Geofence>()
 
-
-    fun getClient(context: Context): GeofencingClient? {
+    fun startGeofencing(context: Context) {
         val geofencePendingIntent: PendingIntent by lazy {
             val intent = Intent(context, GeofenceBroadcastReceiver::class.java)
             // We use FLAG_UPDATE_CURRENT so that we get the same pending intent back
@@ -20,7 +21,8 @@ class GeofencingController() {
             PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)
         }
 
-        val geofencingClient = LocationServices.getGeofencingClient(context)
+        geofencingClient = LocationServices.getGeofencingClient(context)
+        initializeGeofenceList()
         geofencingClient?.addGeofences(getGeofencingRequest(), geofencePendingIntent)?.run {
             addOnSuccessListener {
                 Log.v(TAG_GEO, "Geofences added")
@@ -29,35 +31,41 @@ class GeofencingController() {
                 Log.v(TAG_GEO, "Failed to add geofences")
             }
         }
-
-        return geofencingClient
     }
 
-    private fun getGeofenceList(): List<Geofence> {
-        var geofence = Geofence.Builder()
-            // Set the request ID of the geofence. This is a string to identify this
-            // geofence
-            .setRequestId("Fence1")
-            // Set thh circular region of this geofence. Distance in meters.
-            .setCircularRegion(
-                37.4608,
-                -122.1384,
-                200F
-            )
-            // Set the expiration duration of the geofence. This geofence gets automatically
-            // removed after this period of time
-            .setExpirationDuration(Geofence.NEVER_EXPIRE)
-            .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER or Geofence.GEOFENCE_TRANSITION_EXIT)
-            // Create the geofence
-            .build()
-
-        return listOf<Geofence>(geofence)
+    private fun initializeGeofenceList() {
+        val geofence = createGeofence(37.4608, -122.1384, 200F, Geofence.NEVER_EXPIRE, Geofence.GEOFENCE_TRANSITION_ENTER or Geofence.GEOFENCE_TRANSITION_EXIT)
+        addGeofence(geofence)
     }
 
     private fun getGeofencingRequest(): GeofencingRequest {
         return GeofencingRequest.Builder().apply{
             setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_ENTER)
-            addGeofences(getGeofenceList())
+            addGeofences(geofenceList)
         }.build()
+    }
+
+    fun createGeofence(lat: Double, long: Double, radius: Float, expiration: Long, transTypes: Int) : Geofence{
+        val geofence = Geofence.Builder()
+            // Set the request ID of the geofence. This is a string to identify this
+            // geofence
+            .setRequestId("Fence1")
+            // Set thh circular region of this geofence. Distance in meters.
+            .setCircularRegion(
+                lat,
+                long,
+                radius
+            )
+            // Set the expiration duration of the geofence. This geofence gets automatically
+            // removed after this period of time
+            .setExpirationDuration(expiration)
+            .setTransitionTypes(transTypes)
+            // Create the geofence
+            .build()
+        return geofence
+    }
+
+    fun addGeofence(geofence: Geofence){
+        geofenceList.plusAssign(geofence)
     }
 }
