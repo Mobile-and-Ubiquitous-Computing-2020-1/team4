@@ -9,6 +9,7 @@ import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.activity_scrolling.*
+import kotlinx.android.synthetic.main.content_scrolling.*
 
 const val MY_PERMISSIONS_REQUEST_LOCATION_ID = 99
 const val CHANNEL_ID = "CiceroneComms1337"
@@ -19,6 +20,7 @@ class MainActivity : AppCompatActivity() {
     private val latCon = LocationController()
     private val notCon = NotificationsController()
     private val geoCon = GeofencingController()
+    private val dataCon = DataController()
     @RequiresApi(Build.VERSION_CODES.Q)
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -43,6 +45,10 @@ class MainActivity : AppCompatActivity() {
                 .setAction("Action", null).show()
             notCon.sendNotification(this, "Test notification", "Hi, I'm the notification that was sent", 1)
         }
+
+        // Make data request to API and display data
+        var recommendedPlace = dataCon.requestData(this)
+        dataCon.displayData(this, recommendedPlace, venue_description)
     }
 
     @RequiresApi(Build.VERSION_CODES.Q)
