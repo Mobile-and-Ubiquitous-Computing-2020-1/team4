@@ -34,10 +34,10 @@ class GeofenceBroadcastReceiver : BroadcastReceiver() {
 
             // Get the geofences that were triggered. A single even can trigger
             // multiple geofences
-            val triggerinGeofences = geofencingEvent.triggeringGeofences
+            val triggerinGeofence = geofencingEvent.triggeringGeofences[0]
 
             // Get the transition details as a String
-            val geofenceTransitionDetails = "You crossed the Geofence - Cool dude"
+            val geofenceTransitionDetails = "You crossed the Geofence with ID:${triggerinGeofence.requestId} - Cool dude"
             // Send notification and log the transition details
             if (context != null) {
                 sendNotification(context, "Cicerone geofence", geofenceTransitionDetails, 1337)
