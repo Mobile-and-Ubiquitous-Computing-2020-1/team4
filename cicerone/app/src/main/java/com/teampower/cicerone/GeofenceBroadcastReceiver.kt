@@ -40,7 +40,7 @@ class GeofenceBroadcastReceiver : BroadcastReceiver() {
             val geofenceTransitionDetails = "You crossed the Geofence with ID:${triggerinGeofence.requestId} - Cool dude"
             // Send notification and log the transition details
             if (context != null) {
-                sendNotification(context, "Cicerone geofence", geofenceTransitionDetails, 1337)
+                sendNotification(context, "Cicerone geofence", geofenceTransitionDetails, 1337, geofenceTransitionDetails)
             }
             Log.i(TAG, geofenceTransitionDetails)
         } else {
@@ -49,8 +49,8 @@ class GeofenceBroadcastReceiver : BroadcastReceiver() {
         }
     }
 
-    private fun sendNotification(context: Context, title: String, content: String, notificationId: Int) {
+    private fun sendNotification(context: Context, title: String, content: String, notificationId: Int, transitionDetails: String) {
         val notCon = NotificationsController()
-        notCon.sendNotification(context, title, content, notificationId)
+        notCon.sendNotificationTriggeredGeofence(context, title, content, notificationId, transitionDetails)
     }
 }

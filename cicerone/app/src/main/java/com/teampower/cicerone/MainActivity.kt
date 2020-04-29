@@ -50,7 +50,7 @@ class MainActivity : AppCompatActivity() {
         fab.setOnClickListener { view ->
             Snackbar.make(view, "Notification sent", Snackbar.LENGTH_LONG)
                 .setAction("Action", null).show()
-            notCon.sendNotification(this, "Test notification", "Hi, I'm the notification that was sent", 1)
+            notCon.sendNotificationToMain(this, "Test notification", "Hi, I'm the notification that was sent", 1)
         }
     }
 
