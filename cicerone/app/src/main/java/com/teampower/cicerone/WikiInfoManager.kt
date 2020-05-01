@@ -5,25 +5,22 @@ import retrofit2.Callback
 import retrofit2.Response
 
 class WikiInfoManager(private val api: RestAPI = RestAPI()) {
-    fun getSearchResults(searchString: String): List<WikipediaSearchQueryPageItem>? {
-        var searchResults: List<WikipediaSearchQueryPageItem>? = null
-        api.getSearchResult(searchString)
-            .enqueue(object : Callback<WikipediaSearchResponse> {
+    fun getPlaceInfo(placeName: String): WikipediaPlaceInfo? {
+        var placeInfo: WikipediaPlaceInfo? = null
+        api.getPlaceInfo(placeName)
+            .enqueue(object : Callback<WikipediaPlaceInfo> {
                 override fun onResponse(
-                    call: Call<WikipediaSearchResponse>,
-                    response: Response<WikipediaSearchResponse>
+                    call: Call<WikipediaPlaceInfo>,
+                    response: Response<WikipediaPlaceInfo>
                 ) {
-                    searchResults = response.body()?.query?.search?.map {
-                        WikipediaSearchQueryPageItem(
-                            it.title, it.pageid, it.snippet
-                        )
-                    }
-                    println("MEMEMEMEMEMEMEMEME: $searchResults")
+                    placeInfo = response.body()
+
+                    println("MEMEMEMEMEMEMEMEME: $placeInfo")
                 }
 
-                override fun onFailure(call: Call<WikipediaSearchResponse>, t: Throwable) =
+                override fun onFailure(call: Call<WikipediaPlaceInfo>, t: Throwable) =
                     t.printStackTrace()
             })
-        return searchResults
+        return placeInfo
     }
 }

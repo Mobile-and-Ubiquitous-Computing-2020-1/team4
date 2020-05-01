@@ -29,9 +29,9 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_scrolling)
         setSupportActionBar(toolbar)
 
-        // Test Wikipedia API
-        val restApi = wikiManager.getSearchResults("Gyeongbokgung Palace")
-
+        // Test Wikipedia API. This variable is null if no page was found. TODO: Implement stuff to make the data come here so we can use it for displaying. Async problem
+        val placeInfo = wikiManager.getPlaceInfo("Gyeongbokgung Palace")
+        //wikipedia_extract.text = placeInfo?.extract
         user_location.text = getString(R.string.user_position, "-", "-")
 
         // Setup location services

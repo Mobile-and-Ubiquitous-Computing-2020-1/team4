@@ -10,18 +10,15 @@ class RestAPI() {
 
     init {
         val retrofit = Retrofit.Builder()
-            .baseUrl("https://en.wikipedia.org/w/")
+            .baseUrl("https://en.wikipedia.org/api/rest_v1/")
             .addConverterFactory(MoshiConverterFactory.create())
             .build()
         wikipediaService = retrofit.create(WikipediaService::class.java)
     }
 
-    fun getSearchResult(searchString: String): Call<WikipediaSearchResponse> {
-        return wikipediaService.generalSearch(
-            action = "query",
-            list = "search",
-            srsearch = searchString,
-            format = "json"
+    fun getPlaceInfo(placeName: String): Call<WikipediaPlaceInfo> {
+        return wikipediaService.getPageSummary(
+            placeName = placeName
         )
     }
 }
