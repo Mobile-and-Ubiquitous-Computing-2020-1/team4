@@ -47,8 +47,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         // Make data request to API and display data
-        dataCon.requestData(this, venue_description)
-        /*dataCon.displayData(this, recommendedPlace, venue_description)*/
+        dataCon.requestData("38.8897,-77.0089", venue_description)
     }
 
     @RequiresApi(Build.VERSION_CODES.Q)
