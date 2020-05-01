@@ -47,8 +47,8 @@ class MainActivity : AppCompatActivity() {
         }
 
         // Make data request to API and display data
-        var recommendedPlace = dataCon.requestData(this)
-        dataCon.displayData(this, recommendedPlace, venue_description)
+        dataCon.requestData(this, venue_description)
+        /*dataCon.displayData(this, recommendedPlace, venue_description)*/
     }
 
     @RequiresApi(Build.VERSION_CODES.Q)
