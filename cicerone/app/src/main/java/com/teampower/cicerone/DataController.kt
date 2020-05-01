@@ -10,12 +10,13 @@ import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
 
 class DataController {
-   fun requestData(location: String, venue_description: TextView) {
+   fun requestData(location: android.location.Location, venue_description: TextView) {
         // Loads client ID and secret from "secret.properties" file in BuildConfig
         val foursquare_id = BuildConfig.FOURSQUARE_ID
         val foursquare_secret = BuildConfig.FOURSQUARE_SECRET
 
         // API call parameters
+        val location_string: String = "${location.latitude.toString()}, ${location.longitude.toString()}"
         val radius = "100"
         val limit = "30"
         val version = "20200420" // set date for API versioning here (see Foursquare API)
@@ -39,7 +40,7 @@ class DataController {
 
         // Make API call
         val FoursquareAPI = retrofit.create(FoursquareAPI::class.java)
-        FoursquareAPI.searchVenues(location).enqueue(object : retrofit2.Callback<FoursquareData> {
+        FoursquareAPI.searchVenues(location_string).enqueue(object : retrofit2.Callback<FoursquareData> {
             override fun onFailure(call: retrofit2.Call<FoursquareData>?, t: Throwable?) {
                 Log.e(TAG, "Error: could not receive response from Foursquare API")
             }
@@ -69,10 +70,9 @@ class DataController {
     private fun displayData(place: Place, venue_description: TextView) {
         val place_string = StringBuilder()
         place_string.append("Name: ${place.name}").appendln()
-        place_string.append("Location: ${place.longitude}, ${place.latitude}").appendln()
+        place_string.append("Location: ${place.latitude}, -122.084000").appendln()
         place_string.append("Address: ${place.address}").appendln()
-        place_string.appendln()
-        place_string.append(place.description)
+        place_string.append("Category: ${place.category}")
 
         venue_description.text = place_string
     }

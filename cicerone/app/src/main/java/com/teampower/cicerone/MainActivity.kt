@@ -2,6 +2,7 @@ package com.teampower.cicerone
 
 import android.os.Build
 import android.os.Bundle
+import android.provider.Settings
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
@@ -10,6 +11,8 @@ import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.activity_scrolling.*
 import kotlinx.android.synthetic.main.content_scrolling.*
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.async
 
 const val MY_PERMISSIONS_REQUEST_LOCATION_ID = 99
 const val CHANNEL_ID = "CiceroneComms1337"
@@ -46,8 +49,12 @@ class MainActivity : AppCompatActivity() {
             notCon.sendNotification(this, "Test notification", "Hi, I'm the notification that was sent", 1)
         }
 
-        // Make data request to API and display data
-        dataCon.requestData("38.8897,-77.0089", venue_description)
+        // Get last location and use it to make data request to API, then display the retrieved data
+        // var curr_location = "38.8897,-77.0089"
+        GlobalScope.async {
+            var curr_location: android.location.Location = latCon.getLocation()
+            dataCon.requestData(curr_location, venue_description)
+        }
     }
 
     @RequiresApi(Build.VERSION_CODES.Q)

@@ -2,7 +2,6 @@ package com.teampower.cicerone
 import com.google.gson.annotations.SerializedName
 
 data class Location (
-
 	@SerializedName("address") val address : String,
 	@SerializedName("crossStreet") val crossStreet : String,
 	@SerializedName("lat") val lat : Double,
