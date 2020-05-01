@@ -12,7 +12,7 @@ import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.activity_scrolling.*
 import kotlinx.android.synthetic.main.content_scrolling.*
 import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
 
 const val MY_PERMISSIONS_REQUEST_LOCATION_ID = 99
 const val CHANNEL_ID = "CiceroneComms1337"
@@ -51,7 +51,7 @@ class MainActivity : AppCompatActivity() {
 
         // Get last location and use it to make data request to API, then display the retrieved data
         // var curr_location = "38.8897,-77.0089"
-        GlobalScope.async {
+        GlobalScope.launch {
             var curr_location: android.location.Location = latCon.getLocation()
             dataCon.requestData(curr_location, venue_description)
         }

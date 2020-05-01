@@ -10,7 +10,7 @@ import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
 
 class DataController {
-   fun requestData(location: android.location.Location, venue_description: TextView) {
+   fun requestData(location: android.location.Location, venue_view: TextView) {
         // Loads client ID and secret from "secret.properties" file in BuildConfig
         val foursquare_id = BuildConfig.FOURSQUARE_ID
         val foursquare_secret = BuildConfig.FOURSQUARE_SECRET
@@ -51,7 +51,7 @@ class DataController {
                     val venues = result!!.response.venues
                     val place = placeBuilder(venues.get(0))
                     Log.d("TAG", "Venues:" + venues.toString())
-                    displayData(place, venue_description)
+                    displayData(place, venue_view)
                 }
             }
         })
@@ -67,14 +67,14 @@ class DataController {
         return Place(name, latitude, longitude, distance, address, description)
     }
 
-    private fun displayData(place: Place, venue_description: TextView) {
+    private fun displayData(place: Place, venue_view: TextView) {
         val place_string = StringBuilder()
         place_string.append("Name: ${place.name}").appendln()
         place_string.append("Location: ${place.latitude}, -122.084000").appendln()
         place_string.append("Address: ${place.address}").appendln()
-        place_string.append("Category: ${place.category}")
-
-        venue_description.text = place_string
+        place_string.append("Category: ${place.category}").appendln()
+        place_string.append("Current distance: ${place.distance}m")
+        venue_view.text = place_string
     }
 
 }
