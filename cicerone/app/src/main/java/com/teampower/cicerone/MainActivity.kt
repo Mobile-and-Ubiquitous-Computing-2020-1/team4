@@ -8,6 +8,7 @@ import android.view.Menu
 import android.view.MenuItem
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
+import com.google.android.gms.location.Geofence
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.activity_scrolling.*
 import kotlinx.android.synthetic.main.content_scrolling.*
@@ -38,6 +39,14 @@ class MainActivity : AppCompatActivity() {
 
         // Setup geofencing services
         geoCon.startGeofencing(this)
+        // TODO Example of adding multiple geofences. Should be moved to onResponse function
+        // TODO for POI queries
+        val pois = arrayOf(POI(37.4553, -122.1462, "POI 1"), POI(37.4654, -122.1609, "POI 2"))
+        for(poi in pois) {
+           val gf = geoCon.createGeofence(poi.lat, poi.long, poi.id, 200F, Geofence.NEVER_EXPIRE, Geofence.GEOFENCE_TRANSITION_ENTER or Geofence.GEOFENCE_TRANSITION_EXIT)
+            geoCon.addGeofence(gf, this)
+        }
+        geoCon.removeGeofence("POI 2", this)
 
         // Setup notifications
         notCon.createNotificationChannel(this)
@@ -46,7 +55,7 @@ class MainActivity : AppCompatActivity() {
         fab.setOnClickListener { view ->
             Snackbar.make(view, "Notification sent", Snackbar.LENGTH_LONG)
                 .setAction("Action", null).show()
-            notCon.sendNotification(this, "Test notification", "Hi, I'm the notification that was sent", 1)
+            notCon.sendNotificationToMain(this, "Test notification", "Hi, I'm the notification that was sent", 1)
         }
 
         // Get last location and use it to make data request to API, then display the retrieved data
