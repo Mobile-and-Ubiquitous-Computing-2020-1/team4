@@ -62,6 +62,7 @@ class MainActivity : AppCompatActivity() {
         // var curr_location = "38.8897,-77.0089"
         GlobalScope.launch {
             var curr_location: android.location.Location = latCon.getLocation()
+            Log.d(TAG, "Current location: ${curr_location}. Requesting data...")
             dataCon.requestData(curr_location, venue_description)
         }
     }

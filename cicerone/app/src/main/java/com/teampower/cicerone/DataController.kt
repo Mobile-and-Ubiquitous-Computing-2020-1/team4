@@ -42,7 +42,8 @@ class DataController {
         val FoursquareAPI = retrofit.create(FoursquareAPI::class.java)
         FoursquareAPI.searchVenues(location_string).enqueue(object : retrofit2.Callback<FoursquareData> {
             override fun onFailure(call: retrofit2.Call<FoursquareData>?, t: Throwable?) {
-                Log.e(TAG, "Error: could not receive response from Foursquare API")
+                Log.e(TAG, "Error: could not receive response from Foursquare API. ${t?.message}")
+
             }
 
             override fun onResponse(call: retrofit2.Call<FoursquareData>, response: retrofit2.Response<FoursquareData>) {

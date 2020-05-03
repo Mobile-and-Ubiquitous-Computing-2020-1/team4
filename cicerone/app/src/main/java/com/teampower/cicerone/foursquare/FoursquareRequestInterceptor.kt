@@ -17,6 +17,7 @@ class FoursquareRequestInterceptor(private val client_id: String, private val cl
         val newRequest = request.newBuilder()
             .url(url)
             .addHeader("Cache-Control", "public, max-age=$cacheDuration")
+            .addHeader("Content-Type", "application/json; charset=utf-8")
             .build()
 
         return chain.proceed(newRequest)
