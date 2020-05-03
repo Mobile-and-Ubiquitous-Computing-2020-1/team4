@@ -17,8 +17,11 @@ class DataController {
 
         // API call parameters
         val location_string: String = "${location.latitude.toString()}, ${location.longitude.toString()}"
-        val radius = "100"
-        val limit = "30"
+        val radius = 300 // TODO set radius for query
+        val limit = 200
+        // TODO decide which categories to query
+        // comma-seperated list of Foursquare categoryIDs to query for
+        val categories = "4d4b7104d754a06370d81259,4d4b7105d754a06373d81259,4d4b7105d754a06374d81259,4d4b7105d754a06376d81259,4d4b7105d754a06377d81259"
         val version = "20200420" // set date for API versioning here (see Foursquare API)
         val cacheDuration = 60
 
@@ -40,7 +43,7 @@ class DataController {
 
         // Make API call
         val FoursquareAPI = retrofit.create(FoursquareAPI::class.java)
-        FoursquareAPI.searchVenues(location_string).enqueue(object : retrofit2.Callback<FoursquareData> {
+        FoursquareAPI.searchVenues(location_string, categories, radius, limit).enqueue(object : retrofit2.Callback<FoursquareData> {
             override fun onFailure(call: retrofit2.Call<FoursquareData>?, t: Throwable?) {
                 Log.e(TAG, "Error: could not receive response from Foursquare API. ${t?.message}")
 
