@@ -74,7 +74,7 @@ class DataController {
     private fun displayData(place: Place, venue_view: TextView) {
         val place_string = StringBuilder()
         place_string.append("Name: ${place.name}").appendln()
-        place_string.append("Location: ${place.latitude}, -122.084000").appendln()
+        place_string.append("Location: ${place.latitude}, ${place.longitude}").appendln()
         place_string.append("Address: ${place.address}").appendln()
         place_string.append("Category: ${place.category}").appendln()
         place_string.append("Current distance: ${place.distance}m")
