@@ -36,7 +36,16 @@ class GeofenceBroadcastReceiver : BroadcastReceiver() {
             // multiple geofences
             val triggerinGeofence = geofencingEvent.triggeringGeofences[0]
 
-            // Get the transition details as a String
+            // TODO: This is basically demo #2 for mid-term - only need to get Wikipedia info as string
+            // Extract the transitionDetails
+            val POI = intent?.getStringExtra("POI")
+            // Query wikipedia
+            val wikiManager = WikiInfoManager()
+            val placeInfo = wikiManager.getPlaceInfo(POI!!)
+            // Log the information
+            Log.i(TAG, placeInfo.toString())
+
+            // TODO create a geofenceTransitionsDetails serializable object to pass to the GeofenceTriggeredActivity
             val geofenceTransitionDetails = "You crossed the Geofence with ID:${triggerinGeofence.requestId} - Cool dude"
             // Send notification and log the transition details
             if (context != null) {

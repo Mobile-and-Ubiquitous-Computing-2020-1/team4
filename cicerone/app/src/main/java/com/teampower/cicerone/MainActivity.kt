@@ -55,7 +55,7 @@ class MainActivity : AppCompatActivity() {
                 Geofence.NEVER_EXPIRE,
                 Geofence.GEOFENCE_TRANSITION_ENTER or Geofence.GEOFENCE_TRANSITION_EXIT
             )
-            geoCon.addGeofence(gf, this)
+            geoCon.addGeofence(gf, this, poi)
         }
         geoCon.removeGeofence("POI 2", this)
 

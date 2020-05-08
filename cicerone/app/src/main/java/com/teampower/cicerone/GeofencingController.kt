@@ -17,9 +17,10 @@ class GeofencingController() {
         geofencingClient = LocationServices.getGeofencingClient(context)
     }
 
-    fun addGeofence(geofence: Geofence, context: Context) {
+    fun addGeofence(geofence: Geofence, context: Context, poi: POI) {
         val geofenceAddPendingIntent: PendingIntent by lazy {
             val intent = Intent(context, GeofenceBroadcastReceiver::class.java)
+            intent.putExtra("POI", "Nakseongdae Park")
             // We use FLAG_UPDATE_CURRENT so that we get the same pending intent back
             // when calling addGeofences() and removeGeofences().
             PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)
