@@ -25,6 +25,7 @@ class MainActivity : AppCompatActivity() {
     private val notCon = NotificationsController()
     private val geoCon = GeofencingController()
     private val dataCon = DataController()
+    private val wikiManager by lazy { WikiInfoManager() }
     @RequiresApi(Build.VERSION_CODES.Q)
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -32,6 +33,9 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_scrolling)
         setSupportActionBar(toolbar)
 
+        // Test Wikipedia API. This variable is null if no page was found. TODO: Implement stuff to make the data come here so we can use it for displaying. Async problem
+        val placeInfo = wikiManager.getPlaceInfo("Gyeongbokgung Palace")
+        //wikipedia_extract.text = placeInfo?.extract
         user_location.text = getString(R.string.user_position, "-", "-")
 
         // Setup location services
@@ -42,8 +46,15 @@ class MainActivity : AppCompatActivity() {
         // TODO Example of adding multiple geofences. Should be moved to onResponse function
         // TODO for POI queries
         val pois = arrayOf(POI(37.4553, -122.1462, "POI 1"), POI(37.4654, -122.1609, "POI 2"))
-        for(poi in pois) {
-           val gf = geoCon.createGeofence(poi.lat, poi.long, poi.id, 200F, Geofence.NEVER_EXPIRE, Geofence.GEOFENCE_TRANSITION_ENTER or Geofence.GEOFENCE_TRANSITION_EXIT)
+        for (poi in pois) {
+            val gf = geoCon.createGeofence(
+                poi.lat,
+                poi.long,
+                poi.id,
+                200F,
+                Geofence.NEVER_EXPIRE,
+                Geofence.GEOFENCE_TRANSITION_ENTER or Geofence.GEOFENCE_TRANSITION_EXIT
+            )
             geoCon.addGeofence(gf, this)
         }
         geoCon.removeGeofence("POI 2", this)
@@ -55,7 +66,12 @@ class MainActivity : AppCompatActivity() {
         fab.setOnClickListener { view ->
             Snackbar.make(view, "Notification sent", Snackbar.LENGTH_LONG)
                 .setAction("Action", null).show()
-            notCon.sendNotificationToMain(this, "Test notification", "Hi, I'm the notification that was sent", 1)
+            notCon.sendNotificationToMain(
+                this,
+                "Test notification",
+                "Hi, I'm the notification that was sent",
+                1
+            )
         }
 
         // Get last location and use it to make data request to API, then display the retrieved data
@@ -94,8 +110,10 @@ class MainActivity : AppCompatActivity() {
     //  Define a wrapper function for the onRequestPermissionsResults in LocationController
     //  to properly override the function. Not ideal, but I didn't manage to get this to work
     //  outside the MainActivity.
-    override fun onRequestPermissionsResult(requestCode: Int,
-                                            permissions: Array<String>, grantResults: IntArray) {
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<String>, grantResults: IntArray
+    ) {
         latCon.onRequestPermissionsResult(requestCode, permissions, grantResults)
     }
 }
