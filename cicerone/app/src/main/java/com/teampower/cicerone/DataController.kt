@@ -64,14 +64,14 @@ class DataController(private val geoCon: GeofencingController) {
                     val result = response.body()
                     val venues = result!!.response.venues
                     //Log.d(TAG, "Venues:" + venues.toString())
-                    // For now, take the 100 closest POIs
+                    // For now, take the 100 closest POIs and make sure they aren't closer than 10 m
                     val closestVenues = getClosestVenues(venues)
-                    val radius = calculateRadius(closestVenues)
-                    val filteredVenues = filterVenues(venues, 2*radius) // Remove POIs in a distance of twice the radius
+                    val filteredVenues = filterVenues(closestVenues, 50F) // Remove POIs if closer than 10m to each other
+                    val radius = calculateRadius(filteredVenues)
                     Log.d(TAG, "Radius: $radius m")
                     for ((id, venue) in filteredVenues.withIndex()) {
                         val poi = poiBuilder(venue, id)
-                        Log.d(TAG, "Venue:" + venue.toString())
+                        //Log.d(TAG, "Venue:" + venue.toString())
                         // Create the geofence
                         val gf = geoCon.createGeofence(
                             poi.lat,
@@ -120,7 +120,7 @@ class DataController(private val geoCon: GeofencingController) {
     }
 
     private fun getClosestVenues(venues: List<Venues>): List<Venues> {
-        val closestVenues = venues.sortedBy { venue -> venue.location.distance }.slice(0..100)
+        val closestVenues = venues.sortedBy { venue -> venue.location.distance }.slice(0..49)
         return closestVenues
     }
 
@@ -141,15 +141,14 @@ class DataController(private val geoCon: GeofencingController) {
                 }
             }
         }
-        return shortestDistance
+        return shortestDistance/2
     }
 
     private fun filterVenues(venues: List<Venues>, threshold: Float): ArrayList<Venues> {
-        var filteredVenues = ArrayList<Venues>() // TODO don't use arraylist
-        var add = true
+        val filteredVenues = ArrayList<Venues>() // TODO don't use
+        val indicesNotToAdd = ArrayList<Int>()
         for (i in venues.indices) {
-            add = true
-            for (j in i + 1 until venues.size) { // compare list.get(i) and list.get(j)
+            for (j in i + 1 until venues.size) {
                 val locationA = Location("A")
                 locationA.latitude = venues[i].location.lat
                 locationA.longitude = venues[i].location.lng
@@ -162,11 +161,11 @@ class DataController(private val geoCon: GeofencingController) {
                 val distanceBUser = venues[j].location.distance // Distance between B and user
                 // Filter out the POI that's farthest away
                 if( distanceAB < threshold ) {
-                    // If overlapping, make sure venue[i] is closer than every other geofence
-                    add = add && distanceAUser<distanceBUser
+                    // If overlapping, make sure venue[i] is closer than every other geofence by removing j
+                    indicesNotToAdd.add(j)
                 }
             }
-            if (add) {
+            if (!indicesNotToAdd.contains(i)) {
                 filteredVenues.add(venues[i])
             }
         }

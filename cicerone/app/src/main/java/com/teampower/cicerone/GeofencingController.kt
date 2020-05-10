@@ -23,7 +23,7 @@ class GeofencingController() {
         val geofenceAddPendingIntent: PendingIntent by lazy {
             val intent = Intent(context, GeofenceBroadcastReceiver::class.java)
             // TODO Serialize poi
-            intent.putExtra("POI", poi.name)
+            intent.putExtra("POI", geofence.requestId)
             // We use FLAG_UPDATE_CURRENT so that we get the same pending intent back
             // when calling addGeofences() and removeGeofences().
             PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)
