@@ -46,7 +46,7 @@ class GeofenceBroadcastReceiver : BroadcastReceiver() {
             Log.i(TAG, placeInfo.toString())
 
             // TODO create a geofenceTransitionsDetails serializable object to pass to the GeofenceTriggeredActivity
-            val geofenceTransitionDetails = "You crossed the Geofence with ID:${triggerinGeofence.requestId} - Cool dude"
+            val geofenceTransitionDetails = "$POI"
             // Send notification and log the transition details
             if (context != null) {
                 sendNotification(context, "Cicerone geofence", geofenceTransitionDetails, 1337, geofenceTransitionDetails)

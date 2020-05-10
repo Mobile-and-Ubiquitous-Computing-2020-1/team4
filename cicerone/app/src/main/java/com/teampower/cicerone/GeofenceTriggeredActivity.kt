@@ -19,6 +19,9 @@ class GeofenceTriggeredActivity : AppCompatActivity() {
 
         supportActionBar?.setDisplayHomeAsUpEnabled(true) // Home button to MainActivity
 
-        geofence_information.text = transitionDetails
+        // Update the view
+        setTitle(transitionDetails)
+        geofence_information.text = "You crossed the Geofence with ID:${transitionDetails} - Cool dude"
+
     }
 }
