@@ -8,6 +8,8 @@ import android.view.MenuItem
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.snackbar.Snackbar
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import kotlinx.android.synthetic.main.activity_scrolling.*
 import kotlinx.android.synthetic.main.content_scrolling.*
 import kotlinx.coroutines.GlobalScope
@@ -24,6 +26,17 @@ class MainActivity : AppCompatActivity() {
     private val geoCon = GeofencingController()
     private val dataCon = DataController(geoCon)
     private val wikiManager by lazy { WikiInfoManager() }
+
+    companion object {
+        inline fun <reified T> fromJson(json: String): T {
+            return Gson().fromJson(json, object : TypeToken<T>() {}.type)
+        }
+
+        inline fun <reified T> toJson(input: T): String {
+            return Gson().toJson(input)
+        }
+    }
+
     @RequiresApi(Build.VERSION_CODES.Q)
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -43,7 +56,11 @@ class MainActivity : AppCompatActivity() {
         geoCon.startGeofencing(this)
         // TODO Example of adding multiple geofences. Should be moved to onResponse function
         // TODO for POI queries
-        /*
+
+
+        /* Test values
+        val pois = arrayOf(POI(37.4553, -122.1462, "POI 1"), POI(37.4654, -122.1609, "POI 2"))
+
         for (poi in pois) {
             val gf = geoCon.createGeofence(
                 poi.lat,
