@@ -10,11 +10,10 @@ import okhttp3.logging.HttpLoggingInterceptor.Level
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
-import com.teampower.cicerone.MainActivity
-import com.teampower.cicerone.GeofencingController
-import com.teampower.cicerone.POI
 
 class DataController(private val geoCon: GeofencingController) {
+
+    private val pois = mutableMapOf<String,POI>() // We can store all POIs in this map, indexed by ID
 
     fun requestData(location: android.location.Location, venue_view: TextView, mainContext: Context) {
         // Set context
@@ -63,10 +62,10 @@ class DataController(private val geoCon: GeofencingController) {
                     val result = response.body()
                     val venues = result!!.response.venues
                     Log.d(TAG, "Venues:" + venues.toString())
-                    //displayData(poi, venue_view)
                     for (venue in venues) {
-                        Log.d(TAG, "Venue:" + venue.toString())
                         val poi = poiBuilder(venue)
+                        Log.d(TAG, "Venue:" + venue.toString())
+                        // Create the geofence
                         val gf = geoCon.createGeofence(
                             poi.lat,
                             poi.long,
@@ -76,7 +75,10 @@ class DataController(private val geoCon: GeofencingController) {
                             Geofence.GEOFENCE_TRANSITION_ENTER or Geofence.GEOFENCE_TRANSITION_EXIT
                         )
                         geoCon.addGeofence(gf, context, poi)
+                        // Add POI to the list of current POIs
+                        pois.put(poi.id, poi)
                     }
+                    displayData(pois.toList().get(0).second, venue_view)
                 }
             }
         })
@@ -89,9 +91,11 @@ class DataController(private val geoCon: GeofencingController) {
         val long = venue.location.labeledLatLngs.get(0).lng
         val distance = venue.location.distance
         val address = venue.location.formattedAddress.joinToString()
-        //val category = venue.categories.get(0)?.name
-        val category = "123"
-        return POI(id, name, lat, long, distance, address, category)
+        var categories = ""
+        for (cat in venue.categories) {
+            categories = categories + cat.name
+        }
+        return POI(id, name, lat, long, distance, address, categories)
     }
 
     private fun displayData(poi: POI, venue_view: TextView) {
