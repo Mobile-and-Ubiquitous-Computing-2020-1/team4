@@ -84,6 +84,10 @@ class DataController(private val geoCon: GeofencingController) {
         })
     }
 
+    fun getPOI(id: String): POI? {
+        return pois.get(id)
+    }
+
     private fun poiBuilder(venue: Venues): POI {
         val id = venue.id
         val name = venue.name
