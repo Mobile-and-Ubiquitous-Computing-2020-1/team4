@@ -2,6 +2,7 @@ package com.teampower.cicerone
 
 import android.os.Build
 import android.os.Bundle
+import android.provider.Settings
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
@@ -10,6 +11,9 @@ import androidx.appcompat.app.AppCompatActivity
 import com.google.android.gms.location.Geofence
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.activity_scrolling.*
+import kotlinx.android.synthetic.main.content_scrolling.*
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
 const val MY_PERMISSIONS_REQUEST_LOCATION_ID = 99
 const val CHANNEL_ID = "CiceroneComms1337"
@@ -20,8 +24,8 @@ class MainActivity : AppCompatActivity() {
     private val latCon = LocationController()
     private val notCon = NotificationsController()
     private val geoCon = GeofencingController()
+    private val dataCon = DataController()
     private val wikiManager by lazy { WikiInfoManager() }
-
     @RequiresApi(Build.VERSION_CODES.Q)
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -68,6 +72,14 @@ class MainActivity : AppCompatActivity() {
                 "Hi, I'm the notification that was sent",
                 1
             )
+        }
+
+        // Get last location and use it to make data request to API, then display the retrieved data
+        // var curr_location = "38.8897,-77.0089"
+        GlobalScope.launch {
+            var curr_location: android.location.Location = latCon.getLocation()
+            Log.d(TAG, "Current location: ${curr_location}. Requesting data...")
+            dataCon.requestData(curr_location, venue_description)
         }
     }
 

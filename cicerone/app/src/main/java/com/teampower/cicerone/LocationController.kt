@@ -15,11 +15,14 @@ import com.google.android.gms.common.api.ResolvableApiException
 import com.google.android.gms.location.*
 import com.google.android.gms.tasks.Task
 import kotlinx.android.synthetic.main.activity_scrolling.*
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.async
 
 class LocationController() {
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private lateinit var locationRequest: LocationRequest
     private lateinit var locationCallback: LocationCallback
+    private lateinit var lastLocation: android.location.Location
     private var requestingLocationUpdates = true
 
     fun startLocation(context: Context, activity: MainActivity, user_location: TextView) {
@@ -28,6 +31,7 @@ class LocationController() {
         locationCallback = object : LocationCallback() {
             override fun onLocationResult(locationResult: LocationResult?) {
                 locationResult ?: return
+                lastLocation = locationResult.lastLocation
                 for (location in locationResult.locations) {
                     Log.v(TAG, location.toString())
                     user_location.text = context.getString(
@@ -38,6 +42,14 @@ class LocationController() {
                 }
             }
         }
+    }
+
+    fun getLocation(): android.location.Location {
+        while (!::lastLocation.isInitialized) {
+            // block and wait
+        }
+        Log.d(TAG, "returned")
+        return lastLocation
     }
 
     @RequiresApi(Build.VERSION_CODES.Q)
