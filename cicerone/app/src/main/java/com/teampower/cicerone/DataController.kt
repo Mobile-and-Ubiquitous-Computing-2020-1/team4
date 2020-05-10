@@ -1,8 +1,9 @@
 package com.teampower.cicerone
 
 import android.content.Context
-import android.widget.TextView
+import android.location.Location
 import android.util.Log
+import android.widget.TextView
 import com.google.android.gms.location.Geofence
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -10,6 +11,7 @@ import okhttp3.logging.HttpLoggingInterceptor.Level
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
+
 
 class DataController(private val geoCon: GeofencingController) {
 
@@ -61,16 +63,21 @@ class DataController(private val geoCon: GeofencingController) {
                 if (response.isSuccessful()) {
                     val result = response.body()
                     val venues = result!!.response.venues
-                    Log.d(TAG, "Venues:" + venues.toString())
-                    for (venue in venues) {
-                        val poi = poiBuilder(venue)
+                    //Log.d(TAG, "Venues:" + venues.toString())
+                    // For now, take the 100 closest POIs
+                    val closestVenues = getClosestVenues(venues)
+                    val radius = calculateRadius(closestVenues)
+                    val filteredVenues = filterVenues(venues, 2*radius) // Remove POIs in a distance of twice the radius
+                    Log.d(TAG, "Radius: $radius m")
+                    for ((id, venue) in filteredVenues.withIndex()) {
+                        val poi = poiBuilder(venue, id)
                         Log.d(TAG, "Venue:" + venue.toString())
                         // Create the geofence
                         val gf = geoCon.createGeofence(
                             poi.lat,
                             poi.long,
                             poi.id,
-                            1F,
+                            radius,
                             Geofence.NEVER_EXPIRE,
                             Geofence.GEOFENCE_TRANSITION_ENTER or Geofence.GEOFENCE_TRANSITION_EXIT
                         )
@@ -88,8 +95,8 @@ class DataController(private val geoCon: GeofencingController) {
         return pois.get(id)
     }
 
-    private fun poiBuilder(venue: Venues): POI {
-        val id = venue.id
+    private fun poiBuilder(venue: Venues, id: Int): POI {
+        // val id = venue.id # Replace this with a running id, to let Geofences be replaced
         val name = venue.name
         val lat = venue.location.labeledLatLngs.get(0).lat
         val long = venue.location.labeledLatLngs.get(0).lng
@@ -99,7 +106,7 @@ class DataController(private val geoCon: GeofencingController) {
         for (cat in venue.categories) {
             categories = categories + cat.name
         }
-        return POI(id, name, lat, long, distance, address, categories)
+        return POI(id.toString(), name, lat, long, distance, address, categories)
     }
 
     private fun displayData(poi: POI, venue_view: TextView) {
@@ -110,6 +117,60 @@ class DataController(private val geoCon: GeofencingController) {
         poi_string.append("Category: ${poi.category}").appendln()
         poi_string.append("Current distance: ${poi.distance}m")
         venue_view.text = poi_string
+    }
+
+    private fun getClosestVenues(venues: List<Venues>): List<Venues> {
+        val closestVenues = venues.sortedBy { venue -> venue.location.distance }.slice(0..100)
+        return closestVenues
+    }
+
+    private fun calculateRadius(venues: List<Venues>): Float {
+        var shortestDistance = 300F
+        for (i in venues.indices) {
+            for (j in i + 1 until venues.size) { // compare list.get(i) and list.get(j)
+                val locationA = Location("A")
+                locationA.latitude = venues[i].location.lat
+                locationA.longitude = venues[i].location.lng
+                val locationB = Location("B")
+                locationB.latitude = venues[j].location.lat
+                locationB.longitude = venues[j].location.lng
+
+                val distance = locationA.distanceTo(locationB)
+                if (distance < shortestDistance) {
+                    shortestDistance = distance
+                }
+            }
+        }
+        return shortestDistance
+    }
+
+    private fun filterVenues(venues: List<Venues>, threshold: Float): ArrayList<Venues> {
+        var filteredVenues = ArrayList<Venues>() // TODO don't use arraylist
+        var add = true
+        for (i in venues.indices) {
+            add = true
+            for (j in i + 1 until venues.size) { // compare list.get(i) and list.get(j)
+                val locationA = Location("A")
+                locationA.latitude = venues[i].location.lat
+                locationA.longitude = venues[i].location.lng
+                val locationB = Location("B")
+                locationB.latitude = venues[j].location.lat
+                locationB.longitude = venues[j].location.lng
+
+                val distanceAB = locationA.distanceTo(locationB) // Distance between AB
+                val distanceAUser = venues[i].location.distance // Distance between A and user
+                val distanceBUser = venues[j].location.distance // Distance between B and user
+                // Filter out the POI that's farthest away
+                if( distanceAB < threshold ) {
+                    // If overlapping, make sure venue[i] is closer than every other geofence
+                    add = add && distanceAUser<distanceBUser
+                }
+            }
+            if (add) {
+                filteredVenues.add(venues[i])
+            }
+        }
+        return filteredVenues
     }
 
 }

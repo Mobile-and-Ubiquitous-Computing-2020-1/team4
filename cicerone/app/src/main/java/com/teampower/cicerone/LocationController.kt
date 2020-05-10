@@ -15,6 +15,7 @@ import com.google.android.gms.common.api.ResolvableApiException
 import com.google.android.gms.location.*
 import com.google.android.gms.tasks.Task
 import kotlinx.android.synthetic.main.activity_scrolling.*
+import kotlinx.android.synthetic.main.content_scrolling.*
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
 
@@ -25,7 +26,7 @@ class LocationController() {
     private lateinit var lastLocation: android.location.Location
     private var requestingLocationUpdates = true
 
-    fun startLocation(context: Context, activity: MainActivity, user_location: TextView) {
+    fun startLocation(context: Context, activity: MainActivity, user_location: TextView, dataCon: DataController) {
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(context)
         locationRequest = createLocationRequest(context, activity)
         locationCallback = object : LocationCallback() {

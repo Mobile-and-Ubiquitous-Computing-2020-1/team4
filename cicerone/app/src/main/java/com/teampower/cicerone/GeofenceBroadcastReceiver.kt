@@ -11,6 +11,7 @@ import androidx.core.app.NotificationManagerCompat
 import com.google.android.gms.location.Geofence
 import com.google.android.gms.location.GeofenceStatusCodes
 import com.google.android.gms.location.GeofencingEvent
+import com.google.android.gms.location.LocationServices
 
 
 class GeofenceBroadcastReceiver : BroadcastReceiver() {

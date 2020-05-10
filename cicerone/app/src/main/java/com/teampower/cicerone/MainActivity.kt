@@ -1,15 +1,12 @@
 package com.teampower.cicerone
 
-import android.content.Context
 import android.os.Build
 import android.os.Bundle
-import android.provider.Settings
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
-import com.google.android.gms.location.Geofence
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.activity_scrolling.*
 import kotlinx.android.synthetic.main.content_scrolling.*
@@ -40,13 +37,13 @@ class MainActivity : AppCompatActivity() {
         user_location.text = getString(R.string.user_position, "-", "-")
 
         // Setup location services
-        latCon.startLocation(this, this@MainActivity, user_location)
+        latCon.startLocation(this, this@MainActivity, user_location, dataCon)
 
         // Setup geofencing services
         geoCon.startGeofencing(this)
         // TODO Example of adding multiple geofences. Should be moved to onResponse function
         // TODO for POI queries
-        /*val pois = arrayOf(POI(37.4553, -122.1462, "POI 1"), POI(37.4654, -122.1609, "POI 2"))
+        /*
         for (poi in pois) {
             val gf = geoCon.createGeofence(
                 poi.lat,
@@ -57,8 +54,7 @@ class MainActivity : AppCompatActivity() {
                 Geofence.GEOFENCE_TRANSITION_ENTER or Geofence.GEOFENCE_TRANSITION_EXIT
             )
             geoCon.addGeofence(gf, this, poi)
-        }
-        geoCon.removeGeofence("POI 2", this)*/
+        */
 
         // Setup notifications
         notCon.createNotificationChannel(this)
@@ -78,9 +74,9 @@ class MainActivity : AppCompatActivity() {
         // Get last location and use it to make data request to API, then display the retrieved data
         // var curr_location = "38.8897,-77.0089"
         GlobalScope.launch {
-            var curr_location: android.location.Location = latCon.getLocation()
-            Log.d(TAG, "Current location: ${curr_location}. Requesting data...")
-            dataCon.requestData(curr_location, venue_description, this@MainActivity)
+            var currLocation: android.location.Location = latCon.getLocation()
+            Log.d(TAG, "Current location: ${currLocation}. Requesting data...")
+            dataCon.requestData(currLocation, venue_description, this@MainActivity)
         }
     }
 
