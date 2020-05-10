@@ -1,5 +1,6 @@
 package com.teampower.cicerone
 
+import android.content.Context
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
@@ -24,7 +25,7 @@ class MainActivity : AppCompatActivity() {
     private val latCon = LocationController()
     private val notCon = NotificationsController()
     private val geoCon = GeofencingController()
-    private val dataCon = DataController()
+    private val dataCon = DataController(geoCon)
     private val wikiManager by lazy { WikiInfoManager() }
     @RequiresApi(Build.VERSION_CODES.Q)
 
@@ -45,7 +46,7 @@ class MainActivity : AppCompatActivity() {
         geoCon.startGeofencing(this)
         // TODO Example of adding multiple geofences. Should be moved to onResponse function
         // TODO for POI queries
-        val pois = arrayOf(POI(37.4553, -122.1462, "POI 1"), POI(37.4654, -122.1609, "POI 2"))
+        /*val pois = arrayOf(POI(37.4553, -122.1462, "POI 1"), POI(37.4654, -122.1609, "POI 2"))
         for (poi in pois) {
             val gf = geoCon.createGeofence(
                 poi.lat,
@@ -57,7 +58,7 @@ class MainActivity : AppCompatActivity() {
             )
             geoCon.addGeofence(gf, this, poi)
         }
-        geoCon.removeGeofence("POI 2", this)
+        geoCon.removeGeofence("POI 2", this)*/
 
         // Setup notifications
         notCon.createNotificationChannel(this)
@@ -79,7 +80,7 @@ class MainActivity : AppCompatActivity() {
         GlobalScope.launch {
             var curr_location: android.location.Location = latCon.getLocation()
             Log.d(TAG, "Current location: ${curr_location}. Requesting data...")
-            dataCon.requestData(curr_location, venue_description)
+            dataCon.requestData(curr_location, venue_description, this@MainActivity)
         }
     }
 

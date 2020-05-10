@@ -1,16 +1,25 @@
 package com.teampower.cicerone
 
+import android.content.Context
 import android.widget.TextView
 import android.util.Log
+import com.google.android.gms.location.Geofence
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import okhttp3.logging.HttpLoggingInterceptor.Level
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
+import com.teampower.cicerone.MainActivity
+import com.teampower.cicerone.GeofencingController
+import com.teampower.cicerone.POI
 
-class DataController {
-   fun requestData(location: android.location.Location, venue_view: TextView) {
+class DataController(private val geoCon: GeofencingController) {
+
+    fun requestData(location: android.location.Location, venue_view: TextView, mainContext: Context) {
+        // Set context
+        val context = mainContext
+
         // Loads client ID and secret from "secret.properties" file in BuildConfig
         val foursquare_id = BuildConfig.FOURSQUARE_ID
         val foursquare_secret = BuildConfig.FOURSQUARE_SECRET
@@ -53,32 +62,46 @@ class DataController {
                 if (response.isSuccessful()) {
                     val result = response.body()
                     val venues = result!!.response.venues
-                    val place = placeBuilder(venues.get(0))
-                    Log.d("TAG", "Venues:" + venues.toString())
-                    displayData(place, venue_view)
+                    Log.d(TAG, "Venues:" + venues.toString())
+                    //displayData(poi, venue_view)
+                    for (venue in venues) {
+                        Log.d(TAG, "Venue:" + venue.toString())
+                        val poi = poiBuilder(venue)
+                        val gf = geoCon.createGeofence(
+                            poi.lat,
+                            poi.long,
+                            poi.id,
+                            1F,
+                            Geofence.NEVER_EXPIRE,
+                            Geofence.GEOFENCE_TRANSITION_ENTER or Geofence.GEOFENCE_TRANSITION_EXIT
+                        )
+                        geoCon.addGeofence(gf, context, poi)
+                    }
                 }
             }
         })
     }
 
-    private fun placeBuilder(venue: Venues): Place {
+    private fun poiBuilder(venue: Venues): POI {
+        val id = venue.id
         val name = venue.name
-        val latitude = venue.location.labeledLatLngs.get(0).lat
-        val longitude = venue.location.labeledLatLngs.get(0).lng
+        val lat = venue.location.labeledLatLngs.get(0).lat
+        val long = venue.location.labeledLatLngs.get(0).lng
         val distance = venue.location.distance
         val address = venue.location.formattedAddress.joinToString()
-        val description = venue.categories.get(0).name
-        return Place(name, latitude, longitude, distance, address, description)
+        //val category = venue.categories.get(0)?.name
+        val category = "123"
+        return POI(id, name, lat, long, distance, address, category)
     }
 
-    private fun displayData(place: Place, venue_view: TextView) {
-        val place_string = StringBuilder()
-        place_string.append("Name: ${place.name}").appendln()
-        place_string.append("Location: ${place.latitude}, ${place.longitude}").appendln()
-        place_string.append("Address: ${place.address}").appendln()
-        place_string.append("Category: ${place.category}").appendln()
-        place_string.append("Current distance: ${place.distance}m")
-        venue_view.text = place_string
+    private fun displayData(poi: POI, venue_view: TextView) {
+        val poi_string = StringBuilder()
+        poi_string.append("Name: ${poi.name}").appendln()
+        poi_string.append("Location: ${poi.lat}, ${poi.long}").appendln()
+        poi_string.append("Address: ${poi.address}").appendln()
+        poi_string.append("Category: ${poi.category}").appendln()
+        poi_string.append("Current distance: ${poi.distance}m")
+        venue_view.text = poi_string
     }
 
 }
