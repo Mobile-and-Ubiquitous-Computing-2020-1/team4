@@ -28,7 +28,7 @@ class GeofencingController() {
             PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)
         }
 
-        geofencingClient?.addGeofences(getGeofencingRequest(geofence), geofenceAddPendingIntent)
+        geofencingClient.addGeofences(getGeofencingRequest(geofence), geofenceAddPendingIntent)
             ?.run {
                 addOnSuccessListener {
                     Log.v(

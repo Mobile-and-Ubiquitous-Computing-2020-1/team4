@@ -20,7 +20,7 @@ class GeofenceTriggeredActivity : AppCompatActivity() {
 
         // Update the view
         title = placeDetails.poi.name
-        wikipediaInfo.text = placeDetails.wikipediaInfo?.description + placeDetails.poi.category
+        wikipediaInfo.text = placeDetails.wikipediaInfo?.extract
 
     }
 }
