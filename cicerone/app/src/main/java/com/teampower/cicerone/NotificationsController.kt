@@ -62,10 +62,10 @@ class NotificationsController() {
      * moves the user to GeofencedTriggeredActivity. This activity also has a back button
      * which leads to the MainActivity.
      */
-    fun sendNotificationTriggeredGeofence(context: Context, title: String, content: String, notificationId: Int, transitionDetails: String) {
+    fun sendNotificationTriggeredGeofence(context: Context, title: String, content: String, notificationId: Int, transitionDetails: POI) {
         // Create an Intent for the activity you want to start
         val geofenceIntent = Intent(context, GeofenceTriggeredActivity::class.java)
-        geofenceIntent.putExtra("TRANSITION_DETAILS", transitionDetails)
+        geofenceIntent.putExtra("TRANSITION_DETAILS", MainActivity.toJson(transitionDetails))
         // Create the TaskStackBuilder
         val geofencePendingIntent: PendingIntent? = TaskStackBuilder.create(context).run {
             // Add the intent, which inflates the back stack

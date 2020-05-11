@@ -71,7 +71,7 @@ class DataController(private val geoCon: GeofencingController) {
                     Log.d(TAG, "Radius: $radius m")
                     for ((id, venue) in filteredVenues.withIndex()) {
                         val poi = poiBuilder(venue, id)
-                        //Log.d(TAG, "Venue:" + venue.toString())
+                        //Log.d(TAG, "ID: $id - Venue:" + venue.toString())
                         // Create the geofence
                         val gf = geoCon.createGeofence(
                             poi.lat,
@@ -120,7 +120,10 @@ class DataController(private val geoCon: GeofencingController) {
     }
 
     private fun getClosestVenues(venues: List<Venues>): List<Venues> {
-        val closestVenues = venues.sortedBy { venue -> venue.location.distance }.slice(0..49)
+        val closestVenues = venues.sortedBy { venue -> venue.location.distance }
+        if (closestVenues.size > 100 ){
+            return closestVenues.slice(0..1)
+        }
         return closestVenues
     }
 

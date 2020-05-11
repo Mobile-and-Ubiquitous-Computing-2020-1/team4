@@ -10,7 +10,7 @@
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/app_bar"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/app_bar_height"
+        android:layout_height="@dimen/location_app_bar_height"
         android:fitsSystemWindows="true"
         android:theme="@style/AppTheme.AppBarOverlay">
 
@@ -30,19 +30,42 @@
                 app:layout_collapseMode="pin"
                 app:popupTheme="@style/AppTheme.PopupOverlay" />
 
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:paddingLeft="10dp"
+                android:paddingTop="64dp">
+
+                <TextView
+                    android:id="@+id/location_category"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/location_type_height"
+                    android:text="@string/location_category"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
+
+                <TextView
+                    android:id="@+id/location_distance"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/location_type_height"
+                    android:text="@string/location_distance"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
+            </LinearLayout>
+
         </com.google.android.material.appbar.CollapsingToolbarLayout>
     </com.google.android.material.appbar.AppBarLayout>
 
     <include layout="@layout/content_geofence_triggered" />
 
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/save_poi"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="@dimen/fab_margin"
-        app:layout_anchor="@id/app_bar"
-        app:layout_anchorGravity="bottom|end"
-        app:srcCompat="@android:drawable/ic_input_add" />
+<!--    <com.google.android.material.floatingactionbutton.FloatingActionButton-->
+<!--        android:id="@+id/save_poi"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:layout_margin="@dimen/fab_margin"-->
+<!--        app:layout_anchor="@id/app_bar"-->
+<!--        app:layout_anchorGravity="bottom|end"-->
+<!--        app:srcCompat="@android:drawable/btn_plus" />-->
 
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

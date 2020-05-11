@@ -34,7 +34,7 @@ class LocationController() {
                 locationResult ?: return
                 lastLocation = locationResult.lastLocation
                 for (location in locationResult.locations) {
-                    Log.v(TAG, location.toString())
+                    //Log.v(TAG, location.toString())
                     user_location.text = context.getString(
                         R.string.user_position,
                         location.latitude.toString(),

@@ -22,11 +22,11 @@
         android:layout_height="match_parent"
         android:layout_marginTop="16dp">
         <TextView
-            android:id="@+id/geofence_information"
+            android:id="@+id/location_description"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="@dimen/text_margin"
-            android:text="Geofence Information" />
+            android:text="@string/location_description" />
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

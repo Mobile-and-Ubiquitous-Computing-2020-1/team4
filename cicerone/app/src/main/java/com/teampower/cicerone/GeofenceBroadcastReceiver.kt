@@ -35,28 +35,25 @@ class GeofenceBroadcastReceiver : BroadcastReceiver() {
             // TODO: This is basically demo #2 for mid-term - only need to get Wikipedia info as string
             // Extract the transitionDetails
 
-            val POI = intent?.getStringExtra("POI")?.let { MainActivity.fromJson<POI>(it) }
+            var POI = intent?.getStringExtra("POI")?.let { MainActivity.fromJson<POI>(it) }
             if (POI != null) {
                 Log.i(TAG, POI.name)
+                // Query wikipedia
+                val wikiManager = WikiInfoManager()
+                val placeInfo = wikiManager.getPlaceInfo("Nakseongdae")
+                // POI.description = placeInfo.toString()
             }
 
-            // Query wikipedia
-            val wikiManager = WikiInfoManager()
-            //val placeInfo = wikiManager.getPlaceInfo(POI!!)
-            // Log the information
-            // Log.i(TAG, placeInfo.toString())
-
             // TODO create a geofenceTransitionsDetails serializable object to pass to the GeofenceTriggeredActivity
-            val geofenceTransitionDetails =
-                "You crossed the Geofence with ID:${triggerinGeofence.requestId} - Cool dude ${POI?.name}"
+            val geofenceTransitionDetails = MainActivity.toJson(POI)
             // Send notification and log the transition details
             if (context != null) {
                 sendNotification(
                     context,
                     "Cicerone geofence",
-                    geofenceTransitionDetails,
+                    "You reached ${POI!!.name}",
                     1337,
-                    geofenceTransitionDetails
+                    POI
                 )
             }
             Log.i(TAG, geofenceTransitionDetails)
@@ -71,7 +68,7 @@ class GeofenceBroadcastReceiver : BroadcastReceiver() {
         title: String,
         content: String,
         notificationId: Int,
-        transitionDetails: String
+        transitionDetails: POI
     ) {
         val notCon = NotificationsController()
         notCon.sendNotificationTriggeredGeofence(
