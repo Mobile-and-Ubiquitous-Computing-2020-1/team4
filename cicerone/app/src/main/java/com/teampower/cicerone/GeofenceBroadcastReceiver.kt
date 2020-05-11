@@ -75,7 +75,8 @@ class GeofenceBroadcastReceiver : BroadcastReceiver() {
     private fun getPlaceInfoSendNotification(context: Context?): WikipediaPlaceInfo? {
         var placeInfo: WikipediaPlaceInfo? = null
         // Query wikipedia
-        api.getPlaceInfo(poiObject.name)
+        val filterName = poiObject.name.split(" (")[0]
+        api.getPlaceInfo(filterName)
             .enqueue(object : Callback<WikipediaPlaceInfo> {
                 override fun onResponse(
                     call: Call<WikipediaPlaceInfo>,
