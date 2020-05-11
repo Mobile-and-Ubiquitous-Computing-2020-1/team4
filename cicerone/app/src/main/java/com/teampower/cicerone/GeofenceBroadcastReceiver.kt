@@ -1,17 +1,11 @@
 package com.teampower.cicerone
 
-import android.app.PendingIntent
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import android.provider.Settings.Global.getString
 import android.util.Log
-import androidx.core.app.NotificationCompat
-import androidx.core.app.NotificationManagerCompat
 import com.google.android.gms.location.Geofence
-import com.google.android.gms.location.GeofenceStatusCodes
 import com.google.android.gms.location.GeofencingEvent
-import com.google.android.gms.location.LocationServices
 
 
 class GeofenceBroadcastReceiver : BroadcastReceiver() {
@@ -31,7 +25,8 @@ class GeofenceBroadcastReceiver : BroadcastReceiver() {
         // Test that the reported transition was of interest
         if (geofenceTransition == Geofence.GEOFENCE_TRANSITION_ENTER ||
             geofenceTransition == Geofence.GEOFENCE_TRANSITION_EXIT ||
-            geofenceTransition == Geofence.GEOFENCE_TRANSITION_DWELL){
+            geofenceTransition == Geofence.GEOFENCE_TRANSITION_DWELL
+        ) {
 
             // Get the geofences that were triggered. A single even can trigger
             // multiple geofences
@@ -39,18 +34,30 @@ class GeofenceBroadcastReceiver : BroadcastReceiver() {
 
             // TODO: This is basically demo #2 for mid-term - only need to get Wikipedia info as string
             // Extract the transitionDetails
-            val POI = intent?.getStringExtra("POI")
+
+            val POI = intent?.getStringExtra("POI")?.let { MainActivity.fromJson<POI>(it) }
+            if (POI != null) {
+                Log.i(TAG, POI.name)
+            }
+
             // Query wikipedia
             val wikiManager = WikiInfoManager()
-            val placeInfo = wikiManager.getPlaceInfo(POI!!)
+            //val placeInfo = wikiManager.getPlaceInfo(POI!!)
             // Log the information
-            Log.i(TAG, placeInfo.toString())
+            // Log.i(TAG, placeInfo.toString())
 
             // TODO create a geofenceTransitionsDetails serializable object to pass to the GeofenceTriggeredActivity
-            val geofenceTransitionDetails = "$POI"
+            val geofenceTransitionDetails =
+                "You crossed the Geofence with ID:${triggerinGeofence.requestId} - Cool dude ${POI?.name}"
             // Send notification and log the transition details
             if (context != null) {
-                sendNotification(context, "Cicerone geofence", geofenceTransitionDetails, 1337, geofenceTransitionDetails)
+                sendNotification(
+                    context,
+                    "Cicerone geofence",
+                    geofenceTransitionDetails,
+                    1337,
+                    geofenceTransitionDetails
+                )
             }
             Log.i(TAG, geofenceTransitionDetails)
         } else {
@@ -59,8 +66,20 @@ class GeofenceBroadcastReceiver : BroadcastReceiver() {
         }
     }
 
-    private fun sendNotification(context: Context, title: String, content: String, notificationId: Int, transitionDetails: String) {
+    private fun sendNotification(
+        context: Context,
+        title: String,
+        content: String,
+        notificationId: Int,
+        transitionDetails: String
+    ) {
         val notCon = NotificationsController()
-        notCon.sendNotificationTriggeredGeofence(context, title, content, notificationId, transitionDetails)
+        notCon.sendNotificationTriggeredGeofence(
+            context,
+            title,
+            content,
+            notificationId,
+            transitionDetails
+        )
     }
 }
