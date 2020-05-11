@@ -15,7 +15,7 @@ class WikiInfoManager(private val api: RestAPI = RestAPI()) {
                 ) {
                     placeInfo = response.body()
 
-                    println("MEMEMEMEMEMEMEMEME: $placeInfo")
+                    println("Wiki: $placeInfo")
                 }
 
                 override fun onFailure(call: Call<WikipediaPlaceInfo>, t: Throwable) =
