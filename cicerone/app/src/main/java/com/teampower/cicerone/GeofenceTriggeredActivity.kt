@@ -1,6 +1,8 @@
 package com.teampower.cicerone
 
 import android.os.Bundle
+import androidx.appcompat.app.AppCompatActivity
+import kotlinx.android.synthetic.main.activity_scrolling.*
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import kotlinx.android.synthetic.main.activity_geofence_triggered.*
@@ -16,8 +18,9 @@ class GeofenceTriggeredActivity : AppCompatActivity()  {
         setSupportActionBar(toolbar)
 
         // Extract the transitionDetails
-        val POI = intent?.getStringExtra("TRANSITION_DETAILS")?.let { MainActivity.fromJson<POI>(it) }
-
+        val placeDetailsJson = intent.getStringExtra("PLACE_DETAILS") ?: ""
+        val placeDetails = MainActivity.fromJson<POI.PlaceDetails>(placeDetailsJson)
+        val POI = placeDetails.poi
         supportActionBar?.setDisplayHomeAsUpEnabled(true) // Home button to MainActivity
 
         // Update the view
@@ -32,7 +35,7 @@ class GeofenceTriggeredActivity : AppCompatActivity()  {
         )
         location_description.text = this.getString(
             R.string.location_description,
-            POI?.description
+            placeDetails.wikipediaInfo?.extract
         )
 
         Log.v(TRIG_TAG, POI.toString())
