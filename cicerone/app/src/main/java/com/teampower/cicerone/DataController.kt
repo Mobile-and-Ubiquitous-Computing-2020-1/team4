@@ -70,8 +70,8 @@ class DataController(private val geoCon: GeofencingController) {
                     val radius = calculateRadius(filteredVenues)
                     Log.d(TAG, "Radius: $radius m")
                     for ((id, venue) in filteredVenues.withIndex()) {
+                        Log.d(TAG, "ID: $id - Venue:" + venue.toString())
                         val poi = poiBuilder(venue, id)
-                        //Log.d(TAG, "ID: $id - Venue:" + venue.toString())
                         // Create the geofence
                         val gf = geoCon.createGeofence(
                             poi.lat,
@@ -79,7 +79,7 @@ class DataController(private val geoCon: GeofencingController) {
                             poi.id,
                             radius,
                             Geofence.NEVER_EXPIRE,
-                            Geofence.GEOFENCE_TRANSITION_ENTER or Geofence.GEOFENCE_TRANSITION_EXIT
+                            Geofence.GEOFENCE_TRANSITION_ENTER
                         )
                         geoCon.addGeofence(gf, context, poi)
                         // Add POI to the list of current POIs
@@ -98,8 +98,8 @@ class DataController(private val geoCon: GeofencingController) {
     private fun poiBuilder(venue: Venues, id: Int): POI {
         // val id = venue.id # Replace this with a running id, to let Geofences be replaced
         val name = venue.name
-        val lat = venue.location.labeledLatLngs.get(0).lat
-        val long = venue.location.labeledLatLngs.get(0).lng
+        val lat = venue.location.lat
+        val long = venue.location.lng
         val distance = venue.location.distance
         val address = venue.location.formattedAddress.joinToString()
         var categories = ""
@@ -164,8 +164,13 @@ class DataController(private val geoCon: GeofencingController) {
                 val distanceBUser = venues[j].location.distance // Distance between B and user
                 // Filter out the POI that's farthest away
                 if( distanceAB < threshold ) {
-                    // If overlapping, make sure venue[i] is closer than every other geofence by removing j
-                    indicesNotToAdd.add(j)
+                    // If overlapping, make sure not to add the farthest POI
+                    if (distanceAUser < distanceBUser) {
+                        indicesNotToAdd.add(j)
+                    } else{
+                        indicesNotToAdd.add(i)
+                    }
+
                 }
             }
             if (!indicesNotToAdd.contains(i)) {
