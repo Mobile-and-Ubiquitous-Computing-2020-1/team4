@@ -30,36 +30,37 @@ class GeofenceBroadcastReceiver : BroadcastReceiver() {
 
             // Get the geofences that were triggered. A single even can trigger
             // multiple geofences
-            val triggerinGeofence = geofencingEvent.triggeringGeofences[0]
+            val triggeringGeofence =
+                geofencingEvent.triggeringGeofences[0] // TODO: Remove geofence when used up.
+
 
             // TODO: This is basically demo #2 for mid-term - only need to get Wikipedia info as string
             // Extract the transitionDetails
+            val poiSerialized = intent?.getStringExtra("POI")
+                ?: "" // TODO: Handle error case better. This works only assuming we always get a serialized POI object
+            val poiObject = MainActivity.fromJson<POI>(poiSerialized)
+            Log.i(TAG, "id" + triggeringGeofence.requestId + " got the poi name " + poiObject.name)
 
-            val POI = intent?.getStringExtra("POI")?.let { MainActivity.fromJson<POI>(it) }
-            if (POI != null) {
-                Log.i(TAG, POI.name)
-            }
 
             // Query wikipedia
             val wikiManager = WikiInfoManager()
-            //val placeInfo = wikiManager.getPlaceInfo(POI!!)
+            val wikipediaInfo = wikiManager.getPlaceInfo(poiObject.name)
             // Log the information
-            // Log.i(TAG, placeInfo.toString())
+            Log.i(TAG, wikipediaInfo.toString())
 
-            // TODO create a geofenceTransitionsDetails serializable object to pass to the GeofenceTriggeredActivity
-            val geofenceTransitionDetails =
-                "You crossed the Geofence with ID:${triggerinGeofence.requestId} - Cool dude ${POI?.name}"
+            // Combine info into one object
+            val combinedInfo = PlaceDetails(poiObject, wikipediaInfo)
+
             // Send notification and log the transition details
             if (context != null) {
                 sendNotification(
                     context,
                     "Cicerone geofence",
-                    geofenceTransitionDetails,
-                    1337,
-                    geofenceTransitionDetails
+                    poiObject,
+                    MainActivity.toJson(combinedInfo)
                 )
             }
-            Log.i(TAG, geofenceTransitionDetails)
+            Log.i(TAG, poiSerialized)
         } else {
             // Log the error
             Log.e(TAG, "Error in Geofencer - should log error here one of these days")
@@ -69,17 +70,18 @@ class GeofenceBroadcastReceiver : BroadcastReceiver() {
     private fun sendNotification(
         context: Context,
         title: String,
-        content: String,
-        notificationId: Int,
-        transitionDetails: String
+        poiObject: POI,
+        placeDetailsJson: String
     ) {
+        val contentText =
+            "You are close to ${poiObject.name} (${poiObject.distance}m). Want to go have a look?"
         val notCon = NotificationsController()
         notCon.sendNotificationTriggeredGeofence(
             context,
             title,
-            content,
-            notificationId,
-            transitionDetails
+            contentText,
+            1337,
+            placeDetailsJson
         )
     }
 }

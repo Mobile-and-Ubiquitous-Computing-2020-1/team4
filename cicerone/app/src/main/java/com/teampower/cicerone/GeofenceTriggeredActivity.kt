@@ -1,10 +1,8 @@
 package com.teampower.cicerone
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import kotlinx.android.synthetic.main.activity_geofence_triggered.*
+import androidx.appcompat.app.AppCompatActivity
 import kotlinx.android.synthetic.main.activity_scrolling.*
-import kotlinx.android.synthetic.main.activity_scrolling.toolbar
 import kotlinx.android.synthetic.main.content_geofence_triggered.*
 
 class GeofenceTriggeredActivity : AppCompatActivity() {
@@ -15,13 +13,14 @@ class GeofenceTriggeredActivity : AppCompatActivity() {
         setSupportActionBar(toolbar)
 
         // Extract the transitionDetails
-        val transitionDetails = intent.getStringExtra("TRANSITION_DETAILS")
+        val placeDetailsJson = intent.getStringExtra("PLACE_DETAILS") ?: ""
+        val placeDetails = MainActivity.fromJson<PlaceDetails>(placeDetailsJson)
 
         supportActionBar?.setDisplayHomeAsUpEnabled(true) // Home button to MainActivity
 
         // Update the view
-        setTitle(transitionDetails)
-        geofence_information.text = "You crossed the Geofence with ID:${transitionDetails} - Cool dude"
+        title = placeDetails.poi.name
+        wikipediaInfo.text = placeDetails.wikipediaInfo?.description + placeDetails.poi.category
 
     }
 }
