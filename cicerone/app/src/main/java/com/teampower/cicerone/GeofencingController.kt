@@ -13,15 +13,13 @@ import com.google.android.gms.location.LocationServices
 class GeofencingController() {
     private lateinit var geofencingClient: GeofencingClient
 
-
     fun startGeofencing(context: Context) {
         geofencingClient = LocationServices.getGeofencingClient(context)
     }
 
     fun addGeofence(geofence: Geofence, context: Context, poi: POI) {
         val geofenceAddPendingIntent: PendingIntent by lazy {
-            val intent = Intent(context, GeofenceBroadcastReceiver::class.java)
-
+            val intent = Intent(context, GeofenceBroadcastReceiver()::class.java)
             intent.putExtra("POI", MainActivity.toJson(poi))
             // We use FLAG_UPDATE_CURRENT so that we get the same pending intent back
             // when calling addGeofences() and removeGeofences().
@@ -49,8 +47,8 @@ class GeofencingController() {
             }
     }
 
-    fun removeGeofence(geofenceID: String, context: Context) {
-        geofencingClient?.removeGeofences(listOf(geofenceID))?.run {
+    fun removeGeofence(geofenceID: String) {
+        geofencingClient.removeGeofences(listOf(geofenceID))?.run {
             addOnSuccessListener {
                 Log.v(TAG_GEO, "Geofence with ID:$geofenceID removed")
             }
