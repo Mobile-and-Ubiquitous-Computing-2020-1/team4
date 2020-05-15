@@ -97,5 +97,8 @@
     <string name="title_activity_geofence_triggered">Arg: %1$s</string>
     <string name="location_category">Category: %1$s</string>
     <string name="location_distance">Distance: %1$s m</string>
-    <string name="location_description">\"%1$s\" \n from Wikipedia</string>
+    <string name="location_description_yes_wikipedia">\"%1$s\" \n Cited from Wikipedia.</string>
+    <string name="location_description_no_wikipedia">No information available from Wikipedia</string>
+    <string name="tts_text_yes_wikipedia">You are close to %1$s, a %2$s %3$d meters away. Here is an excerpt from Wikipedia. %4$s. If you liked this recommendation, smash like and subscribe.</string>
+    <string name="tts_text_no_wikipedia">You are close to %1$s, a %2$s %3$d meters away.</string>
 </resources>

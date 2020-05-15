@@ -1,5 +1,7 @@
 package com.teampower.cicerone
 
+import com.google.gson.internal.LinkedTreeMap
+
 data class WikipediaPlaceInfo(
     val title: String,
     val thumbnail: Thumbnail,
