@@ -7,6 +7,10 @@ import android.view.Menu
 import android.view.MenuItem
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
@@ -25,7 +29,7 @@ class MainActivity : AppCompatActivity() {
     private val notCon = NotificationsController()
     private val geoCon = GeofencingController()
     private val dataCon = DataController(geoCon)
-    private val wikiManager by lazy { WikiInfoManager() }
+    private lateinit var wordViewModel: WordViewModel
 
     companion object {
         inline fun <reified T> fromJson(json: String): T {
@@ -44,33 +48,24 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_scrolling)
         setSupportActionBar(toolbar)
 
-        // Test Wikipedia API.
-        // val wiki = wikiManager.getPlaceInfo("Gyeongbokgung Palace")
         user_location.text = getString(R.string.user_position, "-", "-")
 
+        // List history of recent POIs (for now, testing basic setup from tutorial)
+        val recyclerView = findViewById<RecyclerView>(R.id.recyclerview)
+        val adapter = WordListAdapter(this)
+        recyclerView.adapter = adapter
+        recyclerView.layoutManager = LinearLayoutManager(this)
+
+        wordViewModel = ViewModelProvider(this).get(WordViewModel::class.java)
+        wordViewModel.allWords.observe(this, Observer { words ->
+            // Update the cached copy of the words in the adapter.
+            words?.let { adapter.setWords(it) }
+        })
         // Setup location services
         latCon.startLocation(this, this@MainActivity, user_location, dataCon)
 
         // Setup geofencing services
         geoCon.startGeofencing(this)
-        // TODO Example of adding multiple geofences. Should be moved to onResponse function
-        // TODO for POI queries
-
-
-        /* Test values
-        val pois = arrayOf(POI(37.4553, -122.1462, "POI 1"), POI(37.4654, -122.1609, "POI 2"))
-
-        for (poi in pois) {
-            val gf = geoCon.createGeofence(
-                poi.lat,
-                poi.long,
-                poi.id,
-                200F,
-                Geofence.NEVER_EXPIRE,
-                Geofence.GEOFENCE_TRANSITION_ENTER or Geofence.GEOFENCE_TRANSITION_EXIT
-            )
-            geoCon.addGeofence(gf, this, poi)
-        */
 
         // Setup notifications
         notCon.createNotificationChannel(this)

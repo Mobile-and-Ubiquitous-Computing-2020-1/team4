@@ -101,4 +101,10 @@
     <string name="location_description_no_wikipedia">No information available from Wikipedia</string>
     <string name="tts_text_yes_wikipedia">You are close to %1$s, a %2$s %3$d meters away. Here is an excerpt from Wikipedia. %4$s. If you liked this recommendation, smash like and subscribe.</string>
     <string name="tts_text_no_wikipedia">You are close to %1$s, a %2$s %3$d meters away.</string>
+    <string name="location_description">\"%1$s\" \n from Wikipedia</string>
+
+    <string name="hint_word">Word…</string>
+    <string name="button_save">Save</string>
+    <string name="empty_not_saved">Word not saved because it is empty.</string>
+    <string name="add_word">Add word</string>
 </resources>
