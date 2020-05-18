@@ -1,10 +1,11 @@
-package com.teampower.cicerone
+package com.teampower.cicerone.database
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.viewModelScope
 import com.teampower.cicerone.database.CiceroneAppDatabase
+import com.teampower.cicerone.database.POIData
 import com.teampower.cicerone.database.POIRepository
 import com.teampower.cicerone.database.Word
 import kotlinx.coroutines.Dispatchers
@@ -16,7 +17,7 @@ import kotlinx.coroutines.launch
 * while your ViewModel can take care of holding and processing all the data needed for the UI.
 * */
 
-class WordViewModel(application: Application) : AndroidViewModel(application) {
+class POIViewModel(application: Application) : AndroidViewModel(application) {
 
     private val repository: POIRepository
 
@@ -24,12 +25,12 @@ class WordViewModel(application: Application) : AndroidViewModel(application) {
     // - We can put an observer on the data (instead of polling for changes) and only update the
     //   the UI when the data actually changes.
     // - Repository is completely separated from the UI through the ViewModel.
-    val allWords: LiveData<List<Word>>
+    val allPOI: LiveData<List<POIData>>
 
     init {
-        val wordsDao = CiceroneAppDatabase.getDatabase(application, viewModelScope).wordDao()
-        repository = POIRepository(wordsDao)
-        allWords = repository.allWords
+        val poisDao = CiceroneAppDatabase.getDatabase(application, viewModelScope).poiDao()
+        repository = POIRepository(poisDao)
+        allPOI = repository.allPOI
     }
 
     /**
@@ -37,7 +38,7 @@ class WordViewModel(application: Application) : AndroidViewModel(application) {
      * to block the main thread, so we're launching a new coroutine and calling the repository's
      * insert, which is a suspend function.
      */
-    fun insert(word: Word) = viewModelScope.launch(Dispatchers.IO) {
-        repository.insert(word)
+    fun insert(poi: POIData) = viewModelScope.launch(Dispatchers.IO) {
+        repository.insert(poi)
     }
 }

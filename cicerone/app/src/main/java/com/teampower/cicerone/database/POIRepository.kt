@@ -9,15 +9,15 @@ import androidx.lifecycle.LiveData
 * */
 
 // No need to expose the entire database to the repository, so only send in DAO.
-class POIRepository(private val wordDao: WordDao) {
+class POIRepository(private val poiDao: POIDao) {
     // Room executes all queries on a separate thread.
 
 
     // Tutorial test stuff
     // Observed LiveData will notify the observer when the data has changed.
-    val allWords: LiveData<List<Word>> = wordDao.getAlphabetizedWords()
+    val allPOI: LiveData<List<POIData>> = poiDao.getRecentlyTriggered()
 
-    suspend fun insert(word: Word) {
-        wordDao.insert(word)
+    suspend fun insert(poi: POIData) {
+        poiDao.insert(poi)
     }
 }

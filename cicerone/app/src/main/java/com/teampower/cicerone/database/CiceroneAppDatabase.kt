@@ -12,9 +12,9 @@ import kotlinx.coroutines.launch
 public abstract class CiceroneAppDatabase : RoomDatabase() {
 
     // abstract fun POIDao(): POIDao
-    abstract fun wordDao(): WordDao
+    abstract fun poiDao(): POIDao
 
-    private class WordDatabaseCallback(
+    private class POIDatabaseCallback(
         private val scope: CoroutineScope
     ) : RoomDatabase.Callback() {
 
@@ -22,18 +22,16 @@ public abstract class CiceroneAppDatabase : RoomDatabase() {
             super.onOpen(db)
             INSTANCE?.let { database ->
                 scope.launch {
-                    val wordDao = database.wordDao()
+                    val poiDao = database.poiDao()
 
                     // Delete all content here.
-                    wordDao.deleteAll()
+                    poiDao.deleteAll()
 
                     // Add sample words.
-                    var word = Word("Hello")
-                    wordDao.insert(word)
-                    word = Word("World!")
-                    wordDao.insert(word)
-                    word = Word("I like that this works")
-                    wordDao.insert(word)
+                    var poi = POIData("1337XD", "SNU", "School", "12:00", 0.00, 0.00)
+                    poiDao.insert(poi)
+//                    word = Word("World!")
+//                    poiDao.insert(word)
                 }
             }
         }
@@ -57,7 +55,7 @@ public abstract class CiceroneAppDatabase : RoomDatabase() {
                     CiceroneAppDatabase::class.java,
                     "cicerone_app_database"
                 )
-                    .addCallback(WordDatabaseCallback(scope))
+                    .addCallback(POIDatabaseCallback(scope))
                     .build()
                 INSTANCE = instance
                 return instance

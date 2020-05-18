@@ -1,29 +1,30 @@
 package com.teampower.cicerone.database
 
 import androidx.lifecycle.LiveData
-import androidx.room.Dao
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
-import androidx.room.Query
+import androidx.room.*
 
 /*
 * POIDao
 * Contains the methods used for accessing the database.
 * */
 
-/* // TODO: Replace tutorial Word stuff with this.
+// TODO: Replace tutorial Word stuff with this.
 @Dao
 interface POIDao {
     @Query("SELECT * FROM poi_table")
     fun getAll(): LiveData<List<POIData>>
 
+    @Query("SELECT * from poi_table ORDER BY time_triggered ASC")
     fun getRecentlyTriggered(): LiveData<List<POIData>>
-    fun getById(id: String): POIData
 
-    @Query("SELECT * from poi_table where apiId = :foursquareId")
-    fun loadPOI(foursquareId: String): LiveData<POIData?>?
+//    @Query("SELECT 1 from poi_table WHERE apiId =:foursqaureID")
+//    fun getById(id: String): POIData
 
-    fun deletePOI(foursquareId: String)
+    @Query("SELECT * from poi_table where foursquareID = (:foursquareID)")
+    fun loadPOI(foursquareID: String): LiveData<POIData?>?
+
+    @Delete
+    fun deletePOI(poi: POIData)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(poi: POIData)
@@ -32,7 +33,7 @@ interface POIDao {
     suspend fun deleteAll()
 
 }
-*/
+/*
 @Dao
 interface WordDao {
     @Query("SELECT * from word_table ORDER BY word ASC")
@@ -44,7 +45,7 @@ interface WordDao {
     @Query("DELETE FROM word_table")
     suspend fun deleteAll()
 }
-
+*/
 /* Examples
 interface UserDao {
     @Query("SELECT * FROM user")

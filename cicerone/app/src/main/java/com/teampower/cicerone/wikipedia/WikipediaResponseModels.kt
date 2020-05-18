@@ -1,4 +1,4 @@
-package com.teampower.cicerone
+package com.teampower.cicerone.wikipedia
 
 import com.google.gson.internal.LinkedTreeMap
 

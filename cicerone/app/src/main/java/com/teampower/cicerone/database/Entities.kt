@@ -6,7 +6,7 @@ import androidx.room.PrimaryKey
 
 @Entity(tableName = "poi_table")
 data class POIData(
-    @PrimaryKey val apiId: String,
+    @PrimaryKey val foursquareID: String,
     @ColumnInfo(name = "name") val name: String,
     @ColumnInfo(name = "category") val category: String,
     @ColumnInfo(name = "time_triggered") val timeTriggered: String,

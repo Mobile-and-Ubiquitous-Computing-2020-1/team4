@@ -1,4 +1,4 @@
-package com.teampower.cicerone
+package com.teampower.cicerone.control
 
 import android.Manifest
 import android.content.Context
@@ -14,10 +14,10 @@ import androidx.core.app.ActivityCompat
 import com.google.android.gms.common.api.ResolvableApiException
 import com.google.android.gms.location.*
 import com.google.android.gms.tasks.Task
-import kotlinx.android.synthetic.main.activity_scrolling.*
-import kotlinx.android.synthetic.main.content_scrolling.*
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.async
+import com.teampower.cicerone.MY_PERMISSIONS_REQUEST_LOCATION_ID
+import com.teampower.cicerone.MainActivity
+import com.teampower.cicerone.R
+import com.teampower.cicerone.TAG
 
 class LocationController() {
     private lateinit var fusedLocationClient: FusedLocationProviderClient

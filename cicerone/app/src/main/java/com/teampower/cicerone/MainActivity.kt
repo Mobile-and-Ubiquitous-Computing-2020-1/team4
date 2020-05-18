@@ -14,6 +14,12 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import com.teampower.cicerone.control.DataController
+import com.teampower.cicerone.control.GeofencingController
+import com.teampower.cicerone.control.LocationController
+import com.teampower.cicerone.control.NotificationsController
+import com.teampower.cicerone.database.POIListAdapter
+import com.teampower.cicerone.database.POIViewModel
 import kotlinx.android.synthetic.main.activity_scrolling.*
 import kotlinx.android.synthetic.main.content_scrolling.*
 import kotlinx.coroutines.GlobalScope
@@ -29,7 +35,7 @@ class MainActivity : AppCompatActivity() {
     private val notCon = NotificationsController()
     private val geoCon = GeofencingController()
     private val dataCon = DataController(geoCon)
-    private lateinit var wordViewModel: WordViewModel
+    private lateinit var poiViewModel: POIViewModel
 
     companion object {
         inline fun <reified T> fromJson(json: String): T {
@@ -52,15 +58,16 @@ class MainActivity : AppCompatActivity() {
 
         // List history of recent POIs (for now, testing basic setup from tutorial)
         val recyclerView = findViewById<RecyclerView>(R.id.recyclerview)
-        val adapter = WordListAdapter(this)
+        val adapter = POIListAdapter(this)
         recyclerView.adapter = adapter
         recyclerView.layoutManager = LinearLayoutManager(this)
 
-        wordViewModel = ViewModelProvider(this).get(WordViewModel::class.java)
-        wordViewModel.allWords.observe(this, Observer { words ->
+        poiViewModel = ViewModelProvider(this).get(POIViewModel::class.java)
+        poiViewModel.allPOI.observe(this, Observer { pois ->
             // Update the cached copy of the words in the adapter.
-            words?.let { adapter.setWords(it) }
+            pois?.let { adapter.setPOIs(it) }
         })
+
         // Setup location services
         latCon.startLocation(this, this@MainActivity, user_location, dataCon)
 

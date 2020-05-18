@@ -1,4 +1,4 @@
-package com.teampower.cicerone
+package com.teampower.cicerone.control
 
 import android.app.PendingIntent
 import android.content.Context
@@ -8,6 +8,10 @@ import com.google.android.gms.location.Geofence
 import com.google.android.gms.location.GeofencingClient
 import com.google.android.gms.location.GeofencingRequest
 import com.google.android.gms.location.LocationServices
+import com.teampower.cicerone.GeofenceBroadcastReceiver
+import com.teampower.cicerone.MainActivity
+import com.teampower.cicerone.POI
+import com.teampower.cicerone.TAG_GEO
 
 
 class GeofencingController() {

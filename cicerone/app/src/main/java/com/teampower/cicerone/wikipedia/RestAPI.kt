@@ -1,4 +1,4 @@
-package com.teampower.cicerone
+package com.teampower.cicerone.wikipedia
 
 import retrofit2.Call
 import retrofit2.Retrofit

@@ -1,10 +1,11 @@
-package com.teampower.cicerone
+package com.teampower.cicerone.control
 
 import android.content.Context
 import android.location.Location
 import android.util.Log
 import android.widget.TextView
 import com.google.android.gms.location.Geofence
+import com.teampower.cicerone.*
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import okhttp3.logging.HttpLoggingInterceptor.Level
@@ -15,7 +16,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 class DataController(private val geoCon: GeofencingController) {
 
-    private val pois = mutableMapOf<String,POI>() // We can store all POIs in this map, indexed by ID
+    private val pois = mutableMapOf<String, POI>() // We can store all POIs in this map, indexed by ID
 
     fun requestData(location: android.location.Location, venue_view: TextView, mainContext: Context) {
         // Set context
@@ -23,7 +24,8 @@ class DataController(private val geoCon: GeofencingController) {
 
         // Loads client ID and secret from "secret.properties" file in BuildConfig
         val foursquare_id = BuildConfig.FOURSQUARE_ID
-        val foursquare_secret = BuildConfig.FOURSQUARE_SECRET
+        val foursquare_secret =
+            BuildConfig.FOURSQUARE_SECRET
 
         // API call parameters
         val location_string: String = "${location.latitude.toString()}, ${location.longitude.toString()}"
@@ -37,7 +39,14 @@ class DataController(private val geoCon: GeofencingController) {
 
         // Set up HTTP client
         val client = OkHttpClient().newBuilder()
-            .addInterceptor(FoursquareRequestInterceptor(foursquare_id, foursquare_secret, version, cacheDuration))
+            .addInterceptor(
+                FoursquareRequestInterceptor(
+                    foursquare_id,
+                    foursquare_secret,
+                    version,
+                    cacheDuration
+                )
+            )
             .addInterceptor(HttpLoggingInterceptor().apply {
                 level = if (BuildConfig.DEBUG) Level.BODY else Level.NONE
             })
@@ -106,7 +115,15 @@ class DataController(private val geoCon: GeofencingController) {
         for (cat in venue.categories) {
             categories = categories + cat.name
         }
-        return POI(id.toString(), name, lat, long, distance, address, categories)
+        return POI(
+            id.toString(),
+            name,
+            lat,
+            long,
+            distance,
+            address,
+            categories
+        )
     }
 
     private fun displayData(poi: POI, venue_view: TextView) {
