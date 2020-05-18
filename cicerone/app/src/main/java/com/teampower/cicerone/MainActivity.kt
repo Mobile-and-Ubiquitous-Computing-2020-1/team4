@@ -9,7 +9,6 @@ import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.viewModelScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
@@ -19,10 +18,11 @@ import com.teampower.cicerone.control.DataController
 import com.teampower.cicerone.control.GeofencingController
 import com.teampower.cicerone.control.LocationController
 import com.teampower.cicerone.control.NotificationsController
-import com.teampower.cicerone.database.CategoryViewModel
-import com.teampower.cicerone.database.CiceroneAppDatabase
-import com.teampower.cicerone.database.POIListAdapter
-import com.teampower.cicerone.database.POIViewModel
+import com.teampower.cicerone.database.category_table.CategoryViewModel
+import com.teampower.cicerone.database.history_table.POIHistoryListAdapter
+import com.teampower.cicerone.database.history_table.POIHistoryViewModel
+import com.teampower.cicerone.database.history_table.POISavedListAdapter
+import com.teampower.cicerone.database.history_table.POISavedViewModel
 import kotlinx.android.synthetic.main.activity_scrolling.*
 import kotlinx.android.synthetic.main.content_scrolling.*
 import kotlinx.coroutines.GlobalScope
@@ -38,7 +38,9 @@ class MainActivity : AppCompatActivity() {
     private val notCon = NotificationsController()
     private val geoCon = GeofencingController()
     private val dataCon = DataController(geoCon)
-    private lateinit var poiViewModel: POIViewModel
+    private lateinit var poiHistoryViewModel: POIHistoryViewModel
+    private lateinit var poiSavedViewModel: POISavedViewModel
+    private lateinit var catViewModel: CategoryViewModel
 
     companion object {
         inline fun <reified T> fromJson(json: String): T {
@@ -59,16 +61,35 @@ class MainActivity : AppCompatActivity() {
 
         user_location.text = getString(R.string.user_position, "-", "-")
 
-        // List history of recent POIs (for now, testing basic setup from tutorial)
-        val recyclerView = findViewById<RecyclerView>(R.id.recyclerview)
-        val adapter = POIListAdapter(this)
-        recyclerView.adapter = adapter
-        recyclerView.layoutManager = LinearLayoutManager(this)
+        // List history of recent POIs
+        val historyRecyclerView = findViewById<RecyclerView>(R.id.historyrecyclerview)
+        val historyAdapter = POIHistoryListAdapter(this)
+        historyRecyclerView.adapter = historyAdapter
+        historyRecyclerView.layoutManager = LinearLayoutManager(this)
 
-        poiViewModel = ViewModelProvider(this).get(POIViewModel::class.java)
-        poiViewModel.allPOI.observe(this, Observer { pois ->
+        poiHistoryViewModel = ViewModelProvider(this).get(POIHistoryViewModel::class.java)
+        poiHistoryViewModel.allPOI.observe(this, Observer { pois ->
             // Update the cached copy of the words in the adapter.
-            pois?.let { adapter.setPOIs(it) }
+            pois?.let { historyAdapter.setPOIs(it) }
+        })
+
+        // List saved POIs
+        val savedRecyclerView = findViewById<RecyclerView>(R.id.savedrecyclerview)
+        val savedAdapter = POISavedListAdapter(this)
+        savedRecyclerView.adapter = savedAdapter
+        savedRecyclerView.layoutManager = LinearLayoutManager(this)
+
+        poiSavedViewModel = ViewModelProvider(this).get(POISavedViewModel::class.java)
+        poiSavedViewModel.allPOI.observe(this, Observer { pois ->
+            // Update the cached copy of the words in the adapter.
+            pois?.let { savedAdapter.setPOIs(it) }
+        })
+
+        // Connect to local table of category scores
+        catViewModel = ViewModelProvider(this).get(CategoryViewModel::class.java)
+        catViewModel.allCat.observe(this, Observer {cats ->
+            // Set table of scores in DataCon
+            dataCon.setCategoryScores(cats)
         })
 
 

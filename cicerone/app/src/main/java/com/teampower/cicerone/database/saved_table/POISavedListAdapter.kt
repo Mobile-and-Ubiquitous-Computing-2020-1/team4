@@ -1,4 +1,4 @@
-package com.teampower.cicerone.database
+package com.teampower.cicerone.database.history_table
 
 import android.content.Context
 import android.view.LayoutInflater
@@ -7,13 +7,15 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.teampower.cicerone.R
+import com.teampower.cicerone.database.POIHistoryData
+import com.teampower.cicerone.database.POISavedData
 
-class POIListAdapter internal constructor(
+class POISavedListAdapter internal constructor(
     context: Context
-) : RecyclerView.Adapter<POIListAdapter.POIViewHolder>() {
+) : RecyclerView.Adapter<POISavedListAdapter.POIViewHolder>() {
 
     private val inflater: LayoutInflater = LayoutInflater.from(context)
-    private var pois = emptyList<POIData>() // Cached copy of words
+    private var pois = emptyList<POISavedData>() // Cached copy of words
 
     inner class POIViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val poiItemView: TextView = itemView.findViewById(R.id.wordTextView)
@@ -29,7 +31,7 @@ class POIListAdapter internal constructor(
         holder.poiItemView.text = "ID: ${current.foursquareID} - ${current.name}, Type: ${current.category}"  // For some reasons template strings doesn't work here
     }
 
-    internal fun setPOIs(pois: List<POIData>) {
+    internal fun setPOIs(pois: List<POISavedData>) {
         this.pois = pois
         notifyDataSetChanged()
     }

@@ -1,6 +1,7 @@
-package com.teampower.cicerone.database
+package com.teampower.cicerone.database.history_table
 
 import androidx.lifecycle.LiveData
+import com.teampower.cicerone.database.POISavedData
 
 /*
 * POIRepository
@@ -9,14 +10,14 @@ import androidx.lifecycle.LiveData
 * */
 
 // No need to expose the entire database to the repository, so only send in DAO.
-class POIRepository(private val poiDao: POIDao) {
+class POISavedRepository(private val poiHistoryDao: POISavedDao) {
     // Room executes all queries on a separate thread.
 
     // Tutorial test stuff
     // Observed LiveData will notify the observer when the data has changed.
-    val allPOI: LiveData<List<POIData>> = poiDao.getRecentlyTriggered()
+    val allPOI: LiveData<List<POISavedData>> = poiHistoryDao.getRecentlyTriggered()
 
-    suspend fun insert(poi: POIData) {
-        poiDao.insert(poi)
+    suspend fun insert(poi: POISavedData) {
+        poiHistoryDao.insert(poi)
     }
 }

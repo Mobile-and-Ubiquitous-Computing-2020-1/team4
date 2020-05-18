@@ -6,6 +6,7 @@ import android.util.Log
 import android.widget.TextView
 import com.google.android.gms.location.Geofence
 import com.teampower.cicerone.*
+import com.teampower.cicerone.database.CategoryData
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import okhttp3.logging.HttpLoggingInterceptor.Level
@@ -15,7 +16,8 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 
 class DataController(private val geoCon: GeofencingController) {
-
+    private val DATA_CON = "DataController"
+    private lateinit var categoryScores : List<CategoryData>
     private val pois = mutableMapOf<String, POI>() // We can store all POIs in this map, indexed by ID
 
     fun requestData(location: android.location.Location, venue_view: TextView, mainContext: Context) {
@@ -77,9 +79,9 @@ class DataController(private val geoCon: GeofencingController) {
                     val closestVenues = getClosestVenues(venues)
                     val filteredVenues = filterVenues(closestVenues, 200F) // Remove POIs if closer 200m of each other - google recommends minimum radius of 100m
                     val radius = calculateRadius(filteredVenues)
-                    Log.d(TAG, "Radius: $radius m")
+                    Log.d(DATA_CON, "Radius: $radius m")
                     for ((id, venue) in filteredVenues.withIndex()) {
-                        Log.d(TAG, "ID: $id - Venue:" + venue.toString())
+                        Log.d(DATA_CON, "ID: $id - Venue:" + venue.toString())
                         val poi = poiBuilder(venue, id)
                         // Create the geofence
                         val gf = geoCon.createGeofence(
@@ -195,6 +197,11 @@ class DataController(private val geoCon: GeofencingController) {
             }
         }
         return filteredVenues
+    }
+
+    fun setCategoryScores(cats: List<CategoryData>){
+        categoryScores = cats
+        Log.i(DATA_CON, "Category scores updated to: ${categoryScores}")
     }
 
 }

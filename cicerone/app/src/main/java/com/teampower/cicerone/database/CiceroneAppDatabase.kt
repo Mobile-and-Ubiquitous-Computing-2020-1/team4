@@ -5,14 +5,18 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.sqlite.db.SupportSQLiteDatabase
+import com.teampower.cicerone.database.category_table.CategoryDao
+import com.teampower.cicerone.database.history_table.POIHistoryDao
+import com.teampower.cicerone.database.history_table.POISavedDao
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
-@Database(entities = [POIData::class, CategoryData::class], version = 1)
+@Database(entities = [POIHistoryData::class, POISavedData::class, CategoryData::class], version = 1)
 public abstract class CiceroneAppDatabase : RoomDatabase() {
 
     // abstract fun POIDao(): POIDao
-    abstract fun poiDao(): POIDao
+    abstract fun poiHistoryDao(): POIHistoryDao
+    abstract fun poiSavedDao(): POISavedDao
     abstract fun categoryDao(): CategoryDao
 
     private class CiceroneDatabaseCallback(
@@ -23,20 +27,28 @@ public abstract class CiceroneAppDatabase : RoomDatabase() {
             super.onOpen(db)
             INSTANCE?.let { database ->
                 scope.launch {
-                    //************* POI table *************
-                    val poiDao = database.poiDao()
+                    //************* POI History table *************
+                    val poiHDao = database.poiHistoryDao()
                     // Delete all content here.
-                    poiDao.deleteAll()
+                    poiHDao.deleteAll()
                     // Add sample POI.
-                    var poi = POIData("1337XD", "SNU", "School", "12:00", 0.00, 0.00)
-                    poiDao.insert(poi)
+                    val poiH = POIHistoryData("1337XD", "SNU", "School", "12:00", 0.00, 0.00)
+                    poiHDao.insert(poiH)
+
+                    //************* POI Saved table *************
+                    val poiSDao = database.poiSavedDao()
+                    // Delete all content here.
+                    poiSDao.deleteAll()
+                    // Add sample POI.
+                    val poiS = POISavedData("1227", "Nakeseongdae Park", "Park", "12:00", 0.00, 0.00)
+                    poiSDao.insert(poiS)
 
                     //************* Category table *************
                     val catDao = database.categoryDao()
                     // Delete all content here.
-                    catDao.deleteAll()
-                    // Add sample categories with score.
-                    var cat = CategoryData("School", 10.0)
+                    catDao.deleteAll() // Only when resetting
+                    // Initialize table
+                    val cat = CategoryData("School", 1.0)
                     catDao.insert(cat)
                 }
             }

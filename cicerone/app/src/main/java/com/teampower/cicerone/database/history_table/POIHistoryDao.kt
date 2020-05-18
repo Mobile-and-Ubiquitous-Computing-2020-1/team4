@@ -1,7 +1,8 @@
-package com.teampower.cicerone.database
+package com.teampower.cicerone.database.history_table
 
 import androidx.lifecycle.LiveData
 import androidx.room.*
+import com.teampower.cicerone.database.POIHistoryData
 
 /*
 * POIDao
@@ -10,26 +11,26 @@ import androidx.room.*
 
 // History/saved places table interface
 @Dao
-interface POIDao {
-    @Query("SELECT * FROM poi_table")
-    fun getAll(): LiveData<List<POIData>>
+interface POIHistoryDao {
+    @Query("SELECT * FROM poi_history_table")
+    fun getAll(): LiveData<List<POIHistoryData>>
 
-    @Query("SELECT * from poi_table ORDER BY time_triggered ASC")
-    fun getRecentlyTriggered(): LiveData<List<POIData>>
+    @Query("SELECT * from poi_history_table ORDER BY time_triggered ASC")
+    fun getRecentlyTriggered(): LiveData<List<POIHistoryData>>
 
 //    @Query("SELECT 1 from poi_table WHERE apiId =:foursqaureID")
 //    fun getById(id: String): POIData
 
-    @Query("SELECT * from poi_table where foursquareID = (:foursquareID)")
-    fun loadPOI(foursquareID: String): LiveData<POIData?>?
+    @Query("SELECT * from poi_history_table where foursquareID = (:foursquareID)")
+    fun loadPOI(foursquareID: String): LiveData<POIHistoryData?>?
 
     @Delete
-    fun deletePOI(poi: POIData)
+    fun deletePOI(poi: POIHistoryData)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insert(poi: POIData)
+    suspend fun insert(poi: POIHistoryData)
 
-    @Query("DELETE FROM poi_table")
+    @Query("DELETE FROM poi_history_table")
     suspend fun deleteAll()
 }
 

@@ -1,7 +1,8 @@
-package com.teampower.cicerone.database
+package com.teampower.cicerone.database.category_table
 
 import androidx.lifecycle.LiveData
 import androidx.room.*
+import com.teampower.cicerone.database.CategoryData
 
 /*
     Interface for table containing user specific weighting of the different categories.

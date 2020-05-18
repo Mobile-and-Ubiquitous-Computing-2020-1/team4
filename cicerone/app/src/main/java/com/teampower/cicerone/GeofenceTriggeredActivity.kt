@@ -6,8 +6,8 @@ import android.speech.tts.UtteranceProgressListener
 import android.text.Html
 import android.text.method.LinkMovementMethod
 import android.util.Log
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import com.teampower.cicerone.database.category_table.CategoryViewModel
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.google.gson.internal.LinkedTreeMap
@@ -117,19 +117,8 @@ class GeofenceTriggeredActivity : AppCompatActivity()  {
         }
         Log.v(TRIG_TAG, POI.toString())
 
-        // TODO: Remove, for now log score of categories in the table
+        // Demo on how to update category score
         catViewModel = ViewModelProvider(this).get(CategoryViewModel::class.java)
-        /*
-        catViewModel.allCat.observe(this, Observer {cats ->
-            Log.i(TRIG_TAG, "Entry: ${cats?.get(0)}")
-        })
-        */
-        catViewModel.updateCategoryPoints("School", 2.0)
-        val s = catViewModel.getCategoryPoints("School")
-        Log.i(TRIG_TAG, "School: Points=$s")
-
-
-
-
+        catViewModel.updateCategoryPoints("School", 2.0) // Change score
     }
 }
