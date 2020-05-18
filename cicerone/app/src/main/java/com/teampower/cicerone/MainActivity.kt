@@ -9,6 +9,7 @@ import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
@@ -18,6 +19,8 @@ import com.teampower.cicerone.control.DataController
 import com.teampower.cicerone.control.GeofencingController
 import com.teampower.cicerone.control.LocationController
 import com.teampower.cicerone.control.NotificationsController
+import com.teampower.cicerone.database.CategoryViewModel
+import com.teampower.cicerone.database.CiceroneAppDatabase
 import com.teampower.cicerone.database.POIListAdapter
 import com.teampower.cicerone.database.POIViewModel
 import kotlinx.android.synthetic.main.activity_scrolling.*
@@ -67,6 +70,8 @@ class MainActivity : AppCompatActivity() {
             // Update the cached copy of the words in the adapter.
             pois?.let { adapter.setPOIs(it) }
         })
+
+
 
         // Setup location services
         latCon.startLocation(this, this@MainActivity, user_location, dataCon)

@@ -14,5 +14,11 @@ data class POIData(
     @ColumnInfo(name = "longitude") val longitude: Double
 )
 
+@Entity(tableName = "category_table")
+data class CategoryData(
+    @PrimaryKey val name: String,
+    @ColumnInfo val score: Double
+)
+
 @Entity(tableName = "word_table")
 data class Word(@PrimaryKey @ColumnInfo(name = "word") val word: String)

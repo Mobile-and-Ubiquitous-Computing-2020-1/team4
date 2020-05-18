@@ -8,13 +8,14 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
-@Database(entities = [POIData::class, Word::class], version = 1)
+@Database(entities = [POIData::class, CategoryData::class], version = 1)
 public abstract class CiceroneAppDatabase : RoomDatabase() {
 
     // abstract fun POIDao(): POIDao
     abstract fun poiDao(): POIDao
+    abstract fun categoryDao(): CategoryDao
 
-    private class POIDatabaseCallback(
+    private class CiceroneDatabaseCallback(
         private val scope: CoroutineScope
     ) : RoomDatabase.Callback() {
 
@@ -22,16 +23,21 @@ public abstract class CiceroneAppDatabase : RoomDatabase() {
             super.onOpen(db)
             INSTANCE?.let { database ->
                 scope.launch {
+                    //************* POI table *************
                     val poiDao = database.poiDao()
-
                     // Delete all content here.
                     poiDao.deleteAll()
-
-                    // Add sample words.
+                    // Add sample POI.
                     var poi = POIData("1337XD", "SNU", "School", "12:00", 0.00, 0.00)
                     poiDao.insert(poi)
-//                    word = Word("World!")
-//                    poiDao.insert(word)
+
+                    //************* Category table *************
+                    val catDao = database.categoryDao()
+                    // Delete all content here.
+                    catDao.deleteAll()
+                    // Add sample categories with score.
+                    var cat = CategoryData("School", 10.0)
+                    catDao.insert(cat)
                 }
             }
         }
@@ -55,7 +61,7 @@ public abstract class CiceroneAppDatabase : RoomDatabase() {
                     CiceroneAppDatabase::class.java,
                     "cicerone_app_database"
                 )
-                    .addCallback(POIDatabaseCallback(scope))
+                    .addCallback(CiceroneDatabaseCallback(scope))
                     .build()
                 INSTANCE = instance
                 return instance

@@ -6,9 +6,12 @@ import android.speech.tts.UtteranceProgressListener
 import android.text.Html
 import android.text.method.LinkMovementMethod
 import android.util.Log
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.google.gson.internal.LinkedTreeMap
+import com.teampower.cicerone.database.category_table.CategoryViewModel
 import kotlinx.android.synthetic.main.activity_geofence_triggered.*
 import kotlinx.android.synthetic.main.activity_scrolling.toolbar
 import kotlinx.android.synthetic.main.content_geofence_triggered.*
@@ -16,6 +19,7 @@ import java.util.*
 
 
 class GeofenceTriggeredActivity : AppCompatActivity()  {
+    private lateinit var catViewModel: CategoryViewModel
     private val TRIG_TAG = "POIActivity"
     lateinit var tts : TextToSpeech
     private var speaking = false
@@ -111,5 +115,21 @@ class GeofenceTriggeredActivity : AppCompatActivity()  {
                 tts.speak(tts_text, TextToSpeech.QUEUE_FLUSH, null, "TRIG_TTS")
             }
         }
+        Log.v(TRIG_TAG, POI.toString())
+
+        // TODO: Remove, for now log score of categories in the table
+        catViewModel = ViewModelProvider(this).get(CategoryViewModel::class.java)
+        /*
+        catViewModel.allCat.observe(this, Observer {cats ->
+            Log.i(TRIG_TAG, "Entry: ${cats?.get(0)}")
+        })
+        */
+        catViewModel.updateCategoryPoints("School", 2.0)
+        val s = catViewModel.getCategoryPoints("School")
+        Log.i(TRIG_TAG, "School: Points=$s")
+
+
+
+
     }
 }

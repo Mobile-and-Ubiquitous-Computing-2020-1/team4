@@ -12,7 +12,6 @@ import androidx.lifecycle.LiveData
 class POIRepository(private val poiDao: POIDao) {
     // Room executes all queries on a separate thread.
 
-
     // Tutorial test stuff
     // Observed LiveData will notify the observer when the data has changed.
     val allPOI: LiveData<List<POIData>> = poiDao.getRecentlyTriggered()

@@ -8,7 +8,7 @@ import androidx.room.*
 * Contains the methods used for accessing the database.
 * */
 
-// TODO: Replace tutorial Word stuff with this.
+// History/saved places table interface
 @Dao
 interface POIDao {
     @Query("SELECT * FROM poi_table")
@@ -31,8 +31,9 @@ interface POIDao {
 
     @Query("DELETE FROM poi_table")
     suspend fun deleteAll()
-
 }
+
+
 /*
 @Dao
 interface WordDao {
