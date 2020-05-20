@@ -11,7 +11,6 @@ import com.teampower.cicerone.database.category_table.CategoryViewModel
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.google.gson.internal.LinkedTreeMap
-import com.teampower.cicerone.database.category_table.CategoryViewModel
 import kotlinx.android.synthetic.main.activity_geofence_triggered.*
 import kotlinx.android.synthetic.main.activity_scrolling.toolbar
 import kotlinx.android.synthetic.main.content_geofence_triggered.*
