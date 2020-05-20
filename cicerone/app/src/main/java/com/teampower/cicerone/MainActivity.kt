@@ -129,5 +129,4 @@ class MainActivity : AppCompatActivity() {
     ) {
         latCon.onRequestPermissionsResult(requestCode, permissions, grantResults)
     }
-
 }

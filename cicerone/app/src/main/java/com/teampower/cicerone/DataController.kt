@@ -66,7 +66,7 @@ class DataController(private val geoCon: GeofencingController) {
                     //Log.d(TAG, "Venues:" + venues.toString())
                     // For now, take the 100 closest POIs and make sure they aren't closer than 10 m
                     val closestVenues = getClosestVenues(venues)
-                    val filteredVenues = filterVenues(closestVenues, 50F) // Remove POIs if closer than 10m to each other
+                    val filteredVenues = filterVenues(closestVenues, 200F) // Remove POIs if closer 200m of each other - google recommends minimum radius of 100m
                     val radius = calculateRadius(filteredVenues)
                     Log.d(TAG, "Radius: $radius m")
                     for ((id, venue) in filteredVenues.withIndex()) {

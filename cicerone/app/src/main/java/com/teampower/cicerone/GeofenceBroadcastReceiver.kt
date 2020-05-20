@@ -11,15 +11,16 @@ import retrofit2.Callback
 import retrofit2.Response
 
 
-class GeofenceBroadcastReceiver : BroadcastReceiver() {
+class GeofenceBroadcastReceiver() : BroadcastReceiver() {
     private val TAG = "Geofencer"
     private val api: RestAPI = RestAPI()
     private lateinit var poiSerialized: String
     private lateinit var poiObject: POI
+    private val geoCon = GeofencingController()
 
     override fun onReceive(context: Context?, intent: Intent?) {
         val geofencingEvent = GeofencingEvent.fromIntent(intent)
-        Log.i(TAG, "Received geofence")
+        Log.i(TAG, "Received geofence: $geofencingEvent")
         if (geofencingEvent.hasError()) {
             val errorMessage = "Error when receiving geofencing event"
             Log.e(TAG, errorMessage)
@@ -29,28 +30,22 @@ class GeofenceBroadcastReceiver : BroadcastReceiver() {
         val geofenceTransition = geofencingEvent.geofenceTransition
 
         // Test that the reported transition was of interest
-        if (geofenceTransition == Geofence.GEOFENCE_TRANSITION_ENTER ||
-            geofenceTransition == Geofence.GEOFENCE_TRANSITION_EXIT ||
-            geofenceTransition == Geofence.GEOFENCE_TRANSITION_DWELL
-        ) {
-
+        if (geofenceTransition == Geofence.GEOFENCE_TRANSITION_ENTER) {
             // Get the geofences that were triggered. A single even can trigger
             // multiple geofences
-            val triggeringGeofence =
-                geofencingEvent.triggeringGeofences[0] // TODO: Remove geofence when used up.
-
-
-            // TODO: This is basically demo #2 for mid-term - only need to get Wikipedia info as string
+            val triggeringGeofence = geofencingEvent.triggeringGeofences[0]
+            // Remove the geofence - no need to remove the geofence, it won't trigger again.
+            // The second trigger we are experiencing is because it is added to the geofences again from Foursquare.
             // Extract the transitionDetails
             poiSerialized = intent?.getStringExtra("POI")
                 ?: "" // TODO: Handle error case better. This works only assuming we always get a serialized POI object
             poiObject = MainActivity.fromJson(poiSerialized)
             Log.i(TAG, "id" + triggeringGeofence.requestId + " got the poi name " + poiObject.name)
-
             getPlaceInfoSendNotification(context)
+
         } else {
             // Log the error
-            Log.e(TAG, "Error in Geofencer - should log error here one of these days")
+            Log.e(TAG, "Error in geofencer - geofence transition not interesting")
         }
     }
 
