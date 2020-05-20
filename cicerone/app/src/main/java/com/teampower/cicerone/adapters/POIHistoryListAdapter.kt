@@ -1,4 +1,4 @@
-package com.teampower.cicerone.database.history_table
+package com.teampower.cicerone.adapters
 
 import android.content.Context
 import android.view.LayoutInflater

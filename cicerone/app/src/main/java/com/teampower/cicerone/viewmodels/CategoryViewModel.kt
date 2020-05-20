@@ -1,11 +1,12 @@
-package com.teampower.cicerone.database.history_table
+package com.teampower.cicerone.viewmodels
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.viewModelScope
+import com.teampower.cicerone.database.CategoryData
 import com.teampower.cicerone.database.CiceroneAppDatabase
-import com.teampower.cicerone.database.POIHistoryData
+import com.teampower.cicerone.database.repositories.CategoryRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -15,24 +16,26 @@ import kotlinx.coroutines.launch
 * while your ViewModel can take care of holding and processing all the data needed for the UI.
 * */
 
-class POIHistoryViewModel(application: Application) : AndroidViewModel(application) {
+class CategoryViewModel(application: Application) : AndroidViewModel(application) {
 
-    private val historyRepository: POIHistoryRepository
+    private val repository: CategoryRepository
 
     // Using LiveData and caching what getAlphabetizedWords returns has several benefits:
     // - We can put an observer on the data (instead of polling for changes) and only update the
     //   the UI when the data actually changes.
     // - Repository is completely separated from the UI through the ViewModel.
-    val allPOI: LiveData<List<POIHistoryData>>
+    val allCat: LiveData<List<CategoryData>>
 
     init {
-        val poisDao = CiceroneAppDatabase.getDatabase(
+        val catDao = CiceroneAppDatabase.getDatabase(
             application,
             viewModelScope
-        ).poiHistoryDao()
-        historyRepository =
-            POIHistoryRepository(poisDao)
-        allPOI = historyRepository.allPOI
+        ).categoryDao()
+        repository =
+            CategoryRepository(
+                catDao
+            )
+        allCat = repository.allCatScores
     }
 
     /**
@@ -40,7 +43,15 @@ class POIHistoryViewModel(application: Application) : AndroidViewModel(applicati
      * to block the main thread, so we're launching a new coroutine and calling the repository's
      * insert, which is a suspend function.
      */
-    fun insert(poi: POIHistoryData) = viewModelScope.launch(Dispatchers.IO) {
-        historyRepository.insert(poi)
+    fun insert(cat: CategoryData) = viewModelScope.launch(Dispatchers.IO) {
+        repository.insert(cat)
+    }
+
+    fun updateCategoryPoints(catName: String, points: Double) = viewModelScope.launch(Dispatchers.IO) {
+        repository.updateCategoryPoints(catName, points)
+    }
+
+    fun getCategoryPoints(catName: String) = viewModelScope.launch(Dispatchers.IO) {
+        repository.getCategoryPoints(catName)
     }
 }

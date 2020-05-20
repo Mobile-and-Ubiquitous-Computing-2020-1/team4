@@ -1,4 +1,4 @@
-package com.teampower.cicerone.database.history_table
+package com.teampower.cicerone.database
 
 import androidx.lifecycle.LiveData
 import androidx.room.*

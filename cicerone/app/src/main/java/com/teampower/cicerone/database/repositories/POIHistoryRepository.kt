@@ -1,7 +1,8 @@
-package com.teampower.cicerone.database.history_table
+package com.teampower.cicerone.database.repositories
 
 import androidx.lifecycle.LiveData
 import com.teampower.cicerone.database.POIHistoryData
+import com.teampower.cicerone.database.POIHistoryDao
 
 /*
 * POIRepository

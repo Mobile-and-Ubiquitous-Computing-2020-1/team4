@@ -18,9 +18,9 @@ import com.teampower.cicerone.control.DataController
 import com.teampower.cicerone.control.GeofencingController
 import com.teampower.cicerone.control.LocationController
 import com.teampower.cicerone.control.NotificationsController
-import com.teampower.cicerone.database.category_table.CategoryViewModel
-import com.teampower.cicerone.database.history_table.POIHistoryListAdapter
-import com.teampower.cicerone.database.history_table.POIHistoryViewModel
+import com.teampower.cicerone.viewmodels.CategoryViewModel
+import com.teampower.cicerone.adapters.POIHistoryListAdapter
+import com.teampower.cicerone.viewmodels.POIHistoryViewModel
 import com.teampower.cicerone.database.history_table.POISavedListAdapter
 import com.teampower.cicerone.database.history_table.POISavedViewModel
 import kotlinx.android.synthetic.main.activity_scrolling.*
@@ -63,7 +63,8 @@ class MainActivity : AppCompatActivity() {
 
         // List history of recent POIs
         val historyRecyclerView = findViewById<RecyclerView>(R.id.historyrecyclerview)
-        val historyAdapter = POIHistoryListAdapter(this)
+        val historyAdapter =
+            POIHistoryListAdapter(this)
         historyRecyclerView.adapter = historyAdapter
         historyRecyclerView.layoutManager = LinearLayoutManager(this)
 

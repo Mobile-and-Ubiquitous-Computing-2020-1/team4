@@ -1,7 +1,8 @@
-package com.teampower.cicerone.database.category_table
+package com.teampower.cicerone.database.repositories
 
 import androidx.lifecycle.LiveData
 import com.teampower.cicerone.database.CategoryData
+import com.teampower.cicerone.database.CategoryDao
 
 /*
 * CategoryRepository
