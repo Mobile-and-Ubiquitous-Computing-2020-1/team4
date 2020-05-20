@@ -148,7 +148,7 @@ class GeofenceTriggeredActivity : AppCompatActivity() {
 
         // Demo on how to update category score
         catViewModel = ViewModelProvider(this).get(CategoryViewModel::class.java)
-        catViewModel.updateCategoryPoints("School", 2.0) // Change score
+        catViewModel.updateCategoryPoints(POI.categoryID, 2.0) // Change score
     }
 
     private fun toggleFavoritePOI(poi: POI) {

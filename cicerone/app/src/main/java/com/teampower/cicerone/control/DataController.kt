@@ -114,8 +114,13 @@ class DataController(private val geoCon: GeofencingController) {
         val distance = venue.location.distance
         val address = venue.location.formattedAddress.joinToString()
         var categories = ""
+        var categoryID = ""
         for (cat in venue.categories) {
             categories = categories + cat.name
+            if(categoryID!= ""){
+                categoryID = categoryID + ","  // Add delimiter between Ids
+            }
+            categoryID = categoryID + cat.id
         }
         return POI(
             id.toString(),
@@ -124,7 +129,8 @@ class DataController(private val geoCon: GeofencingController) {
             long,
             distance,
             address,
-            categories
+            categories,
+            categoryID
         )
     }
 
@@ -134,6 +140,7 @@ class DataController(private val geoCon: GeofencingController) {
         poi_string.append("Location: ${poi.lat}, ${poi.long}").appendln()
         poi_string.append("Address: ${poi.address}").appendln()
         poi_string.append("Category: ${poi.category}").appendln()
+        poi_string.append("CategoryIDs: ${poi.categoryID}").appendln()
         poi_string.append("Current distance: ${poi.distance}m")
         venue_view.text = poi_string
     }
@@ -171,16 +178,19 @@ class DataController(private val geoCon: GeofencingController) {
         val indicesNotToAdd = ArrayList<Int>()
         for (i in venues.indices) {
             for (j in i + 1 until venues.size) {
+                val venueA = venues[i]
+                val venueB = venues[j]
+
                 val locationA = Location("A")
-                locationA.latitude = venues[i].location.lat
-                locationA.longitude = venues[i].location.lng
+                locationA.latitude = venueA.location.lat
+                locationA.longitude = venueA.location.lng
                 val locationB = Location("B")
-                locationB.latitude = venues[j].location.lat
-                locationB.longitude = venues[j].location.lng
+                locationB.latitude = venueB.location.lat
+                locationB.longitude = venueB.location.lng
 
                 val distanceAB = locationA.distanceTo(locationB) // Distance between AB
-                val distanceAUser = venues[i].location.distance // Distance between A and user
-                val distanceBUser = venues[j].location.distance // Distance between B and user
+                val distanceAUser = venueA.location.distance // Distance between A and user
+                val distanceBUser = venueB.location.distance // Distance between B and user
                 // Filter out the POI that's farthest away
                 if( distanceAB < threshold ) {
                     // If overlapping, make sure not to add the farthest POI
@@ -189,6 +199,9 @@ class DataController(private val geoCon: GeofencingController) {
                     } else{
                         indicesNotToAdd.add(i)
                     }
+                    // TODO: In progress, new filtering based on CategoryScore
+                    Log.i(DATA_CON, venueA.categories.toString())
+                    Log.i(DATA_CON, venueB.categories.toString())
 
                 }
             }

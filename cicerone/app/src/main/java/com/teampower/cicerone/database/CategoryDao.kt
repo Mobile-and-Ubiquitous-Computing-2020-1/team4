@@ -14,11 +14,11 @@ interface CategoryDao {
     @Query("SELECT * FROM category_table")
     fun getAll(): LiveData<List<CategoryData>>
 
-    @Query("UPDATE category_table SET score = score + (:points) WHERE name = (:catName)")
-    fun updateCategoryPoints(catName: String, points: Double): Int
+    @Query("UPDATE category_table SET score = score + (:points) WHERE foursquareID = (:foursquareID)")
+    fun updateCategoryPoints(foursquareID: String, points: Double): Int
 
-    @Query("SELECT * FROM category_table WHERE name = (:catName)")
-    fun getCategoryPoints(catName: String): Double
+    @Query("SELECT * FROM category_table WHERE foursquareID = (:foursquareID)")
+    fun getCategoryPoints(foursquareID: String): Double
 
     @Query("DELETE FROM category_table")
     suspend fun deleteAll()

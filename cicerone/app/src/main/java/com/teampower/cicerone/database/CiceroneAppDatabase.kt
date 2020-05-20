@@ -48,8 +48,10 @@ public abstract class CiceroneAppDatabase : RoomDatabase() {
                     // Delete all content here.
                     catDao.deleteAll() // Only when resetting
                     // Initialize table
-                    val cat = CategoryData("School", 1.0)
-                    catDao.insert(cat)
+                    val cat1 = CategoryData("52e81612bcbc57f1066b7a14", "Palace", 1.0)
+                    catDao.insert(cat1)
+                    val cat2 = CategoryData("50aaa49e4b90af0d42d5de11", "Castle", 1.0)
+                    catDao.insert(cat2)
                 }
             }
         }
