@@ -6,6 +6,8 @@ import android.speech.tts.UtteranceProgressListener
 import android.text.Html
 import android.text.method.LinkMovementMethod
 import android.util.Log
+import androidx.lifecycle.ViewModelProvider
+import com.teampower.cicerone.viewmodels.CategoryViewModel
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.google.gson.internal.LinkedTreeMap
@@ -16,6 +18,7 @@ import java.util.*
 
 
 class GeofenceTriggeredActivity : AppCompatActivity()  {
+    private lateinit var catViewModel: CategoryViewModel
     private val TRIG_TAG = "POIActivity"
     lateinit var tts : TextToSpeech
     private var speaking = false
@@ -111,5 +114,10 @@ class GeofenceTriggeredActivity : AppCompatActivity()  {
                 tts.speak(tts_text, TextToSpeech.QUEUE_FLUSH, null, "TRIG_TTS")
             }
         }
+        Log.v(TRIG_TAG, POI.toString())
+
+        // Demo on how to update category score
+        catViewModel = ViewModelProvider(this).get(CategoryViewModel::class.java)
+        catViewModel.updateCategoryPoints("School", 2.0) // Change score
     }
 }

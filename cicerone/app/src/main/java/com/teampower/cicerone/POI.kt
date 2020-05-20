@@ -1,5 +1,7 @@
 package com.teampower.cicerone
 
+import com.teampower.cicerone.wikipedia.WikipediaPlaceInfo
+
 /**
  * Data class for POI object. May be unnecessary to have this alone in a file.
  * @param lat Latitude of POI

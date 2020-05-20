@@ -6,6 +6,10 @@ import android.content.Intent
 import android.util.Log
 import com.google.android.gms.location.Geofence
 import com.google.android.gms.location.GeofencingEvent
+import com.teampower.cicerone.control.GeofencingController
+import com.teampower.cicerone.control.NotificationsController
+import com.teampower.cicerone.wikipedia.RestAPI
+import com.teampower.cicerone.wikipedia.WikipediaPlaceInfo
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -13,7 +17,8 @@ import retrofit2.Response
 
 class GeofenceBroadcastReceiver() : BroadcastReceiver() {
     private val TAG = "Geofencer"
-    private val api: RestAPI = RestAPI()
+    private val api: RestAPI =
+        RestAPI()
     private lateinit var poiSerialized: String
     private lateinit var poiObject: POI
     private val geoCon = GeofencingController()

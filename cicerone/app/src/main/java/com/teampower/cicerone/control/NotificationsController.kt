@@ -1,4 +1,4 @@
-package com.teampower.cicerone
+package com.teampower.cicerone.control
 
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -9,6 +9,10 @@ import android.content.Intent
 import android.os.Build
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import com.teampower.cicerone.CHANNEL_ID
+import com.teampower.cicerone.GeofenceTriggeredActivity
+import com.teampower.cicerone.MainActivity
+import com.teampower.cicerone.R
 
 
 class NotificationsController() {
@@ -46,7 +50,9 @@ class NotificationsController() {
         }
         val pendingIntent: PendingIntent = PendingIntent.getActivity(context, 0, intent, 0)
 
-        val builder = NotificationCompat.Builder(context, CHANNEL_ID)
+        val builder = NotificationCompat.Builder(context,
+            CHANNEL_ID
+        )
             .setSmallIcon(R.drawable.googleg_standard_color_18)
             .setContentTitle(title)
             .setContentText(content)
@@ -82,7 +88,9 @@ class NotificationsController() {
             getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT)
         }
 
-        val builder = NotificationCompat.Builder(context, CHANNEL_ID)
+        val builder = NotificationCompat.Builder(context,
+            CHANNEL_ID
+        )
             .setSmallIcon(R.drawable.common_full_open_on_phone)
             .setContentTitle(title)
             .setContentText(content)
