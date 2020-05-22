@@ -7,18 +7,24 @@ import android.widget.TextView
 import com.google.android.gms.location.Geofence
 import com.teampower.cicerone.*
 import com.teampower.cicerone.database.CategoryData
+import com.teampower.cicerone.viewmodels.CategoryViewModel
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import okhttp3.logging.HttpLoggingInterceptor.Level
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
+import java.util.*
+import kotlin.collections.ArrayList
 
 
 class DataController(private val geoCon: GeofencingController) {
     private val DATA_CON = "DataController"
     private lateinit var categoryScores : List<CategoryData>
+    private lateinit var categoryViewModel: CategoryViewModel
     private val pois = mutableMapOf<String, POI>() // We can store all POIs in this map, indexed by ID
+    private val uniformRandom = Random() // seed 1 - TODO remove seed
+
 
     fun requestData(location: android.location.Location, venue_view: TextView, mainContext: Context) {
         // Set context
@@ -96,7 +102,9 @@ class DataController(private val geoCon: GeofencingController) {
                         // Add POI to the list of current POIs
                         pois.put(poi.id, poi)
                     }
-                    displayData(pois.toList().get(0).second, venue_view)
+                    if(!pois.isEmpty()){
+                        displayData(pois.toList().get(0).second, venue_view)
+                    }
                 }
             }
         })
@@ -148,7 +156,7 @@ class DataController(private val geoCon: GeofencingController) {
     private fun getClosestVenues(venues: List<Venues>): List<Venues> {
         val closestVenues = venues.sortedBy { venue -> venue.location.distance }
         if (closestVenues.size > 100 ){
-            return closestVenues.slice(0..1)
+            return closestVenues.slice(0..5)
         }
         return closestVenues
     }
@@ -189,22 +197,28 @@ class DataController(private val geoCon: GeofencingController) {
                 locationB.longitude = venueB.location.lng
 
                 val distanceAB = locationA.distanceTo(locationB) // Distance between AB
-                val distanceAUser = venueA.location.distance // Distance between A and user
-                val distanceBUser = venueB.location.distance // Distance between B and user
                 // Filter out the POI that's farthest away
-                if( distanceAB < threshold ) {
-                    // If overlapping, make sure not to add the farthest POI
-                    if (distanceAUser < distanceBUser) {
+                if( distanceAB < threshold) {
+                    // Filtering based on cateogory score
+                    val scoreA = fetchCategoryScore(venueA.categories)
+                    val scoreB = fetchCategoryScore(venueB.categories)
+                    val pA = scoreA/(scoreA+scoreB)
+                    val rv = uniformRandom.nextDouble()
+                    Log.i(DATA_CON, "pA=$pA")
+                    Log.i(DATA_CON, "rv=$rv")
+                    // TODO reimplement how we filter out the places that are not selected: this is not working atm.
+                    // make a probabilistic choice
+                    if(rv <= pA && !indicesNotToAdd.contains(j)){
+                        // If chosen A, remove B
                         indicesNotToAdd.add(j)
-                    } else{
+                        Log.i(DATA_CON, "Venue ${venueB} removed")
+                    }else if(rv > pA && !indicesNotToAdd.contains(i)) {
+                        // if chosen B, remove A
                         indicesNotToAdd.add(i)
                     }
-                    // TODO: In progress, new filtering based on CategoryScore
-                    Log.i(DATA_CON, venueA.categories.toString())
-                    Log.i(DATA_CON, venueB.categories.toString())
-
                 }
             }
+            Log.i(DATA_CON, "Indices not to add: $indicesNotToAdd")
             if (!indicesNotToAdd.contains(i)) {
                 filteredVenues.add(venues[i])
             }
@@ -212,9 +226,33 @@ class DataController(private val geoCon: GeofencingController) {
         return filteredVenues
     }
 
+    private fun fetchCategoryScore(categories: List<Categories>): Double {
+        var score = 0.0
+        for(catScore in categoryScores){
+            for(cat in categories){
+                if(catScore.foursquareID==cat.id){
+                    score = catScore.score
+                }
+            }
+        }
+        if(score==0.0){
+            // If category is not in databse, add that category to the database and initialize the score to 1
+            for(cat in categories){
+                categoryViewModel.insert(CategoryData(cat.id, cat.name, 1.0))
+                Log.i(DATA_CON, "Category ${cat.name} added to database")
+            }
+            score = 1.0
+        }
+        return score
+    }
+
     fun setCategoryScores(cats: List<CategoryData>){
         categoryScores = cats
         Log.i(DATA_CON, "Category scores updated to: ${categoryScores}")
+    }
+
+    fun setCatViewModel(catViewModel: CategoryViewModel) {
+        categoryViewModel = catViewModel
     }
 
 }

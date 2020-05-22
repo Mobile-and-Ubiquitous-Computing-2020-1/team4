@@ -90,12 +90,13 @@ class MainActivity : AppCompatActivity() {
             pois?.let { savedAdapter.setPOIs(it) }
         })
 
-        // Connect to local table of category scores
+        // Connect to local table of category scores - have to do this here since datacon is not a viewmodel provider
         catViewModel = ViewModelProvider(this).get(CategoryViewModel::class.java)
         catViewModel.allCat.observe(this, Observer { cats ->
             // Set table of scores in DataCon
             dataCon.setCategoryScores(cats)
         })
+        dataCon.setCatViewModel(catViewModel)
 
 
         // Setup location services
