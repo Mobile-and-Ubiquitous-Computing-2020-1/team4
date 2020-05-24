@@ -30,16 +30,18 @@ public abstract class CiceroneAppDatabase : RoomDatabase() {
                     // Delete all content here.
                     poiHDao.deleteAll()
                     // Add sample POI.
-                    val poiH = POIHistoryData("1337XD", "SNU", "School", "January 1, 1970, 00:00:00 GMT", 0.00, 0.00)
+                    val poiH = POIHistoryData(
+                        "1337XD",
+                        "SNU",
+                        "School",
+                        "January 1, 1970, 00:00:00 GMT",
+                        0.00,
+                        0.00
+                    )
                     poiHDao.insert(poiH)
 
                     //************* POI Saved table *************
                     val poiSDao = database.poiSavedDao()
-                    // Delete all content here.
-                    poiSDao.deleteAll()
-                    // Add sample POI.
-                    val poiS = POISavedData("1227", "Nakeseongdae Park", "Park", "January 1, 1970, 00:00:00 GMT", 0.00, 0.00)
-                    poiSDao.insert(poiS)
 
                     //************* Category table *************
                     val catDao = database.categoryDao()
