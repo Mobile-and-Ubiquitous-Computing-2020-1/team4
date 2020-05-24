@@ -15,7 +15,7 @@ import okhttp3.logging.HttpLoggingInterceptor.Level
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
-
+import kotlin.math.round
 
 class DataController(private val geoCon: GeofencingController) {
     private val DATA_CON = "DataController"
@@ -103,7 +103,7 @@ class DataController(private val geoCon: GeofencingController) {
         })
     }
 
-    fun requestVenueDetails(venueID: String, venue_detail_view: TextView, mainContext: Context) {
+    fun requestVenueDetails(venueID: String, current_location: Location, venue_detail_view: TextView, mainContext: Context) {
         // Set context
         val context = mainContext
 
@@ -150,7 +150,7 @@ class DataController(private val geoCon: GeofencingController) {
                 if (response.isSuccessful()) {
                     val result = response.body()
                     val venue = result!!.response.venue
-                    val poi = poiDetailBuilder(venue, 0)
+                    val poi = poiDetailBuilder(venue, 0, current_location)
                     displayData(poi, venue_detail_view)
                 }
             }
@@ -183,11 +183,10 @@ class DataController(private val geoCon: GeofencingController) {
         )
     }
 
-    private fun poiDetailBuilder(venue: Venue, id: Int): POI {
+    private fun poiDetailBuilder(venue: Venue, id: Int, current_location: Location): POI {
         val name = venue.name
         val lat = venue.location.lat
         val long = venue.location.lng
-        val distance = 0 // TODO calculate distance
         val address = venue.location.formattedAddress.joinToString()
         val categories = venue.categories.joinToString { it.name }
         val description = venue.description
@@ -195,10 +194,19 @@ class DataController(private val geoCon: GeofencingController) {
         val hours = venue.hours.status
         val phone = venue.contact.formattedPhone
         val facebook = venue.contact.facebook
-        val twitter = venue.contact.instagram
-        val photo_url = venue.bestPhoto.prefix + "original" + venue.bestPhoto.suffix
+        val twitter = venue.contact.twitter
+        val ig = venue.contact.instagram
+        val photo = venue.bestPhoto.prefix + "original" + venue.bestPhoto.suffix
         val website = venue.url
         val tip = venue.tips.groups.get(0).items.get(0).text
+
+        // Compute distance to the venue
+        val venue_location = Location("")
+        venue_location.latitude = lat
+        venue_location.longitude = long
+        val distance = round(current_location.distanceTo(venue_location)).toInt()
+
+        // Create and return the POI object
         return POI(
             id.toString(),
             name,
@@ -213,13 +221,15 @@ class DataController(private val geoCon: GeofencingController) {
             phone,
             facebook,
             twitter,
-            photo_url,
+            ig,
+            photo,
             website,
             tip
         )
     }
 
     private fun displayData(poi: POI, venue_view: TextView) {
+        // Generate string with basic POI information
         val poi_string = StringBuilder()
         poi_string.append("Name: ${poi.name}").appendln()
         poi_string.append("Location: ${poi.lat}, ${poi.long}").appendln()
@@ -232,7 +242,7 @@ class DataController(private val geoCon: GeofencingController) {
             poi_string.append("Description: ${poi.description}").appendln()
         }
         poi.rating?.let {
-            poi_string.append("Rating: ${poi.rating.toString()}").appendln()
+            poi_string.append("Rating: ${poi.rating}").appendln()
         }
         poi.hours?.let {
             poi_string.append("Opening hours: ${poi.hours}").appendln()
@@ -241,12 +251,14 @@ class DataController(private val geoCon: GeofencingController) {
             poi_string.append("Phone number: ${poi.phone}").appendln()
         }
         poi.website?.let {
-            poi_string.append("Website: ${poi.website}").appendln()
+            poi_string.append("Website: ${poi?.website}").appendln()
         }
         poi.tip?.let {
             poi_string.appendln()
             poi_string.append("${poi.tip}")
         }
+
+        // Finally set the text view string to the POI description we generated above
         venue_view.text = poi_string
     }
 

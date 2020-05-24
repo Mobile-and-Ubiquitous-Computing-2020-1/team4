@@ -122,7 +122,8 @@ class MainActivity : AppCompatActivity() {
             var currLocation: android.location.Location = latCon.getLocation()
             Log.d(TAG, "Current location: ${currLocation}. Requesting data...")
             dataCon.requestData(currLocation, venue_description, this@MainActivity)
-            dataCon.requestVenueDetails("412d2800f964a520df0c1fe3", venue_detail, this@MainActivity)
+            val venueID = "412d2800f964a520df0c1fe3"
+            dataCon.requestVenueDetails(venueID, currLocation, venue_detail, this@MainActivity)
         }
     }
 

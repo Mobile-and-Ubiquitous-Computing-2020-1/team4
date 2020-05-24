@@ -27,7 +27,7 @@ data class POI(
     val phone: String? = null,
     val facebook: String? = null,
     val twitter: String? = null,
-    val instagram: String? = null,
+    val ig: String? = null,
     val photo_url: String? = null,
     val website: String? = null,
     val tip: String? = null
