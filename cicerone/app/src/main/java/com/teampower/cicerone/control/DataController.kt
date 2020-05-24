@@ -7,6 +7,8 @@ import android.widget.TextView
 import com.google.android.gms.location.Geofence
 import com.teampower.cicerone.*
 import com.teampower.cicerone.database.CategoryData
+import com.teampower.cicerone.foursquare.premium.FoursquarePremiumData
+import com.teampower.cicerone.foursquare.premium.Venue
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import okhttp3.logging.HttpLoggingInterceptor.Level
@@ -26,8 +28,7 @@ class DataController(private val geoCon: GeofencingController) {
 
         // Loads client ID and secret from "secret.properties" file in BuildConfig
         val foursquare_id = BuildConfig.FOURSQUARE_ID
-        val foursquare_secret =
-            BuildConfig.FOURSQUARE_SECRET
+        val foursquare_secret = BuildConfig.FOURSQUARE_SECRET
 
         // API call parameters
         val location_string: String = "${location.latitude.toString()}, ${location.longitude.toString()}"
@@ -102,6 +103,60 @@ class DataController(private val geoCon: GeofencingController) {
         })
     }
 
+    fun requestVenueDetails(venueID: String, venue_detail_view: TextView, mainContext: Context) {
+        // Set context
+        val context = mainContext
+
+        // Loads client ID and secret from "secret.properties" file in BuildConfig
+        val foursquare_id = BuildConfig.FOURSQUARE_ID
+        val foursquare_secret = BuildConfig.FOURSQUARE_SECRET
+
+        // API call parameters
+        val version = "20200420" // set date for API versioning here (see Foursquare API)
+        val cacheDuration = 60
+
+        // Set up HTTP client
+        val client = OkHttpClient().newBuilder()
+            .addInterceptor(
+                FoursquareRequestInterceptor(
+                    foursquare_id,
+                    foursquare_secret,
+                    version,
+                    cacheDuration
+                )
+            )
+            .addInterceptor(HttpLoggingInterceptor().apply {
+                level = if (BuildConfig.DEBUG) Level.BODY else Level.NONE
+            })
+            .build()
+
+        // Set up retrofit
+        val retrofit = Retrofit.Builder()
+            .baseUrl("https://api.foursquare.com")
+            .client(client)
+            .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+
+        // Make API call
+        val FoursquareAPI = retrofit.create(FoursquareAPI::class.java)
+        FoursquareAPI.getVenueDetails(venueID).enqueue(object : retrofit2.Callback<FoursquarePremiumData> {
+            override fun onFailure(call: retrofit2.Call<FoursquarePremiumData>?, t: Throwable?) {
+                Log.e(TAG, "Error: could not receive response from Foursquare API. ${t?.message}")
+
+            }
+
+            override fun onResponse(call: retrofit2.Call<FoursquarePremiumData>, response: retrofit2.Response<FoursquarePremiumData>) {
+                if (response.isSuccessful()) {
+                    val result = response.body()
+                    val venue = result!!.response.venue
+                    val poi = poiDetailBuilder(venue, 0)
+                    displayData(poi, venue_detail_view)
+                }
+            }
+        })
+    }
+
     fun getPOI(id: String): POI? {
         return pois.get(id)
     }
@@ -128,13 +183,70 @@ class DataController(private val geoCon: GeofencingController) {
         )
     }
 
+    private fun poiDetailBuilder(venue: Venue, id: Int): POI {
+        val name = venue.name
+        val lat = venue.location.lat
+        val long = venue.location.lng
+        val distance = 0 // TODO calculate distance
+        val address = venue.location.formattedAddress.joinToString()
+        val categories = venue.categories.joinToString()
+        val description = venue.description
+        val rating = venue.rating
+        val hours = venue.hours.status
+        val phone = venue.contact.formattedPhone
+        val facebook = venue.contact.facebook
+        val twitter = venue.contact.instagram
+        val photo_url = venue.bestPhoto.prefix + "original" + venue.bestPhoto.suffix
+        val website = venue.url
+        val tip = venue.tips.groups.get(0).items.get(0).text
+        return POI(
+            id.toString(),
+            name,
+            lat,
+            long,
+            distance,
+            address,
+            categories,
+            description,
+            rating,
+            hours,
+            phone,
+            facebook,
+            twitter,
+            photo_url,
+            website,
+            tip
+        )
+    }
+
     private fun displayData(poi: POI, venue_view: TextView) {
         val poi_string = StringBuilder()
         poi_string.append("Name: ${poi.name}").appendln()
         poi_string.append("Location: ${poi.lat}, ${poi.long}").appendln()
         poi_string.append("Address: ${poi.address}").appendln()
         poi_string.append("Category: ${poi.category}").appendln()
-        poi_string.append("Current distance: ${poi.distance}m")
+        poi_string.append("Current distance: ${poi.distance}m").appendln()
+
+        // If we have detail information execute code below
+        poi.description?.let {
+            poi_string.append("Description: ${poi.description}").appendln()
+        }
+        poi.rating?.let {
+            poi_string.append("Rating: ${poi.rating.toString()}").appendln()
+        }
+        poi.hours?.let {
+            poi_string.append("Opening hours: ${poi.hours}").appendln()
+        }
+        poi.phone?.let {
+            poi_string.append("Phone number: ${poi.phone}").appendln()
+        }
+        poi.website?.let {
+            poi_string.append("Website: ${poi.website}").appendln()
+        }
+        poi.tip?.let {
+            poi_string.appendln()
+            poi_string.append("${poi.tip}")
+        }
         venue_view.text = poi_string
     }
 

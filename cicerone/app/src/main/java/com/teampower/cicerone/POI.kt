@@ -21,7 +21,16 @@ data class POI(
     val distance: Int,
     val address: String,
     val category: String,
-    val description: String = "No description yet."
+    val description: String? = null,
+    val rating: Double? = null,
+    val hours: String? = null,
+    val phone: String? = null,
+    val facebook: String? = null,
+    val twitter: String? = null,
+    val instagram: String? = null,
+    val photo_url: String? = null,
+    val website: String? = null,
+    val tip: String? = null
 ) {
 }
 

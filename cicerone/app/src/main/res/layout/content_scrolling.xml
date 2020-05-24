@@ -21,6 +21,14 @@
             android:text="Venue information" />
 
         <TextView
+            android:id="@+id/venue_detail"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/text_margin"
+            android:text="Detailed venue information from Foursquare Premium API" />
+
+
+        <TextView
             android:id="@+id/historytextview"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
