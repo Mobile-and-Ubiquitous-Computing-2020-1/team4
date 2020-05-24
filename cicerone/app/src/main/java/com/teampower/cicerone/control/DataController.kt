@@ -189,7 +189,7 @@ class DataController(private val geoCon: GeofencingController) {
         val long = venue.location.lng
         val distance = 0 // TODO calculate distance
         val address = venue.location.formattedAddress.joinToString()
-        val categories = venue.categories.joinToString()
+        val categories = venue.categories.joinToString { it.name }
         val description = venue.description
         val rating = venue.rating
         val hours = venue.hours.status
