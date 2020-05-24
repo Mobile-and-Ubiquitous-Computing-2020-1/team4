@@ -156,9 +156,9 @@ class DataController(private val geoCon: GeofencingController) {
     private fun getClosestVenues(venues: List<Venues>): List<Venues> {
         val closestVenues = venues.sortedBy { venue -> venue.location.distance }
         if (closestVenues.size > 100 ){
-            return closestVenues.slice(0..5)
+            return closestVenues.slice(0..2)
         }
-        return closestVenues
+        return closestVenues.slice(0..2)
     }
 
     private fun calculateRadius(venues: List<Venues>): Float {
@@ -235,8 +235,9 @@ class DataController(private val geoCon: GeofencingController) {
                 }
             }
         }
-        if(score==0.0){
+        if(score<1){
             // If category is not in databse, add that category to the database and initialize the score to 1
+            // Or if decremented below pseudocount, increase to 1. Works due to replace strategy on insert.
             for(cat in categories){
                 categoryViewModel.insert(CategoryData(cat.id, cat.name, 1.0))
                 Log.i(DATA_CON, "Category ${cat.name} added to database")

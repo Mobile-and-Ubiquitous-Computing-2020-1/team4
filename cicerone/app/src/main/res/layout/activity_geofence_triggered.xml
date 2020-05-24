@@ -31,11 +31,12 @@
                 app:popupTheme="@style/AppTheme.PopupOverlay" />
 
 
+
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:orientation="vertical"
-                android:paddingLeft="10dp"
                 android:paddingTop="64dp">
 
                 <TextView
@@ -43,6 +44,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="@dimen/location_type_height"
                     android:text="@string/location_category"
+                    android:paddingLeft="10dp"
                     android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
 
                 <TextView
@@ -50,8 +52,34 @@
                     android:layout_width="match_parent"
                     android:layout_height="@dimen/location_type_height"
                     android:text="@string/location_distance"
+                    android:paddingLeft="10dp"
                     android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:orientation="horizontal">
+
+                    <Button
+                        android:id="@+id/like"
+                        android:layout_width="100dp"
+                        android:layout_height="wrap_content"
+                        android:backgroundTint="#009688"
+                        android:insetRight="10dp"
+                        android:text="Like" />
+
+                    <Button
+                        android:id="@+id/dislike"
+                        android:layout_width="100dp"
+                        android:layout_height="wrap_content"
+                        android:backgroundTint="#009688"
+                        android:insetLeft="10dp"
+                        android:text="Dislike" />
+                </LinearLayout>
+
             </LinearLayout>
+
 
         </com.google.android.material.appbar.CollapsingToolbarLayout>
     </com.google.android.material.appbar.AppBarLayout>
