@@ -258,7 +258,7 @@ class DataController(private val geoCon: GeofencingController) {
                 var existInDB = false
                 for(dBCat in categoryTable){
                     // This will be true if cat matches once in the database, which is what we want to check
-                    Log.i(DATA_CON, "\tcat.id==dBcat.foursquareID: ${cat.id}===${dBCat.foursquareID} = ${dBCat.foursquareID == cat.id}")
+                    //Log.i(DATA_CON, "\tcat.id==dBcat.foursquareID: ${cat.id}===${dBCat.foursquareID} = ${dBCat.foursquareID == cat.id}")
                     existInDB = existInDB || dBCat.foursquareID == cat.id
                 }
                 if(!existInDB){
