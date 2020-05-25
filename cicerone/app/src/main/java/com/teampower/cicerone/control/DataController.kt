@@ -16,6 +16,8 @@ import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
 import java.util.*
 import kotlin.collections.ArrayList
+import kotlin.math.roundToInt
+import kotlin.random.Random.Default.nextDouble
 
 
 class DataController(private val geoCon: GeofencingController) {
@@ -86,14 +88,14 @@ class DataController(private val geoCon: GeofencingController) {
                     val sampledVenues = recommendVenues(initVenues)
                     val filteredVenues = handleOverlapGreedy(sampledVenues)
                      */
-                    val closestVenues = getClosestVenues(venues)
-                    initializeCategories(closestVenues)
-                    val filteredVenues = filterVenues(closestVenues, 200F) // Remove POIs if closer 200m of each other - google recommends minimum radius of 100m
-                    val radius = calculateRadius(filteredVenues)
+                    initializeCategories(venues)
+                    val recommendVenues = recommendVenues(venues, 50)
+                    val filteredVenues = filterOverlapGreedy(recommendVenues.toMutableList(), 200F) // Remove POIs if closer 200m of each other - google recommends minimum radius of 100m
+                    val radius = calculateRadius(filteredVenues.toTypedArray())
                     Log.d(DATA_CON, "Radius: $radius m")
                     for ((id, venue) in filteredVenues.withIndex()) {
                         Log.d(DATA_CON, "ID: $id - Venue:" + venue.toString())
-                        val poi = poiBuilder(venue, id)
+                        val poi = poiBuilder(venue!!, id)
                         // Create the geofence
                         val gf = geoCon.createGeofence(
                             poi.lat,
@@ -158,24 +160,190 @@ class DataController(private val geoCon: GeofencingController) {
         venue_view.text = poi_string
     }
 
-    private fun getClosestVenues(venues: List<Venues>): List<Venues> {
-        val closestVenues = venues.sortedBy { venue -> venue.location.distance }
-        if (closestVenues.size > 100 ){
-            return closestVenues.slice(0..2)
+    /**
+     * Recommend POIs based on the user's preference.
+     * Uses a Bayesian approach, with the following definitions:
+     *      E_i: The event that the POI belongs to category i
+     *      M_j: User likes POI j. Either the user likes it or not
+     *
+     * We seek P(M_j|E_i) = P(liked j | category i). This can be inferred as (Bayes inference formula):
+     *      P(Liked|Category) = P(Category|Liked) * P(Liked) / (P(Category|Liked) * P(Liked) + P(Category|Disliked) * P(Disliked))
+     *
+     * The likelihood P(Category|Liked) is computed from the fraction of likes for that category.
+     * The prior P(liked) is set to flat 0.5 at the moment (may be tuned later).
+     */
+    private fun recommendVenues(venues: List<Venues>, N: Int): Array<Venues?> {
+        val mutableVenues = venues.toMutableList()
+        val recommendedVenues = arrayOfNulls<Venues>(minOf(N, venues.size))
+        val posterior = arrayOfNulls<Double>(venues.size)
+        val fp = 0.5  // flat prior
+        // 1. Perform inference of posterior probability for each POI
+        for (i in venues.indices){
+            // TODO what to do with places having multiple categories? For now only handle single.
+            var likes = 0.0
+            var dislikes = 0.0
+            var categoryID = ""
+            // Some POIs have no registered category. Then set the probability to 50% that the
+            // user likes the POI.
+            if(venues[i].categories.isEmpty()){
+                likes = 1.0
+                dislikes = 1.0
+            }else{
+                categoryID = venues[i].categories[0].id
+            }
+
+            for(cat in categoryTable){
+                if(cat.foursquareID == categoryID){
+                    likes = cat.likes.toDouble()
+                    dislikes = cat.dislikes.toDouble()
+                }
+            }
+            val ll = likes/(likes+dislikes) // Likelihood P(Category i | Liked)
+            val ld = dislikes/(likes+dislikes)
+            val pp = ll*fp / (ll*fp + ld*fp)
+            posterior[i] = pp
+            /* DEBUG
+            if(i<2){
+                Log.i(DATA_CON, "Category: ${venues[i].categories[0].name}, Likes: $likes, dislikes: $dislikes, l_l: $ll, d_l: $ld, posterior: ${pp}")
+            }
+            */
         }
-        return closestVenues.slice(0..2)
+        // 2. Select a subset of size N of the venues based on their posterior probabilities
+        // Normalize posterior
+        var normPosterior = normalize(posterior.toMutableList())
+        for(i in recommendedVenues.indices){
+            /* Draw a random POI. Do this by drawing a random value between 0 and 1, finding when
+               this value is smaller than the cumulative sum of posteriors.
+
+               Example: post = [0.2, 0.5, 0.3]. rand = 0.4
+               rand > 0.2 but less than 0.7. Thus it falls in the bin of size 0.5 corresponding to
+               the second element.
+            */
+            val urv = nextDouble()
+            var cumSum = 0.0
+            var ind = 0
+            while(cumSum<urv){
+                cumSum += normPosterior[ind]!!
+                ind += 1
+            }
+            if(ind==mutableVenues.size){
+                // Sometimes the criteria isn't satisfied due to rounding errors (?). Wrap-in
+                // to the last element in that case.
+                ind -= 1
+            }
+            recommendedVenues[i] = mutableVenues[ind] // Add the chosen POI
+            // Remove the added elements
+            mutableVenues.removeAt(ind)
+            normPosterior.removeAt(ind)
+            // Re-normalize posterior
+            normPosterior = normalize(normPosterior)
+        }
+        return recommendedVenues
     }
 
-    private fun calculateRadius(venues: List<Venues>): Float {
+    private fun normalize(l: MutableList<Double?>): MutableList<Double?> {
+        var nl = l.toMutableList()
+        var sum = 0.0
+        for (x in l){
+            if (x != null) {
+                sum += x
+            }
+        }
+        for (i in l.indices){
+            nl[i] = l[i]?.div(sum)
+        }
+        return nl
+    }
+
+    /**
+     * Handle overlapping POIs by greedily choosing the POI with the highest score (likes-dislikes)
+     * in the case of conflict. If the score happens to be the same, chose a random POI.
+     *
+     * Recursive algorithm that handles overlaps one at a time until none remains. The approach
+     * is chosen to simplify the code, and to get around the problem of one POI overlaping
+     * multiple others.
+     */
+    private fun filterOverlapGreedy(venues: MutableList<Venues?>, threshold: Float): MutableList<Venues?> {
+        //Log.i(DATA_CON, "Greedy: size=${venues.size}")
+        var mutableVenues = venues.toMutableList()
+        val overlappingIndices = arrayOfNulls<Int>(2)
+        var overlapFound = false
+        var i = 0
+        while (i < venues.size && !overlapFound) {
+            var j = i + 1
+            while ( j < venues.size && !overlapFound) {
+                val venueA = venues[i]
+                val venueB = venues[j]
+
+                val locationA = Location("A")
+                locationA.latitude = venueA!!.location.lat
+                locationA.longitude = venueA.location.lng
+                val locationB = Location("B")
+                locationB.latitude = venueB!!.location.lat
+                locationB.longitude = venueB.location.lng
+
+                val distanceAB = locationA.distanceTo(locationB) // Distance between AB
+                if( distanceAB < threshold) {
+                    overlappingIndices[0] = i
+                    overlappingIndices[1] = j
+                    overlapFound = true
+                    //Log.i(DATA_CON, "\tOverlap found at i=$i j=$j with distance $distanceAB m")
+                }
+                j += 1
+            }
+            i += 1
+        }
+        if (overlapFound){
+            val i = overlappingIndices[0]!!
+            val j = overlappingIndices[1]!!
+            val scoreA = fetchCategoryScore(venues[i]!!)
+            val scoreB = fetchCategoryScore(venues[j]!!)
+            //Log.i(DATA_CON, "Overlap between: ${venues[i]!!.name}, score = $scoreA and ${venues[j]!!.name} score = $scoreB")
+            // Kinda boring but everything has score 0 atm since no likes and too many categories.
+            // TODO: Maybe initialize DB better to get more plausible recommendations?
+            if (scoreA>scoreB){
+                mutableVenues.removeAt(j)
+            } else if (scoreA<scoreB){
+                mutableVenues.removeAt(i)
+            } else{
+                // make a random choice which to delete if they are the same
+                val x = nextDouble().roundToInt() // either 0 or 1
+                mutableVenues.removeAt(overlappingIndices[x]!!)
+            }
+            mutableVenues = filterOverlapGreedy(mutableVenues, threshold)
+        } else{
+          // Log.i(DATA_CON, "No overlaps found!")
+        }
+        return mutableVenues
+    }
+
+    /**
+     * Cateogry score = likes-dislikes
+     */
+    private fun fetchCategoryScore(venue: Venues): Int {
+        var score = 0
+        if(!venue.categories.isEmpty()){
+            var categoryID = venue.categories[0].id
+            for(cat in categoryTable){
+                // Some POIs have no registered category. Then set their score to 0.
+                if(cat.foursquareID == categoryID){
+                    score = cat.likes - cat.dislikes
+                }
+            }
+        }
+        return score
+    }
+
+    private fun calculateRadius(venues: Array<Venues?>): Float {
         var shortestDistance = 300F
         for (i in venues.indices) {
             for (j in i + 1 until venues.size) { // compare list.get(i) and list.get(j)
                 val locationA = Location("A")
-                locationA.latitude = venues[i].location.lat
-                locationA.longitude = venues[i].location.lng
+                locationA.latitude = venues[i]!!.location.lat
+                locationA.longitude = venues[i]!!.location.lng
                 val locationB = Location("B")
-                locationB.latitude = venues[j].location.lat
-                locationB.longitude = venues[j].location.lng
+                locationB.latitude = venues[j]!!.location.lat
+                locationB.longitude = venues[j]!!.location.lng
 
                 val distance = locationA.distanceTo(locationB)
                 if (distance < shortestDistance) {
@@ -184,70 +352,6 @@ class DataController(private val geoCon: GeofencingController) {
             }
         }
         return shortestDistance/2
-    }
-
-    private fun filterVenues(venues: List<Venues>, threshold: Float): ArrayList<Venues> {
-        val filteredVenues = ArrayList<Venues>() // TODO don't use
-        val indicesNotToAdd = ArrayList<Int>()
-        for (i in venues.indices) {
-            for (j in i + 1 until venues.size) {
-                val venueA = venues[i]
-                val venueB = venues[j]
-
-                val locationA = Location("A")
-                locationA.latitude = venueA.location.lat
-                locationA.longitude = venueA.location.lng
-                val locationB = Location("B")
-                locationB.latitude = venueB.location.lat
-                locationB.longitude = venueB.location.lng
-
-                val distanceAB = locationA.distanceTo(locationB) // Distance between AB
-                // Filter out the POI that's farthest away
-                if( distanceAB < threshold) {
-                    // Filtering based on cateogory score
-                    val pA = 0.5
-                    val rv = uniformRandom.nextDouble()
-                    // TODO reimplement how we filter out the places that are not selected: this is not working atm.
-                    // make a probabilistic choice
-                    if(rv <= pA && !indicesNotToAdd.contains(j)){
-                        // If chosen A, remove B
-                        indicesNotToAdd.add(j)
-                        Log.i(DATA_CON, "Venue ${venueB} removed")
-                    }else if(rv > pA && !indicesNotToAdd.contains(i)) {
-                        // if chosen B, remove A
-                        indicesNotToAdd.add(i)
-                    }
-                }
-            }
-            Log.i(DATA_CON, "Indices not to add: $indicesNotToAdd")
-            if (!indicesNotToAdd.contains(i)) {
-                filteredVenues.add(venues[i])
-            }
-        }
-        return filteredVenues
-    }
-
-    private fun fetchCategoryScore(categories: List<Categories>): Int {
-        var likes = 0
-        var found = false
-        for(catScore in categoryTable){
-            for(cat in categories){
-                if(catScore.foursquareID==cat.id){
-                    likes = catScore.likes
-                    found = true
-                }
-            }
-        }
-        if(!found){
-            // If category is not in databse, add that category to the database and initialize likes/dislikes to 1
-            // Pseudocount is 1.0 for both likes and dislikes.
-            for(cat in categories){
-                categoryViewModel.insert(CategoryData(cat.id, cat.name, 1, 1))
-                Log.i(DATA_CON, "Category ${cat.name} added to database")
-            }
-            likes = 1
-        }
-        return likes
     }
 
     private fun initializeCategories(venues: List<Venues>){
@@ -264,7 +368,7 @@ class DataController(private val geoCon: GeofencingController) {
                 if(!existInDB){
                     categoryViewModel.insert(CategoryData(cat.id, cat.name, 1, 1))
                     categoryTable.add(CategoryData(cat.id, cat.name, 1, 1))
-                    Log.i(DATA_CON, "Added Category ${cat.name} to database. CategoryTable: ${categoryTable}")
+                    Log.i(DATA_CON, "Added Category ${cat.name} to database.")
                 }
             }
         }
@@ -272,7 +376,7 @@ class DataController(private val geoCon: GeofencingController) {
 
     fun setCategoryScores(cats: List<CategoryData>){
         categoryTable = ArrayList(cats)
-        Log.i(DATA_CON, "Category scores set to: ${categoryTable}")
+        //Log.i(DATA_CON, "Category scores set to: ${categoryTable}")
     }
 
     fun setCatViewModel(catViewModel: CategoryViewModel) {
