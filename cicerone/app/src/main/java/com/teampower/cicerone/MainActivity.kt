@@ -1,5 +1,6 @@
 package com.teampower.cicerone
 
+import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
@@ -14,19 +15,21 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import com.jakewharton.threetenabp.AndroidThreeTen
+import com.teampower.cicerone.adapters.POIHistoryListAdapter
 import com.teampower.cicerone.control.DataController
 import com.teampower.cicerone.control.GeofencingController
 import com.teampower.cicerone.control.LocationController
 import com.teampower.cicerone.control.NotificationsController
-import com.teampower.cicerone.viewmodels.CategoryViewModel
-import com.teampower.cicerone.adapters.POIHistoryListAdapter
-import com.teampower.cicerone.viewmodels.POIHistoryViewModel
 import com.teampower.cicerone.database.history_table.POISavedListAdapter
 import com.teampower.cicerone.database.history_table.POISavedViewModel
+import com.teampower.cicerone.viewmodels.CategoryViewModel
+import com.teampower.cicerone.viewmodels.POIHistoryViewModel
 import kotlinx.android.synthetic.main.activity_scrolling.*
 import kotlinx.android.synthetic.main.content_scrolling.*
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+
 
 const val MY_PERMISSIONS_REQUEST_LOCATION_ID = 99
 const val CHANNEL_ID = "CiceroneComms1337"
@@ -58,6 +61,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_scrolling)
         setSupportActionBar(toolbar)
+        AndroidThreeTen.init(this);
 
         user_location.text = getString(R.string.user_position, "-", "-")
 
@@ -81,18 +85,17 @@ class MainActivity : AppCompatActivity() {
         savedRecyclerView.layoutManager = LinearLayoutManager(this)
 
         poiSavedViewModel = ViewModelProvider(this).get(POISavedViewModel::class.java)
-        poiSavedViewModel.allPOI.observe(this, Observer { pois ->
+        poiSavedViewModel.recentSavedPOIs.observe(this, Observer { pois ->
             // Update the cached copy of the words in the adapter.
             pois?.let { savedAdapter.setPOIs(it) }
         })
 
         // Connect to local table of category scores
         catViewModel = ViewModelProvider(this).get(CategoryViewModel::class.java)
-        catViewModel.allCat.observe(this, Observer {cats ->
+        catViewModel.allCat.observe(this, Observer { cats ->
             // Set table of scores in DataCon
             dataCon.setCategoryScores(cats)
         })
-
 
 
         // Setup location services
@@ -114,6 +117,10 @@ class MainActivity : AppCompatActivity() {
                 "Hi, I'm the notification that was sent",
                 1
             )
+        }
+
+        see_all_saved_poi_btn.setOnClickListener {
+            startActivity(Intent(this, ListSavedPOIActivity()::class.java))
         }
 
         // Get last location and use it to make data request to API, then display the retrieved data
