@@ -1,5 +1,6 @@
 package com.teampower.cicerone
 
+import android.os.Build
 import android.os.Bundle
 import android.speech.tts.TextToSpeech
 import android.speech.tts.UtteranceProgressListener
@@ -7,6 +8,7 @@ import android.text.Html
 import android.text.method.LinkMovementMethod
 import android.util.Log
 import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.DrawableCompat
@@ -20,7 +22,7 @@ import kotlinx.android.synthetic.main.activity_scrolling.toolbar
 import kotlinx.android.synthetic.main.content_geofence_triggered.*
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
-import org.threeten.bp.Instant
+import java.time.Instant
 import java.util.*
 
 
@@ -34,6 +36,7 @@ class GeofenceTriggeredActivity : AppCompatActivity() {
     private var tts_text = ""
     private var isSaved = false
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_geofence_triggered)
@@ -148,20 +151,21 @@ class GeofenceTriggeredActivity : AppCompatActivity() {
 
         // User-feedback for recommendation
         catViewModel = ViewModelProvider(this).get(CategoryViewModel::class.java)
-        like.setOnClickListener {
+        like_button.setOnClickListener {
             catViewModel.like(POI.categoryID)
-            like.isEnabled = false
-            dislike.isEnabled = false
+            like_button.isEnabled = false
+            dislike_button.isEnabled = false
         }
 
-        dislike.setOnClickListener {
+        dislike_button.setOnClickListener {
             catViewModel.dislike(POI.categoryID)
-            like.isEnabled = false
-            dislike.isEnabled = false
+            like_button.isEnabled = false
+            dislike_button.isEnabled = false
         }
         // TODO table doesn't seem to update
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     private fun toggleFavoritePOI(poi: POI) {
         MainScope().launch {
             val result = poiSavedViewModel.loadPOI(poi.id).await()
