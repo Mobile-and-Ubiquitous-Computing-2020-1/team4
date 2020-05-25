@@ -146,23 +146,19 @@ class GeofenceTriggeredActivity : AppCompatActivity() {
         favorite_button.setOnClickListener { toggleFavoritePOI(POI) }
         Log.v(TRIG_TAG, POI.toString())
 
-        // Demo on how to update category score
+        // User-feedback for recommendation
         catViewModel = ViewModelProvider(this).get(CategoryViewModel::class.java)
-        // We don't need to check if the category is in the database - DataController checks
-        // and adds all those which are not in the database.
-        catViewModel.updateCategoryPoints(POI.id, 1.0)
-
         like.setOnClickListener {
-            catViewModel.updateCategoryPoints(POI.id, 1.0)
+            catViewModel.like(POI.categoryID)
             like.isEnabled = false
             dislike.isEnabled = false
-        } // Increment score by +1 for a total of +2
+        }
 
-        like.setOnClickListener {
-            catViewModel.updateCategoryPoints(POI.id, -2.0)
+        dislike.setOnClickListener {
+            catViewModel.dislike(POI.categoryID)
             like.isEnabled = false
             dislike.isEnabled = false
-        } // Decrement score by -2
+        }
         // TODO table doesn't seem to update
     }
 

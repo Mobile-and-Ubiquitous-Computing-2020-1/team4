@@ -28,5 +28,6 @@ data class POISavedData(
 data class CategoryData(
     @PrimaryKey val foursquareID: String,
     @ColumnInfo val name: String,
-    @ColumnInfo val score: Double
+    @ColumnInfo val likes: Int,
+    @ColumnInfo val dislikes: Int
 )
