@@ -8,7 +8,6 @@ import android.text.Html
 import android.text.method.LinkMovementMethod
 import android.util.Log
 import android.widget.Toast
-import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.DrawableCompat
@@ -22,7 +21,7 @@ import kotlinx.android.synthetic.main.activity_scrolling.toolbar
 import kotlinx.android.synthetic.main.content_geofence_triggered.*
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
-import java.time.Instant
+import org.threeten.bp.Instant
 import java.util.*
 
 
@@ -30,13 +29,12 @@ class GeofenceTriggeredActivity : AppCompatActivity() {
     private val TRIG_TAG = "POIActivity"
     private lateinit var catViewModel: CategoryViewModel
     private lateinit var poiSavedViewModel: POISavedViewModel
-
     lateinit var tts: TextToSpeech
     private var speaking = false
     private var tts_text = ""
     private var isSaved = false
 
-    @RequiresApi(Build.VERSION_CODES.O)
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_geofence_triggered)
@@ -165,7 +163,6 @@ class GeofenceTriggeredActivity : AppCompatActivity() {
         // TODO table doesn't seem to update
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
     private fun toggleFavoritePOI(poi: POI) {
         MainScope().launch {
             val result = poiSavedViewModel.loadPOI(poi.id).await()
