@@ -7,18 +7,24 @@ import android.widget.TextView
 import com.google.android.gms.location.Geofence
 import com.teampower.cicerone.*
 import com.teampower.cicerone.database.CategoryData
+import com.teampower.cicerone.viewmodels.CategoryViewModel
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import okhttp3.logging.HttpLoggingInterceptor.Level
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
+import java.util.*
+import kotlin.collections.ArrayList
 
 
 class DataController(private val geoCon: GeofencingController) {
     private val DATA_CON = "DataController"
-    private lateinit var categoryScores : List<CategoryData>
+    private lateinit var categoryTable : ArrayList<CategoryData>
+    private lateinit var categoryViewModel: CategoryViewModel
     private val pois = mutableMapOf<String, POI>() // We can store all POIs in this map, indexed by ID
+    private val uniformRandom = Random() // seed 1 - TODO remove seed
+
 
     fun requestData(location: android.location.Location, venue_view: TextView, mainContext: Context) {
         // Set context
@@ -74,9 +80,14 @@ class DataController(private val geoCon: GeofencingController) {
                 if (response.isSuccessful()) {
                     val result = response.body()
                     val venues = result!!.response.venues
-                    //Log.d(TAG, "Venues:" + venues.toString())
                     // For now, take the 100 closest POIs and make sure they aren't closer than 10 m
+                    /*
+                    val initVenues = initializeCategories(venus)
+                    val sampledVenues = recommendVenues(initVenues)
+                    val filteredVenues = handleOverlapGreedy(sampledVenues)
+                     */
                     val closestVenues = getClosestVenues(venues)
+                    initializeCategories(closestVenues)
                     val filteredVenues = filterVenues(closestVenues, 200F) // Remove POIs if closer 200m of each other - google recommends minimum radius of 100m
                     val radius = calculateRadius(filteredVenues)
                     Log.d(DATA_CON, "Radius: $radius m")
@@ -96,7 +107,9 @@ class DataController(private val geoCon: GeofencingController) {
                         // Add POI to the list of current POIs
                         pois.put(poi.id, poi)
                     }
-                    displayData(pois.toList().get(0).second, venue_view)
+                    if(!pois.isEmpty()){
+                        displayData(pois.toList().get(0).second, venue_view)
+                    }
                 }
             }
         })
@@ -114,8 +127,13 @@ class DataController(private val geoCon: GeofencingController) {
         val distance = venue.location.distance
         val address = venue.location.formattedAddress.joinToString()
         var categories = ""
+        var categoryID = ""
         for (cat in venue.categories) {
             categories = categories + cat.name
+            if(categoryID!= ""){
+                categoryID = categoryID + ","  // Add delimiter between Ids
+            }
+            categoryID = categoryID + cat.id
         }
         return POI(
             id.toString(),
@@ -124,7 +142,8 @@ class DataController(private val geoCon: GeofencingController) {
             long,
             distance,
             address,
-            categories
+            categories,
+            categoryID
         )
     }
 
@@ -134,6 +153,7 @@ class DataController(private val geoCon: GeofencingController) {
         poi_string.append("Location: ${poi.lat}, ${poi.long}").appendln()
         poi_string.append("Address: ${poi.address}").appendln()
         poi_string.append("Category: ${poi.category}").appendln()
+        poi_string.append("CategoryIDs: ${poi.categoryID}").appendln()
         poi_string.append("Current distance: ${poi.distance}m")
         venue_view.text = poi_string
     }
@@ -141,9 +161,9 @@ class DataController(private val geoCon: GeofencingController) {
     private fun getClosestVenues(venues: List<Venues>): List<Venues> {
         val closestVenues = venues.sortedBy { venue -> venue.location.distance }
         if (closestVenues.size > 100 ){
-            return closestVenues.slice(0..1)
+            return closestVenues.slice(0..2)
         }
-        return closestVenues
+        return closestVenues.slice(0..2)
     }
 
     private fun calculateRadius(venues: List<Venues>): Float {
@@ -171,27 +191,35 @@ class DataController(private val geoCon: GeofencingController) {
         val indicesNotToAdd = ArrayList<Int>()
         for (i in venues.indices) {
             for (j in i + 1 until venues.size) {
+                val venueA = venues[i]
+                val venueB = venues[j]
+
                 val locationA = Location("A")
-                locationA.latitude = venues[i].location.lat
-                locationA.longitude = venues[i].location.lng
+                locationA.latitude = venueA.location.lat
+                locationA.longitude = venueA.location.lng
                 val locationB = Location("B")
-                locationB.latitude = venues[j].location.lat
-                locationB.longitude = venues[j].location.lng
+                locationB.latitude = venueB.location.lat
+                locationB.longitude = venueB.location.lng
 
                 val distanceAB = locationA.distanceTo(locationB) // Distance between AB
-                val distanceAUser = venues[i].location.distance // Distance between A and user
-                val distanceBUser = venues[j].location.distance // Distance between B and user
                 // Filter out the POI that's farthest away
-                if( distanceAB < threshold ) {
-                    // If overlapping, make sure not to add the farthest POI
-                    if (distanceAUser < distanceBUser) {
+                if( distanceAB < threshold) {
+                    // Filtering based on cateogory score
+                    val pA = 0.5
+                    val rv = uniformRandom.nextDouble()
+                    // TODO reimplement how we filter out the places that are not selected: this is not working atm.
+                    // make a probabilistic choice
+                    if(rv <= pA && !indicesNotToAdd.contains(j)){
+                        // If chosen A, remove B
                         indicesNotToAdd.add(j)
-                    } else{
+                        Log.i(DATA_CON, "Venue ${venueB} removed")
+                    }else if(rv > pA && !indicesNotToAdd.contains(i)) {
+                        // if chosen B, remove A
                         indicesNotToAdd.add(i)
                     }
-
                 }
             }
+            Log.i(DATA_CON, "Indices not to add: $indicesNotToAdd")
             if (!indicesNotToAdd.contains(i)) {
                 filteredVenues.add(venues[i])
             }
@@ -199,9 +227,56 @@ class DataController(private val geoCon: GeofencingController) {
         return filteredVenues
     }
 
+    private fun fetchCategoryScore(categories: List<Categories>): Int {
+        var likes = 0
+        var found = false
+        for(catScore in categoryTable){
+            for(cat in categories){
+                if(catScore.foursquareID==cat.id){
+                    likes = catScore.likes
+                    found = true
+                }
+            }
+        }
+        if(!found){
+            // If category is not in databse, add that category to the database and initialize likes/dislikes to 1
+            // Pseudocount is 1.0 for both likes and dislikes.
+            for(cat in categories){
+                categoryViewModel.insert(CategoryData(cat.id, cat.name, 1, 1))
+                Log.i(DATA_CON, "Category ${cat.name} added to database")
+            }
+            likes = 1
+        }
+        return likes
+    }
+
+    private fun initializeCategories(venues: List<Venues>){
+        // Check the DB for an entry for each category for each venue in the list of venues.
+        // If a category doesn't exist, initializes it with likes=1, dislikes=1
+        for(v in venues){
+            for(cat in v.categories){
+                var existInDB = false
+                for(dBCat in categoryTable){
+                    // This will be true if cat matches once in the database, which is what we want to check
+                    //Log.i(DATA_CON, "\tcat.id==dBcat.foursquareID: ${cat.id}===${dBCat.foursquareID} = ${dBCat.foursquareID == cat.id}")
+                    existInDB = existInDB || dBCat.foursquareID == cat.id
+                }
+                if(!existInDB){
+                    categoryViewModel.insert(CategoryData(cat.id, cat.name, 1, 1))
+                    categoryTable.add(CategoryData(cat.id, cat.name, 1, 1))
+                    Log.i(DATA_CON, "Added Category ${cat.name} to database. CategoryTable: ${categoryTable}")
+                }
+            }
+        }
+    }
+
     fun setCategoryScores(cats: List<CategoryData>){
-        categoryScores = cats
-        Log.i(DATA_CON, "Category scores updated to: ${categoryScores}")
+        categoryTable = ArrayList(cats)
+        Log.i(DATA_CON, "Category scores set to: ${categoryTable}")
+    }
+
+    fun setCatViewModel(catViewModel: CategoryViewModel) {
+        categoryViewModel = catViewModel
     }
 
 }

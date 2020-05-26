@@ -1,5 +1,6 @@
 package com.teampower.cicerone
 
+import android.os.Build
 import android.os.Bundle
 import android.speech.tts.TextToSpeech
 import android.speech.tts.UtteranceProgressListener
@@ -28,11 +29,11 @@ class GeofenceTriggeredActivity : AppCompatActivity() {
     private val TRIG_TAG = "POIActivity"
     private lateinit var catViewModel: CategoryViewModel
     private lateinit var poiSavedViewModel: POISavedViewModel
-
     lateinit var tts: TextToSpeech
     private var speaking = false
     private var tts_text = ""
     private var isSaved = false
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -146,9 +147,20 @@ class GeofenceTriggeredActivity : AppCompatActivity() {
         favorite_button.setOnClickListener { toggleFavoritePOI(POI) }
         Log.v(TRIG_TAG, POI.toString())
 
-        // Demo on how to update category score
+        // User-feedback for recommendation
         catViewModel = ViewModelProvider(this).get(CategoryViewModel::class.java)
-        catViewModel.updateCategoryPoints("School", 2.0) // Change score
+        like_button.setOnClickListener {
+            catViewModel.like(POI.categoryID)
+            like_button.isEnabled = false
+            dislike_button.isEnabled = false
+        }
+
+        dislike_button.setOnClickListener {
+            catViewModel.dislike(POI.categoryID)
+            like_button.isEnabled = false
+            dislike_button.isEnabled = false
+        }
+        // TODO table doesn't seem to update
     }
 
     private fun toggleFavoritePOI(poi: POI) {

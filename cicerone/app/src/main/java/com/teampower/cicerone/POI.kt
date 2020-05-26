@@ -21,6 +21,7 @@ data class POI(
     val distance: Int,
     val address: String,
     val category: String,
+    val categoryID: String,
     val description: String = "No description yet."
 ) {
 }

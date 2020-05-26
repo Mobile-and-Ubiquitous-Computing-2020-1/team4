@@ -26,6 +26,8 @@ data class POISavedData(
 
 @Entity(tableName = "category_table")
 data class CategoryData(
-    @PrimaryKey val name: String,
-    @ColumnInfo val score: Double
+    @PrimaryKey val foursquareID: String,
+    @ColumnInfo val name: String,
+    @ColumnInfo val likes: Int,
+    @ColumnInfo val dislikes: Int
 )

@@ -21,7 +21,6 @@ class GeofenceBroadcastReceiver() : BroadcastReceiver() {
         RestAPI()
     private lateinit var poiSerialized: String
     private lateinit var poiObject: POI
-    private val geoCon = GeofencingController()
 
     override fun onReceive(context: Context?, intent: Intent?) {
         val geofencingEvent = GeofencingEvent.fromIntent(intent)
