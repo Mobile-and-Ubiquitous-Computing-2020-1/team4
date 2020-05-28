@@ -12,7 +12,6 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.material.snackbar.Snackbar
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.jakewharton.threetenabp.AndroidThreeTen
@@ -63,8 +62,6 @@ class MainActivity : AppCompatActivity() {
         setSupportActionBar(toolbar)
         AndroidThreeTen.init(this);
 
-        user_location.text = getString(R.string.user_position, "-", "-")
-
         // List history of recent POIs
         val historyRecyclerView = findViewById<RecyclerView>(R.id.historyrecyclerview)
         val historyAdapter =
@@ -99,25 +96,13 @@ class MainActivity : AppCompatActivity() {
 
 
         // Setup location services
-        latCon.startLocation(this, this@MainActivity, user_location, dataCon)
+        latCon.startLocation(this, this@MainActivity, dataCon)
 
         // Setup geofencing services
         geoCon.startGeofencing(this)
 
         // Setup notifications
         notCon.createNotificationChannel(this)
-
-        // Setup fab to test notifications
-        fab.setOnClickListener { view ->
-            Snackbar.make(view, "Notification sent", Snackbar.LENGTH_LONG)
-                .setAction("Action", null).show()
-            notCon.sendNotificationToMain(
-                this,
-                "Test notification",
-                "Hi, I'm the notification that was sent",
-                1
-            )
-        }
 
         see_all_saved_poi_btn.setOnClickListener {
             startActivity(Intent(this, ListSavedPOIActivity()::class.java))

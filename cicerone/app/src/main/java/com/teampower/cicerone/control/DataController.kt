@@ -17,10 +17,15 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 class DataController(private val geoCon: GeofencingController) {
     private val DATA_CON = "DataController"
-    private lateinit var categoryScores : List<CategoryData>
-    private val pois = mutableMapOf<String, POI>() // We can store all POIs in this map, indexed by ID
+    private lateinit var categoryScores: List<CategoryData>
+    private val pois =
+        mutableMapOf<String, POI>() // We can store all POIs in this map, indexed by ID
 
-    fun requestData(location: android.location.Location, venue_view: TextView, mainContext: Context) {
+    fun requestData(
+        location: android.location.Location,
+        venue_view: TextView,
+        mainContext: Context
+    ) {
         // Set context
         val context = mainContext
 
@@ -30,12 +35,14 @@ class DataController(private val geoCon: GeofencingController) {
             BuildConfig.FOURSQUARE_SECRET
 
         // API call parameters
-        val location_string: String = "${location.latitude.toString()}, ${location.longitude.toString()}"
+        val location_string: String =
+            "${location.latitude.toString()}, ${location.longitude.toString()}"
         val radius = 300 // TODO set radius for query
         val limit = 200
         // TODO decide which categories to query
         // comma-seperated list of Foursquare categoryIDs to query for
-        val categories = "4d4b7104d754a06370d81259,4d4b7105d754a06373d81259,4d4b7105d754a06374d81259,4d4b7105d754a06376d81259,4d4b7105d754a06377d81259"
+        val categories =
+            "4d4b7104d754a06370d81259,4d4b7105d754a06373d81259,4d4b7105d754a06374d81259,4d4b7105d754a06376d81259,4d4b7105d754a06377d81259"
         val version = "20200420" // set date for API versioning here (see Foursquare API)
         val cacheDuration = 60
 
@@ -64,42 +71,52 @@ class DataController(private val geoCon: GeofencingController) {
 
         // Make API call
         val FoursquareAPI = retrofit.create(FoursquareAPI::class.java)
-        FoursquareAPI.searchVenues(location_string, categories, radius, limit).enqueue(object : retrofit2.Callback<FoursquareData> {
-            override fun onFailure(call: retrofit2.Call<FoursquareData>?, t: Throwable?) {
-                Log.e(TAG, "Error: could not receive response from Foursquare API. ${t?.message}")
+        FoursquareAPI.searchVenues(location_string, categories, radius, limit)
+            .enqueue(object : retrofit2.Callback<FoursquareData> {
+                override fun onFailure(call: retrofit2.Call<FoursquareData>?, t: Throwable?) {
+                    Log.e(
+                        TAG,
+                        "Error: could not receive response from Foursquare API. ${t?.message}"
+                    )
 
-            }
-
-            override fun onResponse(call: retrofit2.Call<FoursquareData>, response: retrofit2.Response<FoursquareData>) {
-                if (response.isSuccessful()) {
-                    val result = response.body()
-                    val venues = result!!.response.venues
-                    //Log.d(TAG, "Venues:" + venues.toString())
-                    // For now, take the 100 closest POIs and make sure they aren't closer than 10 m
-                    val closestVenues = getClosestVenues(venues)
-                    val filteredVenues = filterVenues(closestVenues, 200F) // Remove POIs if closer 200m of each other - google recommends minimum radius of 100m
-                    val radius = calculateRadius(filteredVenues)
-                    Log.d(DATA_CON, "Radius: $radius m")
-                    for ((id, venue) in filteredVenues.withIndex()) {
-                        Log.d(DATA_CON, "ID: $id - Venue:" + venue.toString())
-                        val poi = poiBuilder(venue, id)
-                        // Create the geofence
-                        val gf = geoCon.createGeofence(
-                            poi.lat,
-                            poi.long,
-                            poi.id,
-                            radius,
-                            Geofence.NEVER_EXPIRE,
-                            Geofence.GEOFENCE_TRANSITION_ENTER
-                        )
-                        geoCon.addGeofence(gf, context, poi)
-                        // Add POI to the list of current POIs
-                        pois.put(poi.id, poi)
-                    }
-                    displayData(pois.toList().get(0).second, venue_view)
                 }
-            }
-        })
+
+                override fun onResponse(
+                    call: retrofit2.Call<FoursquareData>,
+                    response: retrofit2.Response<FoursquareData>
+                ) {
+                    if (response.isSuccessful()) {
+                        val result = response.body()
+                        val venues = result!!.response.venues
+                        //Log.d(TAG, "Venues:" + venues.toString())
+                        // For now, take the 100 closest POIs and make sure they aren't closer than 10 m
+                        val closestVenues = getClosestVenues(venues)
+                        val filteredVenues = filterVenues(
+                            closestVenues,
+                            200F
+                        ) // Remove POIs if closer 200m of each other - google recommends minimum radius of 100m
+                        val radius = calculateRadius(filteredVenues)
+                        Log.d(DATA_CON, "Radius: $radius m")
+                        for ((id, venue) in filteredVenues.withIndex()) {
+                            Log.d(DATA_CON, "ID: $id - Venue:" + venue.toString())
+                            val poi = poiBuilder(venue, id)
+                            // Create the geofence
+                            val gf = geoCon.createGeofence(
+                                poi.lat,
+                                poi.long,
+                                poi.id,
+                                radius,
+                                Geofence.NEVER_EXPIRE,
+                                Geofence.GEOFENCE_TRANSITION_ENTER
+                            )
+                            geoCon.addGeofence(gf, context, poi)
+                            // Add POI to the list of current POIs
+                            pois.put(poi.id, poi)
+                        }
+                        displayData(pois.toList().get(0).second, venue_view)
+                    }
+                }
+            })
     }
 
     fun getPOI(id: String): POI? {
@@ -140,7 +157,7 @@ class DataController(private val geoCon: GeofencingController) {
 
     private fun getClosestVenues(venues: List<Venues>): List<Venues> {
         val closestVenues = venues.sortedBy { venue -> venue.location.distance }
-        if (closestVenues.size > 100 ){
+        if (closestVenues.size > 100) {
             return closestVenues.slice(0..1)
         }
         return closestVenues
@@ -163,7 +180,7 @@ class DataController(private val geoCon: GeofencingController) {
                 }
             }
         }
-        return shortestDistance/2
+        return shortestDistance / 2
     }
 
     private fun filterVenues(venues: List<Venues>, threshold: Float): ArrayList<Venues> {
@@ -182,11 +199,11 @@ class DataController(private val geoCon: GeofencingController) {
                 val distanceAUser = venues[i].location.distance // Distance between A and user
                 val distanceBUser = venues[j].location.distance // Distance between B and user
                 // Filter out the POI that's farthest away
-                if( distanceAB < threshold ) {
+                if (distanceAB < threshold) {
                     // If overlapping, make sure not to add the farthest POI
                     if (distanceAUser < distanceBUser) {
                         indicesNotToAdd.add(j)
-                    } else{
+                    } else {
                         indicesNotToAdd.add(i)
                     }
 
@@ -199,7 +216,7 @@ class DataController(private val geoCon: GeofencingController) {
         return filteredVenues
     }
 
-    fun setCategoryScores(cats: List<CategoryData>){
+    fun setCategoryScores(cats: List<CategoryData>) {
         categoryScores = cats
         Log.i(DATA_CON, "Category scores updated to: ${categoryScores}")
     }

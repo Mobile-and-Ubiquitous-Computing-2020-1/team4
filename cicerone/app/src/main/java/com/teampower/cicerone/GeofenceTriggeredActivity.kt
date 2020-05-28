@@ -1,5 +1,6 @@
 package com.teampower.cicerone
 
+import android.content.res.ColorStateList
 import android.os.Bundle
 import android.speech.tts.TextToSpeech
 import android.speech.tts.UtteranceProgressListener
@@ -137,13 +138,29 @@ class GeofenceTriggeredActivity : AppCompatActivity() {
                 tts.stop()
                 speaking = false
                 tts_button.setImageResource(R.drawable.ic_play_arrow_black_32dp)
+                DrawableCompat.setTint(
+                    DrawableCompat.wrap(tts_button.drawable),
+                    ContextCompat.getColor(applicationContext, android.R.color.white)
+                )
             } else {
                 tts.speak(tts_text, TextToSpeech.QUEUE_FLUSH, null, "TRIG_TTS")
                 tts_button.setImageResource(R.drawable.ic_stop_black_32dp)
+                DrawableCompat.setTint(
+                    DrawableCompat.wrap(tts_button.drawable),
+                    ContextCompat.getColor(applicationContext, android.R.color.white)
+                )
             }
         }
 
         favorite_button.setOnClickListener { toggleFavoritePOI(POI) }
+        DrawableCompat.setTint(
+            DrawableCompat.wrap(favorite_button.drawable),
+            ContextCompat.getColor(applicationContext, android.R.color.darker_gray)
+        )
+        DrawableCompat.setTint(
+            DrawableCompat.wrap(tts_button.drawable),
+            ContextCompat.getColor(applicationContext, android.R.color.white)
+        )
         Log.v(TRIG_TAG, POI.toString())
 
         // Demo on how to update category score
@@ -182,7 +199,7 @@ class GeofenceTriggeredActivity : AppCompatActivity() {
                 isSaved = false
                 DrawableCompat.setTint(
                     DrawableCompat.wrap(favorite_button.drawable),
-                    ContextCompat.getColor(applicationContext, R.color.black)
+                    ContextCompat.getColor(applicationContext, android.R.color.darker_gray)
                 )
                 Log.i(TRIG_TAG, "Removed POI from favorites")
             }
