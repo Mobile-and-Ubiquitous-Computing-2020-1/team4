@@ -15,12 +15,11 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.jakewharton.threetenabp.AndroidThreeTen
-import com.teampower.cicerone.adapters.POIHistoryListAdapter
 import com.teampower.cicerone.control.DataController
 import com.teampower.cicerone.control.GeofencingController
 import com.teampower.cicerone.control.LocationController
 import com.teampower.cicerone.control.NotificationsController
-import com.teampower.cicerone.database.history_table.POISavedListAdapter
+import com.teampower.cicerone.adapters.POIListAdapter
 import com.teampower.cicerone.database.history_table.POISavedViewModel
 import com.teampower.cicerone.viewmodels.CategoryViewModel
 import com.teampower.cicerone.viewmodels.POIHistoryViewModel
@@ -65,7 +64,7 @@ class MainActivity : AppCompatActivity() {
         // List history of recent POIs
         val historyRecyclerView = findViewById<RecyclerView>(R.id.historyrecyclerview)
         val historyAdapter =
-            POIHistoryListAdapter(this)
+            POIListAdapter(this)
         historyRecyclerView.adapter = historyAdapter
         historyRecyclerView.layoutManager = LinearLayoutManager(this)
 
@@ -77,7 +76,7 @@ class MainActivity : AppCompatActivity() {
 
         // List saved POIs
         val savedRecyclerView = findViewById<RecyclerView>(R.id.savedrecyclerview)
-        val savedAdapter = POISavedListAdapter(this)
+        val savedAdapter = POIListAdapter(this)
         savedRecyclerView.adapter = savedAdapter
         savedRecyclerView.layoutManager = LinearLayoutManager(this)
 

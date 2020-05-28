@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginHorizontal="2dp"
+    android:layout_marginVertical="4dp"
+    android:layout_marginBottom="@dimen/small_padding"
+    android:orientation="vertical"
+    app:cardBackgroundColor="@color/colorSecondary"
+    app:cardCornerRadius="13dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:weightSum="10">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/listItemInfoLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="7"
+            android:background="@android:color/white"
+            android:paddingStart="@dimen/big_padding"
+            android:paddingTop="@dimen/big_padding"
+            android:paddingBottom="@dimen/big_padding">
+
+            <TextView
+                android:id="@+id/listItemPlaceName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingRight="@dimen/small_padding"
+                android:text="The Most Wonderful Spot"
+                android:textColor="#000000"
+                android:textIsSelectable="false"
+                android:textSize="@dimen/cardTitleText"
+                android:textStyle="bold"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/listItemSubInfo"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:letterSpacing="0.03"
+                android:text="Day XX, 00:00 • Category"
+                android:textColor="#696969"
+                android:textIsSelectable="true"
+                android:textSize="14sp"
+                app:layout_constraintStart_toStartOf="@+id/listItemPlaceName"
+                app:layout_constraintTop_toBottomOf="@+id/listItemPlaceName" />
+
+            <TextView
+                android:id="@+id/listItemShortText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="@dimen/small_padding"
+                android:letterSpacing="0.03"
+                android:text="@string/shortInfoTextView"
+                android:textColor="#696969"
+                android:textSize="14sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="@+id/listItemSubInfo"
+                app:layout_constraintTop_toBottomOf="@+id/listItemSubInfo" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/listItemStarLayout"
+            android:layout_width="100dp"
+            android:layout_height="match_parent"
+            android:layout_weight="3"
+            android:paddingTop="@dimen/big_padding"
+            android:paddingBottom="@dimen/big_padding">
+
+            <View
+                android:id="@+id/dividerLine"
+                android:layout_width="1dp"
+                android:layout_height="0dp"
+                android:layout_gravity="bottom"
+                android:background="#11000000"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <ImageView
+                android:id="@+id/listItemStarImage"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:contentDescription="save button"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:srcCompat="@drawable/ic_star_black_32dp" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </LinearLayout>
+
+</androidx.cardview.widget.CardView>

@@ -6,7 +6,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.teampower.cicerone.database.history_table.POISavedListAdapter
+import com.teampower.cicerone.adapters.POIListAdapter
 import com.teampower.cicerone.database.history_table.POISavedViewModel
 import kotlinx.android.synthetic.main.activity_scrolling.*
 
@@ -25,7 +25,7 @@ class ListSavedPOIActivity : AppCompatActivity() {
 
         // List saved POIs
         val savedRecyclerView = findViewById<RecyclerView>(R.id.allSavedPOIRecyclerView)
-        val savedAdapter = POISavedListAdapter(this)
+        val savedAdapter = POIListAdapter(this)
         savedRecyclerView.adapter = savedAdapter
         savedRecyclerView.layoutManager = LinearLayoutManager(this)
 

@@ -32,9 +32,9 @@ public abstract class CiceroneAppDatabase : RoomDatabase() {
                     // Add sample POI.
                     val poiH = POIHistoryData(
                         "1337XD",
-                        "SNU",
+                        "The Most Wonderful University",
                         "School",
-                        "January 1, 1970, 00:00:00 GMT",
+                        "2020-05-28T18:16:41.905Z",
                         0.00,
                         0.00
                     )
