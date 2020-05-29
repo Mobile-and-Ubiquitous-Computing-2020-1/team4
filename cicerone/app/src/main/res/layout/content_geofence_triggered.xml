@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     app:layout_behavior="@string/appbar_scrolling_view_behavior">
@@ -56,6 +57,40 @@
         app:layout_constraintStart_toStartOf="@+id/tts_label"
         app:layout_constraintTop_toBottomOf="@+id/tts_label"
         app:srcCompat="@drawable/ic_play_arrow_black_32dp" />
+
+    <TextView
+        android:id="@+id/vote_label"
+        android:layout_width="250dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="64dp"
+        android:text="@string/vote_button_label"
+        app:layout_constraintStart_toStartOf="@+id/tts_label"
+        app:layout_constraintTop_toTopOf="@+id/tts_button" />
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="@+id/vote_label"
+        app:layout_constraintTop_toBottomOf="@+id/vote_label"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/like_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:backgroundTint="#009688"
+            android:contentDescription="Like button"
+            android:text="Like" />
+
+        <Button
+            android:id="@+id/dislike_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="#FFFFFF"
+            android:backgroundTint="#009688"
+            android:contentDescription="Dislike button"
+            android:text="Dislike" />
+    </LinearLayout>
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline"

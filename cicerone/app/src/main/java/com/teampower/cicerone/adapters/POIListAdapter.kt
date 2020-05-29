@@ -57,7 +57,7 @@ class POIListAdapter internal constructor(
                 R.string.list_item_short_text,
                 description
             )
-            if (description == "") shortText.visibility = View.INVISIBLE
+            if (description == null) shortText.visibility = View.GONE
             DrawableCompat.setTint(
                 DrawableCompat.wrap(starImage.drawable),
                 ContextCompat.getColor(context, android.R.color.darker_gray)

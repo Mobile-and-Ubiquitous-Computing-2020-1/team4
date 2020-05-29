@@ -30,25 +30,28 @@ public abstract class CiceroneAppDatabase : RoomDatabase() {
                     poiHDao.deleteAll()
                     // Add sample POI.
                     val poiH = POIHistoryData(
-                        "1337XD",
-                        "The Most Wonderful University",
-                        "School",
-                        "2020-05-28T18:16:41.905Z",
-                        0.00,
-                        0.00,
-                        "Founded in 1912, this is the oldest and most famous university in today's world.",
-                        20,
-                        "Galaxyroad 18, 290192x PoIS, Sunnyland"
+                        foursquareID = "1337XD",
+                        name = "The Most Wonderful University",
+                        category = "School",
+                        categoryID = "1",
+                        timeTriggered = "2020-05-28T18:16:41.905Z",
+                        latitude = 0.00,
+                        longitude = 0.00,
+                        description = "Founded in 1912, this is the oldest and most famous university in today's world.",
+                        distance = 20,
+                        address = "Galaxyroad 18, 290192x PoIS, Sunnyland"
                     )
                     poiHDao.insert(poiH)
 
                     //************* Category table *************
                     val catDao = database.categoryDao()
                     // Delete all content here.
-                    catDao.deleteAll() // Only when resetting
+                    // catDao.deleteAll() // Only when resetting
                     // Initialize table
-                    val cat = CategoryData("School", 1.0)
-                    catDao.insert(cat)
+                    //val cat1 = CategoryData("52e81612bcbc57f1066b7a14", "Palace", 1, 1)
+                    //catDao.insert(cat1)
+                    //val cat2 = CategoryData("50aaa49e4b90af0d42d5de11", "Castle", 1, 1)
+                    //catDao.insert(cat2)
                 }
             }
         }

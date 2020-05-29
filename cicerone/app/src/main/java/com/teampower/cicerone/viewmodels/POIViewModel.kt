@@ -116,15 +116,20 @@ abstract class POIViewModel<T>(application: Application) : AndroidViewModel(appl
 
     fun convertPOIDataToPOI(data: POIData): POI {
         return POI(
-            data.foursquareID,
-            data.name,
-            data.category,
-            data.latitude,
-            data.longitude,
-            data.description,
-            data.distance,
-            data.address,
-            data.wikipediaInfoJSON?.let { MainActivity.fromJson<WikipediaPlaceInfo>(it) })
+            id = data.foursquareID,
+            name = data.name,
+            category = data.category,
+            categoryID = data.categoryID,
+            lat = data.latitude,
+            long = data.longitude,
+            description = data.description,
+            distance = data.distance,
+            address = data.address,
+            wikipediaInfo = data.wikipediaInfoJSON?.let {
+                MainActivity.fromJson<WikipediaPlaceInfo>(
+                    it
+                )
+            })
     }
 
 }
@@ -151,16 +156,17 @@ class POISavedViewModel(application: Application) : POIViewModel<POISavedData>(a
         val currentTimeString = ZonedDateTime.now().toString()
 
         val poiData = POISavedData(
-            poi.id,
-            poi.name,
-            poi.category,
-            currentTimeString,
-            poi.lat,
-            poi.long,
-            poi.description,
-            poi.distance,
-            poi.address,
-            MainActivity.toJson(poi.wikipediaInfo)
+            foursquareID = poi.id,
+            name = poi.name,
+            category = poi.category,
+            categoryID = poi.categoryID,
+            timeTriggered = currentTimeString,
+            latitude = poi.lat,
+            longitude = poi.long,
+            description = poi.description,
+            distance = poi.distance,
+            address = poi.address,
+            wikipediaInfoJSON = MainActivity.toJson(poi.wikipediaInfo)
         )
         super.toggleFavorite(poi, poiData, context, starWrapper)
     }

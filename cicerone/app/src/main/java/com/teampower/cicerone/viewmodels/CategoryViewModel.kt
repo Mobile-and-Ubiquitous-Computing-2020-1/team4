@@ -47,11 +47,11 @@ class CategoryViewModel(application: Application) : AndroidViewModel(application
         repository.insert(cat)
     }
 
-    fun updateCategoryPoints(catName: String, points: Double) = viewModelScope.launch(Dispatchers.IO) {
-        repository.updateCategoryPoints(catName, points)
+    fun like(catName: String) = viewModelScope.launch(Dispatchers.IO) {
+        repository.like(catName)
+    }
+    fun dislike(catName: String) = viewModelScope.launch(Dispatchers.IO) {
+        repository.dislike(catName)
     }
 
-    fun getCategoryPoints(catName: String) = viewModelScope.launch(Dispatchers.IO) {
-        repository.getCategoryPoints(catName)
-    }
 }

@@ -8,6 +8,7 @@ interface POIData {
     val foursquareID: String
     val name: String
     val category: String
+    val categoryID: String
     val timeTriggered: String
     val latitude: Double
     val longitude: Double
@@ -22,6 +23,7 @@ data class POIHistoryData(
     @PrimaryKey override val foursquareID: String,
     @ColumnInfo(name = "name") override val name: String,
     @ColumnInfo(name = "category") override val category: String,
+    @ColumnInfo(name = "category_id") override val categoryID: String,
     @ColumnInfo(name = "time_triggered") override val timeTriggered: String,
     @ColumnInfo(name = "latitude") override val latitude: Double,
     @ColumnInfo(name = "longitude") override val longitude: Double,
@@ -36,6 +38,7 @@ data class POISavedData(
     @PrimaryKey override val foursquareID: String,
     @ColumnInfo(name = "name") override val name: String,
     @ColumnInfo(name = "category") override val category: String,
+    @ColumnInfo(name = "category_id") override val categoryID: String,
     @ColumnInfo(name = "time_triggered") override val timeTriggered: String,
     @ColumnInfo(name = "latitude") override val latitude: Double,
     @ColumnInfo(name = "longitude") override val longitude: Double,
@@ -47,6 +50,8 @@ data class POISavedData(
 
 @Entity(tableName = "category_table")
 data class CategoryData(
-    @PrimaryKey val name: String,
-    @ColumnInfo val score: Double
+    @PrimaryKey val foursquareID: String,
+    @ColumnInfo val name: String,
+    @ColumnInfo val likes: Int,
+    @ColumnInfo val dislikes: Int
 )

@@ -29,8 +29,7 @@ const val POI_DETAILS = "POI_DETAILS"
 class GeofenceTriggeredActivity : AppCompatActivity() {
     private val TRIG_TAG = "POIActivity"
     private lateinit var catViewModel: CategoryViewModel
-    private lateinit var poiViewModel: POISavedViewModel
-
+    private lateinit var poiSavedViewModel: POISavedViewModel
     lateinit var tts: TextToSpeech
     private var speaking = false
     private var tts_text = ""
@@ -49,12 +48,12 @@ class GeofenceTriggeredActivity : AppCompatActivity() {
         setContentView(R.layout.activity_geofence_triggered)
         setSupportActionBar(toolbar)
 
-        poiViewModel = ViewModelProvider(this).get(POISavedViewModel::class.java)
+        poiSavedViewModel = ViewModelProvider(this).get(POISavedViewModel::class.java)
         // Extract the transitionDetails
         val poiObjectJSON = intent.getStringExtra(POI_DETAILS) ?: ""
         val poi = MainActivity.fromJson<POI>(poiObjectJSON)
         MainScope().launch {
-            val result = poiViewModel.loadPOI(poi.id).await()
+            val result = poiSavedViewModel.loadPOI(poi.id).await()
             isSaved = result !== null
             if (isSaved) {
                 DrawableCompat.setTint(
@@ -171,14 +170,25 @@ class GeofenceTriggeredActivity : AppCompatActivity() {
         )
         Log.v(TRIG_TAG, poi.toString())
 
-        // Demo on how to update category score
+        // User-feedback for recommendation
         catViewModel = ViewModelProvider(this).get(CategoryViewModel::class.java)
-        catViewModel.updateCategoryPoints("School", 2.0) // Change score
+        like_button.setOnClickListener {
+            catViewModel.like(poi.categoryID)
+            like_button.isEnabled = false
+            dislike_button.isEnabled = false
+        }
+
+        dislike_button.setOnClickListener {
+            catViewModel.dislike(poi.categoryID)
+            like_button.isEnabled = false
+            dislike_button.isEnabled = false
+        }
+        // TODO table doesn't seem to update
     }
 
     private fun toggleFavoritePOI(poi: POI) {
         MainScope().launch {
-            poiViewModel.toggleFavorite(poi, applicationContext, favorite_button)
+            poiSavedViewModel.toggleFavorite(poi, applicationContext, favorite_button)
         }
     }
 }

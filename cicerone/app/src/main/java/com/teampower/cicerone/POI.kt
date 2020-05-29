@@ -17,6 +17,7 @@ data class POI(
     val id: String,
     val name: String,
     val category: String,
+    val categoryID: String,
     val lat: Double,
     val long: Double,
     val description: String = "",

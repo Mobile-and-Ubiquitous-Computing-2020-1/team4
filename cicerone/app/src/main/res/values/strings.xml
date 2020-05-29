@@ -105,6 +105,7 @@
     <string name="tts_text_no_wikipedia">You are close to %1$s, a %2$s %3$d meters away.</string>
     <string name="location_description">\"%1$s\" \n from Wikipedia</string>
     <string name="tts_button_label">Listen to information</string>
+    <string name='vote_button_label'>Was this recommendation helpful?</string>
 
     <string name="hint_word">Word…</string>
     <string name="button_save">Save</string>
