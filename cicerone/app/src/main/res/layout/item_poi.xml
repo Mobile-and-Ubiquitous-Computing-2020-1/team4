@@ -22,6 +22,9 @@
             android:layout_height="wrap_content"
             android:layout_weight="7"
             android:background="@android:color/white"
+            android:clickable="true"
+            android:focusable="true"
+            android:foreground="?attr/selectableItemBackground"
             android:paddingStart="@dimen/big_padding"
             android:paddingTop="@dimen/big_padding"
             android:paddingBottom="@dimen/big_padding">
@@ -33,7 +36,6 @@
                 android:paddingRight="@dimen/small_padding"
                 android:text="The Most Wonderful Spot"
                 android:textColor="#000000"
-                android:textIsSelectable="false"
                 android:textSize="@dimen/cardTitleText"
                 android:textStyle="bold"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -48,7 +50,6 @@
                 android:letterSpacing="0.03"
                 android:text="Day XX, 00:00 • Category"
                 android:textColor="#696969"
-                android:textIsSelectable="true"
                 android:textSize="14sp"
                 app:layout_constraintStart_toStartOf="@+id/listItemPlaceName"
                 app:layout_constraintTop_toBottomOf="@+id/listItemPlaceName" />
@@ -74,6 +75,9 @@
             android:layout_width="100dp"
             android:layout_height="match_parent"
             android:layout_weight="3"
+            android:clickable="true"
+            android:focusable="true"
+            android:foreground="?attr/selectableItemBackground"
             android:paddingTop="@dimen/big_padding"
             android:paddingBottom="@dimen/big_padding">
 
