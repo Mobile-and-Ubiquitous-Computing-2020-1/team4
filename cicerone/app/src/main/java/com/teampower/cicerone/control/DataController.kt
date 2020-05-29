@@ -3,6 +3,7 @@ package com.teampower.cicerone.control
 import android.content.Context
 import android.location.Location
 import android.util.Log
+import android.widget.ImageView
 import android.widget.TextView
 import com.google.android.gms.location.Geofence
 import com.teampower.cicerone.*
@@ -21,7 +22,7 @@ import kotlin.collections.ArrayList
 import kotlin.math.round
 import kotlin.math.roundToInt
 import kotlin.random.Random.Default.nextDouble
-
+import com.squareup.picasso.Picasso as Picasso
 
 class DataController(private val geoCon: GeofencingController) {
     private val DATA_CON = "DataController"
@@ -31,7 +32,7 @@ class DataController(private val geoCon: GeofencingController) {
     private val uniformRandom = Random() // seed 1 - TODO remove seed
 
 
-    fun requestData(location: android.location.Location, venue_view: TextView, mainContext: Context) {
+    fun requestData(location: android.location.Location, venue_view: TextView, image_view: ImageView, mainContext: Context) {
         // Set context
         val context = mainContext
 
@@ -112,17 +113,14 @@ class DataController(private val geoCon: GeofencingController) {
                         pois.put(poi.id, poi)
                     }
                     if(!pois.isEmpty()){
-                        displayData(pois.toList().get(0).second, venue_view)
+                        displayData(pois.toList().get(0).second, venue_view, image_view, mainContext)
                     }
                 }
             }
         })
     }
 
-    fun requestVenueDetails(venueID: String, current_location: Location, venue_detail_view: TextView, mainContext: Context) {
-        // Set context
-        val context = mainContext
-
+    fun requestVenueDetails(venueID: String, current_location: Location, venue_detail_view: TextView, venue_image_view: ImageView, context: Context) {
         // Loads client ID and secret from "secret.properties" file in BuildConfig
         val foursquare_id = BuildConfig.FOURSQUARE_ID
         val foursquare_secret = BuildConfig.FOURSQUARE_SECRET
@@ -167,7 +165,7 @@ class DataController(private val geoCon: GeofencingController) {
                     val result = response.body()
                     val venue = result!!.response.venue
                     val poi = poiDetailBuilder(venue, 0, current_location)
-                    displayData(poi, venue_detail_view)
+                    displayData(poi, venue_detail_view, venue_image_view, context)
                 }
             }
         })
@@ -211,6 +209,7 @@ class DataController(private val geoCon: GeofencingController) {
         val long = venue.location.lng
         val address = venue.location.formattedAddress.joinToString()
         val categories = venue.categories.joinToString { it.name }
+        val categoryID = venue.categories.get(0).id
         val description = venue.description
         val rating = venue.rating
         val hours = venue.hours.status
@@ -237,6 +236,7 @@ class DataController(private val geoCon: GeofencingController) {
             distance,
             address,
             categories,
+            categoryID,
             description,
             rating,
             hours,
@@ -250,7 +250,7 @@ class DataController(private val geoCon: GeofencingController) {
         )
     }
 
-    private fun displayData(poi: POI, venue_view: TextView) {
+    private fun displayData(poi: POI, venue_view: TextView, venue_image_view: ImageView, context: Context) {
         // Generate string with basic POI information
         val poi_string = StringBuilder()
         poi_string.append("Name: ${poi.name}").appendln()
@@ -283,6 +283,16 @@ class DataController(private val geoCon: GeofencingController) {
 
         // Finally set the text view string to the POI description we generated above
         venue_view.text = poi_string
+
+        Log.d(TAG, "photo: ${poi.photo_url}")
+
+        // Set the image view to the POI's image that we have retrieved
+        poi.photo_url?.let {
+            Picasso.with(context)
+                .load(poi.photo_url)
+                .error(R.drawable.common_google_signin_btn_icon_dark)
+                .into(venue_image_view)
+        }
     }
 
     /**
