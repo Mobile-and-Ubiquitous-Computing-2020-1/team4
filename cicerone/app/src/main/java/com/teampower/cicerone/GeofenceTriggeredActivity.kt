@@ -20,7 +20,7 @@ import kotlinx.android.synthetic.main.activity_scrolling.toolbar
 import kotlinx.android.synthetic.main.content_geofence_triggered.*
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
-import org.threeten.bp.Instant
+import org.threeten.bp.ZonedDateTime
 import java.util.*
 
 
@@ -173,7 +173,7 @@ class GeofenceTriggeredActivity : AppCompatActivity() {
 
             if (!isSaved) {
                 // Add to favorites
-                val currentTimeString = Instant.now().toString()
+                val currentTimeString = ZonedDateTime.now().toString()
                 poiSavedViewModel.favorite(
                     POISavedData(
                         poi.id,
@@ -182,7 +182,7 @@ class GeofenceTriggeredActivity : AppCompatActivity() {
                         currentTimeString,
                         poi.lat,
                         poi.long,
-                        poi.description,
+                        poi.wikipediaInfo?.description,
                         poi.distance,
                         poi.address
                     )

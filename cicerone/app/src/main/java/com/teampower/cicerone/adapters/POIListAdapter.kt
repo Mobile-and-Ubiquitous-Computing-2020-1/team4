@@ -10,8 +10,7 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.RecyclerView
 import com.teampower.cicerone.R
 import com.teampower.cicerone.database.POIData
-import org.threeten.bp.LocalDateTime
-import org.threeten.bp.ZoneOffset
+import org.threeten.bp.ZonedDateTime
 import org.threeten.bp.format.DateTimeFormatter
 
 class POIListAdapter internal constructor(
@@ -38,8 +37,8 @@ class POIListAdapter internal constructor(
     override fun onBindViewHolder(holder: POIViewHolder, position: Int) {
         val currentItem = pois[position]
         holder.placeName.text = currentItem.name
-        val timeFormatter = DateTimeFormatter.ISO_INSTANT.withZone(ZoneOffset.UTC)
-        val prettyTime = LocalDateTime.parse(currentItem.timeTriggered, timeFormatter).format(
+        val timeFormatter = DateTimeFormatter.ISO_ZONED_DATE_TIME
+        val prettyTime = ZonedDateTime.parse(currentItem.timeTriggered, timeFormatter).format(
             DateTimeFormatter.ofPattern("eee, MMM dd HH:mm")
         )
         holder.subInfo.text = holder.subInfo.context.getString(
