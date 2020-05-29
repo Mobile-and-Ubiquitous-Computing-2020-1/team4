@@ -12,17 +12,20 @@ import com.teampower.cicerone.database.POISavedData
 // Saved poi table interface
 @Dao
 interface POISavedDao {
-    @Query("SELECT * FROM poi_saved_table")
-    fun getAll(): LiveData<List<POISavedData>>
+    @Query("SELECT * FROM poi_saved_table ORDER BY time_triggered ASC")
+    fun getAllByAscTimeTriggered(): LiveData<List<POISavedData>>
 
-    @Query("SELECT * from poi_saved_table ORDER BY time_triggered ASC")
+    @Query("SELECT * from poi_saved_table ORDER BY time_triggered ASC limit 5")
     fun getRecentlyTriggered(): LiveData<List<POISavedData>>
 
     @Query("SELECT * from poi_saved_table where foursquareID = (:foursquareID)")
-    fun loadPOI(foursquareID: String): LiveData<POISavedData?>?
+    suspend fun loadPOI(foursquareID: String): POISavedData?
 
     @Delete
-    fun deletePOI(poi: POISavedData)
+    suspend fun deletePOI(poi: POISavedData)
+
+    @Query("DELETE FROM poi_saved_table where foursquareID=(:foursquareID)")
+    suspend fun deletePOIbyId(foursquareID: String)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(poi: POISavedData)

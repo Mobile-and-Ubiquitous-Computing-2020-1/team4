@@ -21,6 +21,7 @@ data class POI(
     val distance: Int,
     val address: String,
     val category: String,
+    val categoryID: String,
     val description: String? = null,
     val rating: Double? = null,
     val hours: String? = null,

@@ -2,7 +2,6 @@ package com.teampower.cicerone.database
 
 import androidx.lifecycle.LiveData
 import androidx.room.*
-import com.teampower.cicerone.database.POIHistoryData
 
 /*
 * POIDao
@@ -18,7 +17,7 @@ interface POIHistoryDao {
     @Query("SELECT * from poi_history_table ORDER BY time_triggered ASC")
     fun getRecentlyTriggered(): LiveData<List<POIHistoryData>>
 
-//    @Query("SELECT 1 from poi_table WHERE apiId =:foursqaureID")
+//    @Query("SELECT 1 from poi_table WHERE apiId =:foursquareID")
 //    fun getById(id: String): POIData
 
     @Query("SELECT * from poi_history_table where foursquareID = (:foursquareID)")

@@ -75,7 +75,18 @@
                 app:layout_constraintRight_toRightOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                tools:listitem="@layout/recyclerview_item" />
+                app:layout_constraintVertical_bias="0.0"
+                tools:listitem="@layout/recyclerview_item">
+
+            </androidx.recyclerview.widget.RecyclerView>
+
+            <Button
+                android:id="@+id/see_all_saved_poi_btn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/see_all_starred_places_label"
+                app:layout_constraintStart_toStartOf="@+id/savedrecyclerview"
+                app:layout_constraintTop_toBottomOf="@+id/savedrecyclerview" />
         </androidx.constraintlayout.widget.ConstraintLayout>
     </LinearLayout>
 

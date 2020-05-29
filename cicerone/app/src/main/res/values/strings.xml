@@ -1,5 +1,7 @@
 <resources>
     <string name="app_name">Cicerone</string>
+    <string name="list_saved_poi">Starred places</string>
+
     <string name="user_position">Latitude: %1$s Longitude: %2$s</string>
 
     <string name="large_text">
@@ -102,9 +104,13 @@
     <string name="tts_text_yes_wikipedia">You are close to %1$s, a %2$s %3$d meters away. Here is an excerpt from Wikipedia. %4$s. If you liked this recommendation, smash like and subscribe.</string>
     <string name="tts_text_no_wikipedia">You are close to %1$s, a %2$s %3$d meters away.</string>
     <string name="location_description">\"%1$s\" \n from Wikipedia</string>
+    <string name="tts_button_label">Listen to information</string>
+    <string name='vote_button_label'>Was this recommendation helpful?</string>
 
     <string name="hint_word">Word…</string>
     <string name="button_save">Save</string>
     <string name="empty_not_saved">Word not saved because it is empty.</string>
     <string name="add_word">Add word</string>
+
+    <string name="see_all_starred_places_label">See all starred places</string>
 </resources>

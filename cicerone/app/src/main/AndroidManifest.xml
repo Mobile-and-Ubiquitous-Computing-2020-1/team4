@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.teampower.cicerone">
+
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
     <uses-permission android:name="android.permission.INTERNET" />
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -14,6 +16,11 @@
         <activity
             android:name=".GeofenceTriggeredActivity"
             android:label="@string/title_activity_geofence_triggered"
+            android:parentActivityName=".MainActivity"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".ListSavedPOIActivity"
+            android:label="@string/list_saved_poi"
             android:parentActivityName=".MainActivity"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity

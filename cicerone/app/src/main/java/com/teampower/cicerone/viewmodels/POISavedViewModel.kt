@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.teampower.cicerone.database.CiceroneAppDatabase
 import com.teampower.cicerone.database.POISavedData
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 
 /*
@@ -17,12 +18,13 @@ import kotlinx.coroutines.launch
 
 class POISavedViewModel(application: Application) : AndroidViewModel(application) {
 
-    private val historyRepository: POISavedRepository
+    private val savedPOIsRepository: POISavedRepository
 
     // Using LiveData and caching what getAlphabetizedWords returns has several benefits:
     // - We can put an observer on the data (instead of polling for changes) and only update the
     //   the UI when the data actually changes.
     // - Repository is completely separated from the UI through the ViewModel.
+    val recentSavedPOIs: LiveData<List<POISavedData>>
     val allPOI: LiveData<List<POISavedData>>
 
     init {
@@ -30,9 +32,10 @@ class POISavedViewModel(application: Application) : AndroidViewModel(application
             application,
             viewModelScope
         ).poiSavedDao()
-        historyRepository =
+        savedPOIsRepository =
             POISavedRepository(poisDao)
-        allPOI = historyRepository.allPOI
+        recentSavedPOIs = savedPOIsRepository.recentSavedPOIs
+        allPOI = savedPOIsRepository.allPOI
     }
 
     /**
@@ -40,7 +43,15 @@ class POISavedViewModel(application: Application) : AndroidViewModel(application
      * to block the main thread, so we're launching a new coroutine and calling the repository's
      * insert, which is a suspend function.
      */
-    fun insert(poi: POISavedData) = viewModelScope.launch(Dispatchers.IO) {
-        historyRepository.insert(poi)
+    fun favorite(poi: POISavedData) = viewModelScope.launch(Dispatchers.IO) {
+        savedPOIsRepository.insert(poi)
+    }
+
+    fun unFavorite(foursquareId: String) = viewModelScope.launch(Dispatchers.IO) {
+        savedPOIsRepository.removePOI(foursquareId)
+    }
+
+    suspend fun loadPOI(foursquareId: String) = viewModelScope.async(Dispatchers.IO) {
+        savedPOIsRepository.loadPOI(foursquareId)
     }
 }

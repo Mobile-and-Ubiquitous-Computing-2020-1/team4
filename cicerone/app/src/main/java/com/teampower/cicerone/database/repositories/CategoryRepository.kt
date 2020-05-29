@@ -20,10 +20,10 @@ class CategoryRepository(private val catDao: CategoryDao) {
     suspend fun insert(cat: CategoryData) {
         catDao.insert(cat)
     }
-    fun updateCategoryPoints(catName: String, points: Double) {
-        catDao.updateCategoryPoints(catName, points)
+    fun like(catName: String) {
+        catDao.like(catName)
     }
-    fun getCategoryPoints(catName: String) {
-        catDao.getCategoryPoints(catName)
+    fun dislike(catName: String) {
+        catDao.dislike(catName)
     }
 }

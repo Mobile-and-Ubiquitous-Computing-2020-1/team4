@@ -31,11 +31,12 @@
                 app:popupTheme="@style/AppTheme.PopupOverlay" />
 
 
+
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:orientation="vertical"
-                android:paddingLeft="10dp"
                 android:paddingTop="64dp">
 
                 <TextView
@@ -43,6 +44,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="@dimen/location_type_height"
                     android:text="@string/location_category"
+                    android:paddingLeft="10dp"
                     android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
 
                 <TextView
@@ -50,8 +52,10 @@
                     android:layout_width="match_parent"
                     android:layout_height="@dimen/location_type_height"
                     android:text="@string/location_distance"
+                    android:paddingLeft="10dp"
                     android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
             </LinearLayout>
+
 
         </com.google.android.material.appbar.CollapsingToolbarLayout>
     </com.google.android.material.appbar.AppBarLayout>
@@ -59,13 +63,13 @@
     <include layout="@layout/content_geofence_triggered" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/tts_button"
+        android:id="@+id/favorite_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/fab_margin"
         app:layout_anchor="@id/app_bar"
         app:layout_anchorGravity="bottom|end"
-        app:srcCompat="@android:drawable/ic_media_play" />
+        app:srcCompat="@drawable/ic_star_black_32dp" />
 
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
