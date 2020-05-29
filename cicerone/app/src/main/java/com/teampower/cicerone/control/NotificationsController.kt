@@ -79,8 +79,7 @@ class NotificationsController() {
         content: String, notificationId: Int, poiDetailsJSON: String
     ) {
         // Create an Intent for the activity you want to start
-        val geofenceIntent = Intent(context, GeofenceTriggeredActivity::class.java)
-        geofenceIntent.putExtra("PLACE_DETAILS", poiDetailsJSON)
+        val geofenceIntent = GeofenceTriggeredActivity.getStartIntent(context, poiDetailsJSON)
         // Create the TaskStackBuilder
         val geofencePendingIntent: PendingIntent? = TaskStackBuilder.create(context).run {
             // Add the intent, which inflates the back stack

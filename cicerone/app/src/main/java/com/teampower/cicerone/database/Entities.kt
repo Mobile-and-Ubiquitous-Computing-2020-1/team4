@@ -11,7 +11,7 @@ abstract class POIData {
     abstract val timeTriggered: String
     abstract val latitude: Double
     abstract val longitude: Double
-    abstract val description: String?
+    abstract val description: String
     abstract val distance: Int?
     abstract val address: String?
     abstract val wikipediaInfoJSON: String?
@@ -26,10 +26,10 @@ data class POIHistoryData(
     @ColumnInfo(name = "time_triggered") override val timeTriggered: String,
     @ColumnInfo(name = "latitude") override val latitude: Double,
     @ColumnInfo(name = "longitude") override val longitude: Double,
-    @ColumnInfo(name = "description") override val description: String?,
+    @ColumnInfo(name = "description") override val description: String,
     @ColumnInfo(name = "distance") override val distance: Int?,
     @ColumnInfo(name = "address") override val address: String?,
-    @ColumnInfo(name = "wikipediaInfoJSON") override val wikipediaInfoJSON: String? = ""
+    @ColumnInfo(name = "wikipedia_info_json") override val wikipediaInfoJSON: String? = ""
 ) : POIData()
 
 @Entity(tableName = "poi_saved_table")
@@ -40,10 +40,10 @@ data class POISavedData(
     @ColumnInfo(name = "time_triggered") override val timeTriggered: String,
     @ColumnInfo(name = "latitude") override val latitude: Double,
     @ColumnInfo(name = "longitude") override val longitude: Double,
-    @ColumnInfo(name = "description") override val description: String?,
+    @ColumnInfo(name = "description") override val description: String,
     @ColumnInfo(name = "distance") override val distance: Int?,
     @ColumnInfo(name = "address") override val address: String?,
-    @ColumnInfo(name = "wikipediaInfoJSON") override val wikipediaInfoJSON: String? = ""
+    @ColumnInfo(name = "wikipedia_info_json") override val wikipediaInfoJSON: String? = ""
 ) : POIData()
 
 @Entity(tableName = "category_table")

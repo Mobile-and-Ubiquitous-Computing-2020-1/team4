@@ -138,11 +138,11 @@ class DataController(private val geoCon: GeofencingController) {
         return POI(
             id.toString(),
             name,
+            categories,
             lat,
             long,
-            distance,
-            address,
-            categories
+            distance = distance,
+            address = address
         )
     }
 

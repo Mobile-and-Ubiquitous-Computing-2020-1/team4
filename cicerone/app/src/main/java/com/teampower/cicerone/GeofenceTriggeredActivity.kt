@@ -1,5 +1,7 @@
 package com.teampower.cicerone
 
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.speech.tts.TextToSpeech
 import android.speech.tts.UtteranceProgressListener
@@ -23,6 +25,8 @@ import kotlinx.coroutines.launch
 import org.threeten.bp.ZonedDateTime
 import java.util.*
 
+const val POI_DETAILS = "POI_DETAILS"
+
 
 class GeofenceTriggeredActivity : AppCompatActivity() {
     private val TRIG_TAG = "POIActivity"
@@ -34,6 +38,14 @@ class GeofenceTriggeredActivity : AppCompatActivity() {
     private var tts_text = ""
     private var isSaved = false
 
+    companion object {
+        // Whenever we want to create this Activity, we use it via this intent creation function.
+        fun getStartIntent(context: Context, poiObjectJSON: String): Intent {
+            return Intent(context, GeofenceTriggeredActivity::class.java)
+                .putExtra(POI_DETAILS, poiObjectJSON)
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_geofence_triggered)
@@ -41,7 +53,7 @@ class GeofenceTriggeredActivity : AppCompatActivity() {
 
         poiSavedViewModel = ViewModelProvider(this).get(POISavedViewModel::class.java)
         // Extract the transitionDetails
-        val poiObjectJSON = intent.getStringExtra("PLACE_DETAILS") ?: ""
+        val poiObjectJSON = intent.getStringExtra(POI_DETAILS) ?: ""
         val poi = MainActivity.fromJson<POI>(poiObjectJSON)
         MainScope().launch {
             val result = poiSavedViewModel.loadPOI(poi.id).await()

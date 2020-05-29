@@ -8,6 +8,8 @@ import android.view.Menu
 import android.view.MenuItem
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
+import androidx.core.graphics.drawable.DrawableCompat
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -15,14 +17,16 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.jakewharton.threetenabp.AndroidThreeTen
+import com.teampower.cicerone.adapters.POIListAdapter
 import com.teampower.cicerone.control.DataController
 import com.teampower.cicerone.control.GeofencingController
 import com.teampower.cicerone.control.LocationController
 import com.teampower.cicerone.control.NotificationsController
-import com.teampower.cicerone.adapters.POIListAdapter
+import com.teampower.cicerone.database.POIData
 import com.teampower.cicerone.database.history_table.POISavedViewModel
 import com.teampower.cicerone.viewmodels.CategoryViewModel
 import com.teampower.cicerone.viewmodels.POIHistoryViewModel
+import com.teampower.cicerone.wikipedia.WikipediaPlaceInfo
 import kotlinx.android.synthetic.main.activity_scrolling.*
 import kotlinx.android.synthetic.main.content_scrolling.*
 import kotlinx.coroutines.GlobalScope
@@ -59,12 +63,36 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_scrolling)
         setSupportActionBar(toolbar)
-        AndroidThreeTen.init(this);
+        AndroidThreeTen.init(this)
+
+        // Adapter on click functions
+        val onListItemInfoClicked: (poi: POIData) -> Unit = { poi ->
+            val convertedPOI = POI(
+                poi.foursquareID,
+                poi.name,
+                poi.category,
+                poi.latitude,
+                poi.longitude,
+                poi.description,
+                poi.distance,
+                poi.address,
+                poi.wikipediaInfoJSON?.let { fromJson<WikipediaPlaceInfo>(it) })
+            Log.d(TAG, "Triggered intent ${poi.name}")
+            startActivity(GeofenceTriggeredActivity.getStartIntent(this, toJson(convertedPOI)))
+        }
+        val onListItemStarClicked: (poi: POIData, holder: POIListAdapter.POIViewHolder) -> Unit =
+            { poi, holder ->
+                Log.d(TAG, "STARRING ${poi.name}")
+                DrawableCompat.setTint(
+                    DrawableCompat.wrap(holder.starImage.drawable),
+                    ContextCompat.getColor(this, R.color.yellow)
+                )
+            }
 
         // List history of recent POIs
         val historyRecyclerView = findViewById<RecyclerView>(R.id.historyrecyclerview)
         val historyAdapter =
-            POIListAdapter(this)
+            POIListAdapter(this, onListItemInfoClicked, onListItemStarClicked)
         historyRecyclerView.adapter = historyAdapter
         historyRecyclerView.layoutManager = LinearLayoutManager(this)
 
@@ -76,7 +104,7 @@ class MainActivity : AppCompatActivity() {
 
         // List saved POIs
         val savedRecyclerView = findViewById<RecyclerView>(R.id.savedrecyclerview)
-        val savedAdapter = POIListAdapter(this)
+        val savedAdapter = POIListAdapter(this, onListItemInfoClicked, onListItemStarClicked)
         savedRecyclerView.adapter = savedAdapter
         savedRecyclerView.layoutManager = LinearLayoutManager(this)
 
@@ -149,4 +177,5 @@ class MainActivity : AppCompatActivity() {
     ) {
         latCon.onRequestPermissionsResult(requestCode, permissions, grantResults)
     }
+
 }
