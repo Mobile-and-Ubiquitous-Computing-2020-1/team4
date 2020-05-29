@@ -15,8 +15,8 @@ import androidx.core.graphics.drawable.DrawableCompat
 import androidx.lifecycle.ViewModelProvider
 import com.google.gson.internal.LinkedTreeMap
 import com.teampower.cicerone.database.POISavedData
-import com.teampower.cicerone.database.history_table.POISavedViewModel
 import com.teampower.cicerone.viewmodels.CategoryViewModel
+import com.teampower.cicerone.viewmodels.POISavedViewModel
 import kotlinx.android.synthetic.main.activity_geofence_triggered.*
 import kotlinx.android.synthetic.main.activity_scrolling.toolbar
 import kotlinx.android.synthetic.main.content_geofence_triggered.*
@@ -31,7 +31,7 @@ const val POI_DETAILS = "POI_DETAILS"
 class GeofenceTriggeredActivity : AppCompatActivity() {
     private val TRIG_TAG = "POIActivity"
     private lateinit var catViewModel: CategoryViewModel
-    private lateinit var poiSavedViewModel: POISavedViewModel
+    private lateinit var poiViewModel: POISavedViewModel
 
     lateinit var tts: TextToSpeech
     private var speaking = false
@@ -51,12 +51,12 @@ class GeofenceTriggeredActivity : AppCompatActivity() {
         setContentView(R.layout.activity_geofence_triggered)
         setSupportActionBar(toolbar)
 
-        poiSavedViewModel = ViewModelProvider(this).get(POISavedViewModel::class.java)
+        poiViewModel = ViewModelProvider(this).get(POISavedViewModel::class.java)
         // Extract the transitionDetails
         val poiObjectJSON = intent.getStringExtra(POI_DETAILS) ?: ""
         val poi = MainActivity.fromJson<POI>(poiObjectJSON)
         MainScope().launch {
-            val result = poiSavedViewModel.loadPOI(poi.id).await()
+            val result = poiViewModel.loadPOI(poi.id).await()
             isSaved = result !== null
             if (isSaved) {
                 DrawableCompat.setTint(
@@ -180,13 +180,13 @@ class GeofenceTriggeredActivity : AppCompatActivity() {
 
     private fun toggleFavoritePOI(poi: POI) {
         MainScope().launch {
-            val result = poiSavedViewModel.loadPOI(poi.id).await()
+            val result = poiViewModel.loadPOI(poi.id).await()
             isSaved = result !== null
 
             if (!isSaved) {
                 // Add to favorites
                 val currentTimeString = ZonedDateTime.now().toString()
-                poiSavedViewModel.favorite(
+                poiViewModel.favorite(
                     POISavedData(
                         poi.id,
                         poi.name,
@@ -209,7 +209,7 @@ class GeofenceTriggeredActivity : AppCompatActivity() {
 
             } else {
                 // Remove from favorites
-                poiSavedViewModel.unFavorite(poi.id)
+                poiViewModel.unFavorite(poi.id)
                 isSaved = false
                 DrawableCompat.setTint(
                     DrawableCompat.wrap(favorite_button.drawable),

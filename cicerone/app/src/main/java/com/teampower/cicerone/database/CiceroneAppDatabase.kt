@@ -5,7 +5,6 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.sqlite.db.SupportSQLiteDatabase
-import com.teampower.cicerone.database.history_table.POISavedDao
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -42,9 +41,6 @@ public abstract class CiceroneAppDatabase : RoomDatabase() {
                         "Galaxyroad 18, 290192x PoIS, Sunnyland"
                     )
                     poiHDao.insert(poiH)
-
-                    //************* POI Saved table *************
-                    val poiSDao = database.poiSavedDao()
 
                     //************* Category table *************
                     val catDao = database.categoryDao()

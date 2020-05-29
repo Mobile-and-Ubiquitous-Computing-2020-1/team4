@@ -23,9 +23,9 @@ import com.teampower.cicerone.control.GeofencingController
 import com.teampower.cicerone.control.LocationController
 import com.teampower.cicerone.control.NotificationsController
 import com.teampower.cicerone.database.POIData
-import com.teampower.cicerone.database.history_table.POISavedViewModel
 import com.teampower.cicerone.viewmodels.CategoryViewModel
 import com.teampower.cicerone.viewmodels.POIHistoryViewModel
+import com.teampower.cicerone.viewmodels.POISavedViewModel
 import com.teampower.cicerone.wikipedia.WikipediaPlaceInfo
 import kotlinx.android.synthetic.main.activity_scrolling.*
 import kotlinx.android.synthetic.main.content_scrolling.*
@@ -44,7 +44,7 @@ class MainActivity : AppCompatActivity() {
     private val geoCon = GeofencingController()
     private val dataCon = DataController(geoCon)
     private lateinit var poiHistoryViewModel: POIHistoryViewModel
-    private lateinit var poiSavedViewModel: POISavedViewModel
+    private lateinit var poiViewModel: POISavedViewModel
     private lateinit var catViewModel: CategoryViewModel
 
     companion object {
@@ -108,8 +108,8 @@ class MainActivity : AppCompatActivity() {
         savedRecyclerView.adapter = savedAdapter
         savedRecyclerView.layoutManager = LinearLayoutManager(this)
 
-        poiSavedViewModel = ViewModelProvider(this).get(POISavedViewModel::class.java)
-        poiSavedViewModel.recentSavedPOIs.observe(this, Observer { pois ->
+        poiViewModel = ViewModelProvider(this).get(POISavedViewModel::class.java)
+        poiViewModel.recentSavedPOIs.observe(this, Observer { pois ->
             // Update the cached copy of the words in the adapter.
             pois?.let { savedAdapter.setPOIs(it) }
         })

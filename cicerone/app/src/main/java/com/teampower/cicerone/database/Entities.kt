@@ -4,18 +4,17 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
-abstract class POIData {
-    abstract val foursquareID: String
-    abstract val name: String
-    abstract val category: String
-    abstract val timeTriggered: String
-    abstract val latitude: Double
-    abstract val longitude: Double
-    abstract val description: String
-    abstract val distance: Int?
-    abstract val address: String?
-    abstract val wikipediaInfoJSON: String?
-
+interface POIData {
+    val foursquareID: String
+    val name: String
+    val category: String
+    val timeTriggered: String
+    val latitude: Double
+    val longitude: Double
+    val description: String
+    val distance: Int?
+    val address: String?
+    val wikipediaInfoJSON: String?
 }
 
 @Entity(tableName = "poi_history_table")
@@ -30,7 +29,7 @@ data class POIHistoryData(
     @ColumnInfo(name = "distance") override val distance: Int?,
     @ColumnInfo(name = "address") override val address: String?,
     @ColumnInfo(name = "wikipedia_info_json") override val wikipediaInfoJSON: String? = ""
-) : POIData()
+) : POIData
 
 @Entity(tableName = "poi_saved_table")
 data class POISavedData(
@@ -44,7 +43,7 @@ data class POISavedData(
     @ColumnInfo(name = "distance") override val distance: Int?,
     @ColumnInfo(name = "address") override val address: String?,
     @ColumnInfo(name = "wikipedia_info_json") override val wikipediaInfoJSON: String? = ""
-) : POIData()
+) : POIData
 
 @Entity(tableName = "category_table")
 data class CategoryData(

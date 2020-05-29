@@ -11,14 +11,14 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.teampower.cicerone.adapters.POIListAdapter
 import com.teampower.cicerone.database.POIData
-import com.teampower.cicerone.database.history_table.POISavedViewModel
+import com.teampower.cicerone.viewmodels.POISavedViewModel
 import com.teampower.cicerone.wikipedia.WikipediaPlaceInfo
 import kotlinx.android.synthetic.main.activity_scrolling.*
 
 
 class ListSavedPOIActivity : AppCompatActivity() {
     private val TRIG_TAG = "ListSavedPOIActivity"
-    private lateinit var poiSavedViewModel: POISavedViewModel
+    private lateinit var poiViewModel: POISavedViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -26,7 +26,7 @@ class ListSavedPOIActivity : AppCompatActivity() {
         setSupportActionBar(toolbar)
         supportActionBar?.setDisplayHomeAsUpEnabled(true) // Home button to MainActivity
 
-        poiSavedViewModel = ViewModelProvider(this).get(POISavedViewModel::class.java)
+        poiViewModel = ViewModelProvider(this).get(POISavedViewModel::class.java)
 
         // Adapter on click functions
         val onListItemInfoClicked: (poi: POIData) -> Unit = { poi ->
@@ -63,8 +63,7 @@ class ListSavedPOIActivity : AppCompatActivity() {
         savedRecyclerView.adapter = savedAdapter
         savedRecyclerView.layoutManager = LinearLayoutManager(this)
 
-        poiSavedViewModel = ViewModelProvider(this).get(POISavedViewModel::class.java)
-        poiSavedViewModel.allPOI.observe(this, Observer { pois ->
+        poiViewModel.allPOI.observe(this, Observer { pois ->
             // Update the cached copy of the words in the adapter.
             pois?.let { savedAdapter.setPOIs(it) }
         })
