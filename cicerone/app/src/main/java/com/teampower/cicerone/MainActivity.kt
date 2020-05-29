@@ -125,13 +125,12 @@ class MainActivity : AppCompatActivity() {
         }
 
         // Get last location and use it to make data request to API, then display the retrieved data
-        // var curr_location = "38.8897,-77.0089"
         GlobalScope.launch {
             var currLocation: android.location.Location = latCon.getLocation()
             Log.d(TAG, "Current location: ${currLocation}. Requesting data...")
             dataCon.requestData(currLocation, venue_description, venue_image, this@MainActivity)
-            val venueID = "412d2800f964a520df0c1fe3"
-            dataCon.requestVenueDetails(venueID, currLocation, venue_detail, venue_image, this@MainActivity)
+            //val venueID = "412d2800f964a520df0c1fe3"
+            //dataCon.requestVenueDetails(venueID, venue_detail, venue_image, this@MainActivity)
         }
     }
 

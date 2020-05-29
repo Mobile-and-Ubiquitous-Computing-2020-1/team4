@@ -16,9 +16,12 @@ import com.google.gson.internal.LinkedTreeMap
 import com.teampower.cicerone.database.POISavedData
 import com.teampower.cicerone.database.history_table.POISavedViewModel
 import com.teampower.cicerone.viewmodels.CategoryViewModel
+import com.teampower.cicerone.control.DataController
+import com.teampower.cicerone.control.GeofencingController
 import kotlinx.android.synthetic.main.activity_geofence_triggered.*
 import kotlinx.android.synthetic.main.activity_scrolling.toolbar
 import kotlinx.android.synthetic.main.content_geofence_triggered.*
+import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import org.threeten.bp.Instant
@@ -33,7 +36,8 @@ class GeofenceTriggeredActivity : AppCompatActivity() {
     private var speaking = false
     private var tts_text = ""
     private var isSaved = false
-
+    private var geoCon = GeofencingController() // TODO: this sucks, we need to somehow pass the controllers to this activity
+    private var dataCon = DataController(geoCon) // TODO: replace this
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -57,6 +61,15 @@ class GeofenceTriggeredActivity : AppCompatActivity() {
         }
 
         supportActionBar?.setDisplayHomeAsUpEnabled(true) // Home button to MainActivity
+
+        Log.d(TAG, "Requesting detailed data from Foursquare")
+        // Request detailed data for the POI from Foursquare in a non-blocking manner
+        GlobalScope.launch {
+            // Get the current location
+            dataCon.requestVenueDetails(POI.id, venue_details, venue_image, this@GeofenceTriggeredActivity)
+            Log.d(TAG, "Finished retrieving data from Foursquare")
+        }
+
 
         // Update the view
         title = POI.name

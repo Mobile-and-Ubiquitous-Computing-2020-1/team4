@@ -9,7 +9,7 @@ import com.teampower.cicerone.foursquare.premium.FoursquarePremiumData
 interface FoursquareAPI {
     @GET("/v2/venues/search")
     fun searchVenues(@Query("ll") location: String,
-                     @Query("categoryID") query: String,
+                     @Query("categoryId") query: String,
                      @Query("radius") radius: Int,
                      @Query("limit") limit: Int
     ): Call<FoursquareData>
