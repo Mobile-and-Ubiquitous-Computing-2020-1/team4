@@ -4,6 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+
+    android:background="@color/backgroundColor"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context=".ScrollingActivity"
     tools:showIn="@layout/activity_scrolling">
@@ -39,14 +41,14 @@
                 android:id="@+id/historyrecyclerview"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:padding="@dimen/big_padding"
+                android:paddingHorizontal="@dimen/big_padding"
+                android:paddingVertical="@dimen/small_padding"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintRight_toRightOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/historySpotsLabel"
-                tools:listitem="@layout/item_poi"
-                tools:visibility="gone">
+                tools:listitem="@layout/item_poi">
 
             </androidx.recyclerview.widget.RecyclerView>
         </androidx.constraintlayout.widget.ConstraintLayout>
@@ -84,17 +86,17 @@
                     app:layout_constraintTop_toTopOf="parent" />
 
                 <Button
-                    android:id="@+id/see_all_saved_poi_btn"
+                    android:id="@+id/seeAllSavedSpotsBtn"
                     style="@style/Widget.AppCompat.Button.Borderless"
                     android:layout_width="292dp"
                     android:layout_height="wrap_content"
-                    android:backgroundTint="#FFFFFF"
+                    android:backgroundTint="@android:color/transparent"
                     android:paddingEnd="32dp"
                     android:text="@string/see_all_starred_places_label"
                     android:textAlignment="textEnd"
                     android:textAllCaps="false"
                     android:textColor="@color/colorAccent"
-                    android:textSize="16sp"
+                    android:textSize="@dimen/biggerText"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintHorizontal_bias="1.0"
@@ -106,7 +108,8 @@
                 android:id="@+id/savedrecyclerview"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:padding="@dimen/big_padding"
+                android:paddingHorizontal="@dimen/big_padding"
+                android:paddingVertical="@dimen/small_padding"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintRight_toRightOf="parent"

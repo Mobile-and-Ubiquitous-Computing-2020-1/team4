@@ -7,6 +7,8 @@
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
         <item name="colorSecondary">@color/colorSecondary</item>
+        <item name="android:textSize">@dimen/normalText</item>
+        <item name="android:textColor">@color/black</item>
     </style>
 
     <style name="AppTheme.NoActionBar">
@@ -20,9 +22,24 @@
 
     <style name="listLabels">
         <item name="android:paddingLeft">@dimen/big_padding</item>
-        <item name="android:textSize">18sp</item>
+        <item name="android:textSize">@dimen/bigText</item>
         <item name="android:textColor">@color/colorPrimaryDark</item>
         <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="cardLabels">
+        <item name="android:paddingLeft">@dimen/big_padding</item>
+        <item name="android:textColor">@color/gray</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:letterSpacing">0.1</item>
+    </style>
+
+    <style name="toolbarFacts">
+        <item name="android:paddingRight">@dimen/big_padding</item>
+        <item name="android:textColor">@android:color/white</item>
+        <item name="android:letterSpacing">0.1</item>
+        <item name="android:textSize">@dimen/bigText</item>
+        <item name="android:textAlignment">viewEnd</item>
     </style>
 
 </resources>

@@ -36,7 +36,7 @@
                 android:paddingRight="@dimen/small_padding"
                 android:text="The Most Wonderful Spot"
                 android:textColor="#000000"
-                android:textSize="@dimen/cardTitleText"
+                android:textSize="@dimen/biggerText"
                 android:textStyle="bold"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.0"

@@ -31,28 +31,26 @@
                 app:popupTheme="@style/AppTheme.PopupOverlay" />
 
 
-
-
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:orientation="vertical"
-                android:paddingTop="64dp">
+                android:layout_marginTop="64dp"
+                android:orientation="vertical">
 
                 <TextView
                     android:id="@+id/location_category"
+                    style="@style/toolbarFacts"
                     android:layout_width="match_parent"
-                    android:layout_height="@dimen/location_type_height"
+                    android:layout_height="wrap_content"
                     android:text="@string/location_category"
-                    android:paddingLeft="10dp"
                     android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
 
                 <TextView
                     android:id="@+id/location_distance"
+                    style="@style/toolbarFacts"
                     android:layout_width="match_parent"
-                    android:layout_height="@dimen/location_type_height"
+                    android:layout_height="wrap_content"
                     android:text="@string/location_distance"
-                    android:paddingLeft="10dp"
                     android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
             </LinearLayout>
 
@@ -67,8 +65,11 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/fab_margin"
+        android:scaleType="center"
+        app:fabCustomSize="65dp"
         app:layout_anchor="@id/app_bar"
         app:layout_anchorGravity="bottom|end"
+        app:maxImageSize="38dp"
         app:srcCompat="@drawable/ic_star_black_32dp" />
 
 

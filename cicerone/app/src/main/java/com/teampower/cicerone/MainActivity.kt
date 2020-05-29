@@ -121,7 +121,7 @@ class MainActivity : AppCompatActivity() {
         // Setup notifications
         notCon.createNotificationChannel(this)
 
-        see_all_saved_poi_btn.setOnClickListener {
+        seeAllSavedSpotsBtn.setOnClickListener {
             startActivity(Intent(this, ListSavedPOIActivity()::class.java))
         }
 

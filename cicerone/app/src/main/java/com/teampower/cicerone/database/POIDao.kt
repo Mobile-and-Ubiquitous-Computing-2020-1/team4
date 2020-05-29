@@ -11,6 +11,7 @@ import androidx.room.*
 
 interface POIDao<T> {
     fun getAllByAscTimeTriggered(): LiveData<List<T>>
+    fun getAllByDescTimeTriggered(): LiveData<List<T>>
     fun getRecentlyTriggered(): LiveData<List<T>>
     suspend fun loadPOI(foursquareID: String): T?
     suspend fun deletePOI(poi: T)
@@ -25,7 +26,10 @@ interface POISavedDao : POIDao<POISavedData> {
     @Query("SELECT * FROM poi_saved_table ORDER BY time_triggered ASC")
     override fun getAllByAscTimeTriggered(): LiveData<List<POISavedData>>
 
-    @Query("SELECT * from poi_saved_table ORDER BY time_triggered ASC limit 5")
+    @Query("SELECT * FROM poi_saved_table ORDER BY time_triggered DESC")
+    override fun getAllByDescTimeTriggered(): LiveData<List<POISavedData>>
+
+    @Query("SELECT * from poi_saved_table ORDER BY time_triggered DESC limit 5")
     override fun getRecentlyTriggered(): LiveData<List<POISavedData>>
 
     @Query("SELECT * from poi_saved_table where foursquareID = (:foursquareID)")
@@ -50,7 +54,10 @@ interface POIHistoryDao : POIDao<POIHistoryData> {
     @Query("SELECT * FROM poi_history_table ORDER BY time_triggered ASC")
     override fun getAllByAscTimeTriggered(): LiveData<List<POIHistoryData>>
 
-    @Query("SELECT * from poi_history_table ORDER BY time_triggered ASC limit 5")
+    @Query("SELECT * FROM poi_history_table ORDER BY time_triggered DESC")
+    override fun getAllByDescTimeTriggered(): LiveData<List<POIHistoryData>>
+
+    @Query("SELECT * from poi_history_table ORDER BY time_triggered DESC limit 5")
     override fun getRecentlyTriggered(): LiveData<List<POIHistoryData>>
 
     @Query("SELECT * from poi_history_table where foursquareID = (:foursquareID)")
