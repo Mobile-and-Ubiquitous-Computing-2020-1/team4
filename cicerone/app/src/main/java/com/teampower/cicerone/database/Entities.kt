@@ -11,6 +11,9 @@ abstract class POIData {
     abstract val timeTriggered: String
     abstract val latitude: Double
     abstract val longitude: Double
+    abstract val description: String?
+    abstract val distance: Int?
+    abstract val address: String?
 }
 
 @Entity(tableName = "poi_history_table")
@@ -20,7 +23,10 @@ data class POIHistoryData(
     @ColumnInfo(name = "category") override val category: String,
     @ColumnInfo(name = "time_triggered") override val timeTriggered: String,
     @ColumnInfo(name = "latitude") override val latitude: Double,
-    @ColumnInfo(name = "longitude") override val longitude: Double
+    @ColumnInfo(name = "longitude") override val longitude: Double,
+    @ColumnInfo(name = "description") override val description: String?,
+    @ColumnInfo(name = "distance") override val distance: Int?,
+    @ColumnInfo(name = "address") override val address: String?
 ) : POIData()
 
 @Entity(tableName = "poi_saved_table")
@@ -30,7 +36,10 @@ data class POISavedData(
     @ColumnInfo(name = "category") override val category: String,
     @ColumnInfo(name = "time_triggered") override val timeTriggered: String,
     @ColumnInfo(name = "latitude") override val latitude: Double,
-    @ColumnInfo(name = "longitude") override val longitude: Double
+    @ColumnInfo(name = "longitude") override val longitude: Double,
+    @ColumnInfo(name = "description") override val description: String?,
+    @ColumnInfo(name = "distance") override val distance: Int?,
+    @ColumnInfo(name = "address") override val address: String?
 ) : POIData()
 
 @Entity(tableName = "category_table")

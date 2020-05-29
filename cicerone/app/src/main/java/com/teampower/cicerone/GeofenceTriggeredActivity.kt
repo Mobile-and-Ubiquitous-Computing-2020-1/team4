@@ -1,6 +1,5 @@
 package com.teampower.cicerone
 
-import android.content.res.ColorStateList
 import android.os.Bundle
 import android.speech.tts.TextToSpeech
 import android.speech.tts.UtteranceProgressListener
@@ -183,7 +182,10 @@ class GeofenceTriggeredActivity : AppCompatActivity() {
                         poi.category,
                         currentTimeString,
                         poi.lat,
-                        poi.long
+                        poi.long,
+                        poi.description,
+                        poi.distance,
+                        poi.address
                     )
                 )
                 isSaved = true

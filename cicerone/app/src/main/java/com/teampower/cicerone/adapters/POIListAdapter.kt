@@ -42,12 +42,15 @@ class POIListAdapter internal constructor(
         val prettyTime = LocalDateTime.parse(currentItem.timeTriggered, timeFormatter).format(
             DateTimeFormatter.ofPattern("eee, MMM dd HH:mm")
         )
-        holder.subInfo.text = holder.placeName.context.getString(
+        holder.subInfo.text = holder.subInfo.context.getString(
             R.string.list_item_sub_info,
             prettyTime,
             currentItem.category
         )
-        // holder.shortText.text = currentItem.description // TODO: Implement proper datastructure to be able to use this
+        holder.shortText.text = holder.shortText.context.getString(
+            R.string.list_item_short_text,
+            currentItem.description
+        )
         // TODO: Add function to send intent to open detail screen //holder.listItemLayout
         // TODO: Add function to star/unstar to button //holder.listItemStar
         // TODO: Change color of star based on saved or not.

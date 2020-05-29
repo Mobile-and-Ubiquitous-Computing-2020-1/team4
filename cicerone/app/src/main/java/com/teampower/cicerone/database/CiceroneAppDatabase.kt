@@ -36,7 +36,10 @@ public abstract class CiceroneAppDatabase : RoomDatabase() {
                         "School",
                         "2020-05-28T18:16:41.905Z",
                         0.00,
-                        0.00
+                        0.00,
+                        "Founded in 1912, this is the oldest and most famous university in today's world.",
+                        20,
+                        "Galaxyroad 18, 290192x PoIS, Sunnyland"
                     )
                     poiHDao.insert(poiH)
 
