@@ -7,18 +7,24 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.content.ContextCompat
+import androidx.core.graphics.drawable.DrawableCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.teampower.cicerone.MainActivity
 import com.teampower.cicerone.R
 import com.teampower.cicerone.database.POIData
+import com.teampower.cicerone.viewmodels.POIViewModel
 import com.teampower.cicerone.wikipedia.WikipediaPlaceInfo
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.launch
 import org.threeten.bp.ZonedDateTime
 import org.threeten.bp.format.DateTimeFormatter
 
 class POIListAdapter internal constructor(
-    private val context: Context,
+    val context: Context,
     val onItemClick: ((POIData) -> Unit),
-    val onStarClicked: ((POIData, POIListAdapter.POIViewHolder) -> Unit)
+    val onStarClicked: ((POIData, POIListAdapter.POIViewHolder) -> Unit),
+    val viewModel: POIViewModel<*>
 ) : RecyclerView.Adapter<POIListAdapter.POIViewHolder>() {
     private val inflater: LayoutInflater = LayoutInflater.from(context)
     private var pois: List<POIData> = emptyList() // Cached copy of words
@@ -52,20 +58,38 @@ class POIListAdapter internal constructor(
                 description
             )
             if (description == "") shortText.visibility = View.INVISIBLE
+            DrawableCompat.setTint(
+                DrawableCompat.wrap(starImage.drawable),
+                ContextCompat.getColor(context, android.R.color.darker_gray)
+            )
+            MainScope().launch {
+                val result = viewModel.loadPOI(poiItem.foursquareID).await()
+                val isSaved = result !== null
+                if (isSaved) {
+                    DrawableCompat.setTint(
+                        DrawableCompat.wrap(starImage.drawable),
+                        ContextCompat.getColor(context, R.color.yellow)
+                    )
+                } else {
+                    DrawableCompat.setTint(
+                        DrawableCompat.wrap(starImage.drawable),
+                        ContextCompat.getColor(context, android.R.color.darker_gray)
+                    )
+                }
+            }
         }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): POIViewHolder {
         val itemView = inflater.inflate(R.layout.item_poi, parent, false)
         val holder = POIViewHolder(itemView)
+
         // Add click listeners
         holder.infoLayout.setOnClickListener {
             if (holder.adapterPosition != RecyclerView.NO_POSITION) {
                 onItemClick.invoke(pois[holder.adapterPosition])
             }
         }
-        // TODO: Add function to star/unstar to button //listItemStar
-        // TODO: Change color of star based on saved or not.
         holder.starLayout.setOnClickListener {
             if (holder.adapterPosition != RecyclerView.NO_POSITION) {
                 onStarClicked.invoke(pois[holder.adapterPosition], holder)

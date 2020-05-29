@@ -8,8 +8,6 @@ import android.view.Menu
 import android.view.MenuItem
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContextCompat
-import androidx.core.graphics.drawable.DrawableCompat
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -26,10 +24,10 @@ import com.teampower.cicerone.database.POIData
 import com.teampower.cicerone.viewmodels.CategoryViewModel
 import com.teampower.cicerone.viewmodels.POIHistoryViewModel
 import com.teampower.cicerone.viewmodels.POISavedViewModel
-import com.teampower.cicerone.wikipedia.WikipediaPlaceInfo
 import kotlinx.android.synthetic.main.activity_scrolling.*
 import kotlinx.android.synthetic.main.content_scrolling.*
 import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 
 
@@ -44,7 +42,7 @@ class MainActivity : AppCompatActivity() {
     private val geoCon = GeofencingController()
     private val dataCon = DataController(geoCon)
     private lateinit var poiHistoryViewModel: POIHistoryViewModel
-    private lateinit var poiViewModel: POISavedViewModel
+    private lateinit var poiSavedViewModel: POISavedViewModel
     private lateinit var catViewModel: CategoryViewModel
 
     companion object {
@@ -67,36 +65,28 @@ class MainActivity : AppCompatActivity() {
 
         // Adapter on click functions
         val onListItemInfoClicked: (poi: POIData) -> Unit = { poi ->
-            val convertedPOI = POI(
-                poi.foursquareID,
-                poi.name,
-                poi.category,
-                poi.latitude,
-                poi.longitude,
-                poi.description,
-                poi.distance,
-                poi.address,
-                poi.wikipediaInfoJSON?.let { fromJson<WikipediaPlaceInfo>(it) })
+            val convertedPOI = poiSavedViewModel.convertPOIDataToPOI(poi)
             Log.d(TAG, "Triggered intent ${poi.name}")
             startActivity(GeofenceTriggeredActivity.getStartIntent(this, toJson(convertedPOI)))
         }
         val onListItemStarClicked: (poi: POIData, holder: POIListAdapter.POIViewHolder) -> Unit =
             { poi, holder ->
-                Log.d(TAG, "STARRING ${poi.name}")
-                DrawableCompat.setTint(
-                    DrawableCompat.wrap(holder.starImage.drawable),
-                    ContextCompat.getColor(this, R.color.yellow)
-                )
+                val convertedPOI = poiSavedViewModel.convertPOIDataToPOI(poi)
+                MainScope().launch {
+                    poiSavedViewModel.toggleFavorite(convertedPOI, applicationContext, holder.starImage)
+                }
             }
+
+        poiHistoryViewModel = ViewModelProvider(this).get(POIHistoryViewModel::class.java)
+        poiSavedViewModel = ViewModelProvider(this).get(POISavedViewModel::class.java)
 
         // List history of recent POIs
         val historyRecyclerView = findViewById<RecyclerView>(R.id.historyrecyclerview)
         val historyAdapter =
-            POIListAdapter(this, onListItemInfoClicked, onListItemStarClicked)
+            POIListAdapter(this, onListItemInfoClicked, onListItemStarClicked, poiSavedViewModel)
         historyRecyclerView.adapter = historyAdapter
         historyRecyclerView.layoutManager = LinearLayoutManager(this)
 
-        poiHistoryViewModel = ViewModelProvider(this).get(POIHistoryViewModel::class.java)
         poiHistoryViewModel.allPOI.observe(this, Observer { pois ->
             // Update the cached copy of the words in the adapter.
             pois?.let { historyAdapter.setPOIs(it) }
@@ -104,12 +94,11 @@ class MainActivity : AppCompatActivity() {
 
         // List saved POIs
         val savedRecyclerView = findViewById<RecyclerView>(R.id.savedrecyclerview)
-        val savedAdapter = POIListAdapter(this, onListItemInfoClicked, onListItemStarClicked)
+        val savedAdapter = POIListAdapter(this, onListItemInfoClicked, onListItemStarClicked, poiSavedViewModel)
         savedRecyclerView.adapter = savedAdapter
         savedRecyclerView.layoutManager = LinearLayoutManager(this)
 
-        poiViewModel = ViewModelProvider(this).get(POISavedViewModel::class.java)
-        poiViewModel.recentSavedPOIs.observe(this, Observer { pois ->
+        poiSavedViewModel.recentSavedPOIs.observe(this, Observer { pois ->
             // Update the cached copy of the words in the adapter.
             pois?.let { savedAdapter.setPOIs(it) }
         })
@@ -177,5 +166,6 @@ class MainActivity : AppCompatActivity() {
     ) {
         latCon.onRequestPermissionsResult(requestCode, permissions, grantResults)
     }
+
 
 }

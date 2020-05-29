@@ -14,7 +14,6 @@ import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.DrawableCompat
 import androidx.lifecycle.ViewModelProvider
 import com.google.gson.internal.LinkedTreeMap
-import com.teampower.cicerone.database.POISavedData
 import com.teampower.cicerone.viewmodels.CategoryViewModel
 import com.teampower.cicerone.viewmodels.POISavedViewModel
 import kotlinx.android.synthetic.main.activity_geofence_triggered.*
@@ -22,7 +21,6 @@ import kotlinx.android.synthetic.main.activity_scrolling.toolbar
 import kotlinx.android.synthetic.main.content_geofence_triggered.*
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
-import org.threeten.bp.ZonedDateTime
 import java.util.*
 
 const val POI_DETAILS = "POI_DETAILS"
@@ -180,43 +178,7 @@ class GeofenceTriggeredActivity : AppCompatActivity() {
 
     private fun toggleFavoritePOI(poi: POI) {
         MainScope().launch {
-            val result = poiViewModel.loadPOI(poi.id).await()
-            isSaved = result !== null
-
-            if (!isSaved) {
-                // Add to favorites
-                val currentTimeString = ZonedDateTime.now().toString()
-                poiViewModel.favorite(
-                    POISavedData(
-                        poi.id,
-                        poi.name,
-                        poi.category,
-                        currentTimeString,
-                        poi.lat,
-                        poi.long,
-                        poi.description,
-                        poi.distance,
-                        poi.address,
-                        MainActivity.toJson(poi.wikipediaInfo)
-                    )
-                )
-                isSaved = true
-                DrawableCompat.setTint(
-                    DrawableCompat.wrap(favorite_button.drawable),
-                    ContextCompat.getColor(applicationContext, R.color.yellow)
-                )
-                Log.i(TRIG_TAG, "Added POI to favorites")
-
-            } else {
-                // Remove from favorites
-                poiViewModel.unFavorite(poi.id)
-                isSaved = false
-                DrawableCompat.setTint(
-                    DrawableCompat.wrap(favorite_button.drawable),
-                    ContextCompat.getColor(applicationContext, android.R.color.darker_gray)
-                )
-                Log.i(TRIG_TAG, "Removed POI from favorites")
-            }
+            poiViewModel.toggleFavorite(poi, applicationContext, favorite_button)
         }
     }
 }
