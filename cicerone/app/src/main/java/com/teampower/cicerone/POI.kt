@@ -16,17 +16,12 @@ import com.teampower.cicerone.wikipedia.WikipediaPlaceInfo
 data class POI(
     val id: String,
     val name: String,
-    val lat: Double,
-    val long: Double,
-    val distance: Int,
-    val address: String,
     val category: String,
     val categoryID: String,
-    val description: String = "No description yet."
-) {
-}
-
-data class PlaceDetails(
-    val poi: POI,
-    val wikipediaInfo: WikipediaPlaceInfo?
+    val lat: Double,
+    val long: Double,
+    val description: String = "",
+    val distance: Int?,
+    val address: String?,
+    var wikipediaInfo: WikipediaPlaceInfo? = null
 )

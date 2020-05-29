@@ -20,65 +20,103 @@
             android:layout_margin="@dimen/text_margin"
             android:text="Venue information" />
 
-        <TextView
-            android:id="@+id/historytextview"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="History POIs" />
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             tools:context=".MainActivity">
 
+            <TextView
+                android:id="@+id/historySpotsLabel"
+                style="@style/listLabels"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Recent recommendations"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/historyrecyclerview"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:padding="@dimen/big_padding"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintRight_toRightOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                tools:listitem="@layout/recyclerview_item" >
+                app:layout_constraintTop_toBottomOf="@+id/historySpotsLabel"
+                tools:listitem="@layout/item_poi"
+                tools:visibility="gone">
 
             </androidx.recyclerview.widget.RecyclerView>
         </androidx.constraintlayout.widget.ConstraintLayout>
 
-        <TextView
-            android:id="@+id/savedtextview"
+        <View
+            android:id="@+id/dividerLine1"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Saved POIs" />
+            android:layout_height="1dp"
+            android:layout_gravity="bottom"
+            android:layout_marginVertical="@dimen/big_padding"
+            android:background="#11000000"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             tools:context=".MainActivity">
 
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/constraintLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:id="@+id/savedSpotsLabel"
+                    style="@style/listLabels"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Saved spots"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <Button
+                    android:id="@+id/see_all_saved_poi_btn"
+                    style="@style/Widget.AppCompat.Button.Borderless"
+                    android:layout_width="292dp"
+                    android:layout_height="wrap_content"
+                    android:backgroundTint="#FFFFFF"
+                    android:paddingEnd="32dp"
+                    android:text="@string/see_all_starred_places_label"
+                    android:textAlignment="textEnd"
+                    android:textAllCaps="false"
+                    android:textColor="@color/colorAccent"
+                    android:textSize="16sp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="1.0"
+                    app:layout_constraintStart_toEndOf="@+id/savedSpotsLabel"
+                    app:layout_constraintTop_toTopOf="parent" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/savedrecyclerview"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:padding="@dimen/big_padding"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintRight_toRightOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/constraintLayout"
                 app:layout_constraintVertical_bias="0.0"
-                tools:listitem="@layout/recyclerview_item">
+                tools:listitem="@layout/item_poi">
 
             </androidx.recyclerview.widget.RecyclerView>
 
-            <Button
-                android:id="@+id/see_all_saved_poi_btn"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/see_all_starred_places_label"
-                app:layout_constraintStart_toStartOf="@+id/savedrecyclerview"
-                app:layout_constraintTop_toBottomOf="@+id/savedrecyclerview" />
         </androidx.constraintlayout.widget.ConstraintLayout>
     </LinearLayout>
 

@@ -7,7 +7,6 @@ import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Looper
 import android.util.Log
-import android.widget.TextView
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AlertDialog
 import androidx.core.app.ActivityCompat
@@ -16,7 +15,6 @@ import com.google.android.gms.location.*
 import com.google.android.gms.tasks.Task
 import com.teampower.cicerone.MY_PERMISSIONS_REQUEST_LOCATION_ID
 import com.teampower.cicerone.MainActivity
-import com.teampower.cicerone.R
 import com.teampower.cicerone.TAG
 
 class LocationController() {
@@ -26,21 +24,13 @@ class LocationController() {
     private lateinit var lastLocation: android.location.Location
     private var requestingLocationUpdates = true
 
-    fun startLocation(context: Context, activity: MainActivity, user_location: TextView, dataCon: DataController) {
+    fun startLocation(context: Context, activity: MainActivity, dataCon: DataController) {
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(context)
         locationRequest = createLocationRequest(context, activity)
         locationCallback = object : LocationCallback() {
             override fun onLocationResult(locationResult: LocationResult?) {
                 locationResult ?: return
                 lastLocation = locationResult.lastLocation
-                for (location in locationResult.locations) {
-                    //Log.v(TAG, location.toString())
-                    user_location.text = context.getString(
-                        R.string.user_position,
-                        location.latitude.toString(),
-                        location.longitude.toString()
-                    )
-                }
             }
         }
     }

@@ -1,6 +1,7 @@
 package com.teampower.cicerone
 
-import android.os.Build
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.speech.tts.TextToSpeech
 import android.speech.tts.UtteranceProgressListener
@@ -13,16 +14,16 @@ import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.DrawableCompat
 import androidx.lifecycle.ViewModelProvider
 import com.google.gson.internal.LinkedTreeMap
-import com.teampower.cicerone.database.POISavedData
-import com.teampower.cicerone.database.history_table.POISavedViewModel
 import com.teampower.cicerone.viewmodels.CategoryViewModel
+import com.teampower.cicerone.viewmodels.POISavedViewModel
 import kotlinx.android.synthetic.main.activity_geofence_triggered.*
 import kotlinx.android.synthetic.main.activity_scrolling.toolbar
 import kotlinx.android.synthetic.main.content_geofence_triggered.*
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
-import org.threeten.bp.Instant
 import java.util.*
+
+const val POI_DETAILS = "POI_DETAILS"
 
 
 class GeofenceTriggeredActivity : AppCompatActivity() {
@@ -34,6 +35,13 @@ class GeofenceTriggeredActivity : AppCompatActivity() {
     private var tts_text = ""
     private var isSaved = false
 
+    companion object {
+        // Whenever we want to create this Activity, we use it via this intent creation function.
+        fun getStartIntent(context: Context, poiObjectJSON: String): Intent {
+            return Intent(context, GeofenceTriggeredActivity::class.java)
+                .putExtra(POI_DETAILS, poiObjectJSON)
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -42,11 +50,10 @@ class GeofenceTriggeredActivity : AppCompatActivity() {
 
         poiSavedViewModel = ViewModelProvider(this).get(POISavedViewModel::class.java)
         // Extract the transitionDetails
-        val placeDetailsJson = intent.getStringExtra("PLACE_DETAILS") ?: ""
-        val placeDetails = MainActivity.fromJson<PlaceDetails>(placeDetailsJson)
-        val POI = placeDetails.poi
+        val poiObjectJSON = intent.getStringExtra(POI_DETAILS) ?: ""
+        val poi = MainActivity.fromJson<POI>(poiObjectJSON)
         MainScope().launch {
-            val result = poiSavedViewModel.loadPOI(POI.id).await()
+            val result = poiSavedViewModel.loadPOI(poi.id).await()
             isSaved = result !== null
             if (isSaved) {
                 DrawableCompat.setTint(
@@ -59,36 +66,36 @@ class GeofenceTriggeredActivity : AppCompatActivity() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true) // Home button to MainActivity
 
         // Update the view
-        title = POI.name
+        title = poi.name
         location_category.text = this.getString(
             R.string.location_category,
-            POI.category
+            poi.category
         )
         location_distance.text = this.getString(
             R.string.location_distance,
-            POI?.distance.toString()
+            poi.distance.toString()
         )
-        if (placeDetails.wikipediaInfo != null) {
+        if (poi.wikipediaInfo != null) {
             // For some reason didn't work to set proper type in WikipediaResponseModule.kt
             val url_list: LinkedTreeMap<String, LinkedTreeMap<String, String>> =
-                placeDetails.wikipediaInfo.content_urls as LinkedTreeMap<String, LinkedTreeMap<String, String>>
+                poi.wikipediaInfo?.content_urls as LinkedTreeMap<String, LinkedTreeMap<String, String>>
             Log.i(TRIG_TAG, "${url_list::class.simpleName}")
             Log.i(TRIG_TAG, "${url_list["mobile"]?.get("page")}")
             location_description.text = this.getString(
                 R.string.location_description_yes_wikipedia,
-                placeDetails.wikipediaInfo.extract
+                poi.wikipediaInfo?.extract
             )
-            wikipedia_link_url.setClickable(true)
-            wikipedia_link_url.setMovementMethod(LinkMovementMethod.getInstance())
+            wikipedia_link_url.isClickable = true
+            wikipedia_link_url.movementMethod = LinkMovementMethod.getInstance()
             val text =
                 "<a href='${url_list["mobile"]?.get("page")}'> Link to Wikipedia article </a>"
             wikipedia_link_url.text = Html.fromHtml(text, Html.FROM_HTML_MODE_COMPACT)
             tts_text = this.getString(
                 R.string.tts_text_yes_wikipedia,
-                POI.name,
-                POI.category,
-                POI.distance,
-                placeDetails.wikipediaInfo.extract
+                poi.name,
+                poi.category,
+                poi.distance,
+                poi.wikipediaInfo?.extract
             )
         } else {
             location_description.text = this.getString(
@@ -96,9 +103,9 @@ class GeofenceTriggeredActivity : AppCompatActivity() {
             )
             tts_text = this.getString(
                 R.string.tts_text_no_wikipedia,
-                POI.name,
-                POI.category,
-                POI.distance
+                poi.name,
+                poi.category,
+                poi.distance
             )
         }
 
@@ -138,25 +145,41 @@ class GeofenceTriggeredActivity : AppCompatActivity() {
                 tts.stop()
                 speaking = false
                 tts_button.setImageResource(R.drawable.ic_play_arrow_black_32dp)
+                DrawableCompat.setTint(
+                    DrawableCompat.wrap(tts_button.drawable),
+                    ContextCompat.getColor(applicationContext, android.R.color.white)
+                )
             } else {
                 tts.speak(tts_text, TextToSpeech.QUEUE_FLUSH, null, "TRIG_TTS")
                 tts_button.setImageResource(R.drawable.ic_stop_black_32dp)
+                DrawableCompat.setTint(
+                    DrawableCompat.wrap(tts_button.drawable),
+                    ContextCompat.getColor(applicationContext, android.R.color.white)
+                )
             }
         }
 
-        favorite_button.setOnClickListener { toggleFavoritePOI(POI) }
-        Log.v(TRIG_TAG, POI.toString())
+        favorite_button.setOnClickListener { toggleFavoritePOI(poi) }
+        DrawableCompat.setTint(
+            DrawableCompat.wrap(favorite_button.drawable),
+            ContextCompat.getColor(applicationContext, android.R.color.darker_gray)
+        )
+        DrawableCompat.setTint(
+            DrawableCompat.wrap(tts_button.drawable),
+            ContextCompat.getColor(applicationContext, android.R.color.white)
+        )
+        Log.v(TRIG_TAG, poi.toString())
 
         // User-feedback for recommendation
         catViewModel = ViewModelProvider(this).get(CategoryViewModel::class.java)
         like_button.setOnClickListener {
-            catViewModel.like(POI.categoryID)
+            catViewModel.like(poi.categoryID)
             like_button.isEnabled = false
             dislike_button.isEnabled = false
         }
 
         dislike_button.setOnClickListener {
-            catViewModel.dislike(POI.categoryID)
+            catViewModel.dislike(poi.categoryID)
             like_button.isEnabled = false
             dislike_button.isEnabled = false
         }
@@ -165,39 +188,7 @@ class GeofenceTriggeredActivity : AppCompatActivity() {
 
     private fun toggleFavoritePOI(poi: POI) {
         MainScope().launch {
-            val result = poiSavedViewModel.loadPOI(poi.id).await()
-            isSaved = result !== null
-
-            if (!isSaved) {
-                // Add to favorites
-                val currentTimeString = Instant.now().toString()
-                poiSavedViewModel.favorite(
-                    POISavedData(
-                        poi.id,
-                        poi.name,
-                        poi.category,
-                        currentTimeString,
-                        poi.lat,
-                        poi.long
-                    )
-                )
-                isSaved = true
-                DrawableCompat.setTint(
-                    DrawableCompat.wrap(favorite_button.drawable),
-                    ContextCompat.getColor(applicationContext, R.color.yellow)
-                )
-                Log.i(TRIG_TAG, "Added POI to favorites")
-
-            } else {
-                // Remove from favorites
-                poiSavedViewModel.unFavorite(poi.id)
-                isSaved = false
-                DrawableCompat.setTint(
-                    DrawableCompat.wrap(favorite_button.drawable),
-                    ContextCompat.getColor(applicationContext, R.color.black)
-                )
-                Log.i(TRIG_TAG, "Removed POI from favorites")
-            }
+            poiSavedViewModel.toggleFavorite(poi, applicationContext, favorite_button)
         }
     }
 }

@@ -22,13 +22,18 @@ import kotlin.random.Random.Default.nextDouble
 
 class DataController(private val geoCon: GeofencingController) {
     private val DATA_CON = "DataController"
-    private lateinit var categoryTable : ArrayList<CategoryData>
+    private lateinit var categoryTable: ArrayList<CategoryData>
     private lateinit var categoryViewModel: CategoryViewModel
-    private val pois = mutableMapOf<String, POI>() // We can store all POIs in this map, indexed by ID
+    private val pois =
+        mutableMapOf<String, POI>() // We can store all POIs in this map, indexed by ID
     private val uniformRandom = Random() // seed 1 - TODO remove seed
 
 
-    fun requestData(location: android.location.Location, venue_view: TextView, mainContext: Context) {
+    fun requestData(
+        location: android.location.Location,
+        venue_view: TextView,
+        mainContext: Context
+    ) {
         // Set context
         val context = mainContext
 
@@ -38,12 +43,14 @@ class DataController(private val geoCon: GeofencingController) {
             BuildConfig.FOURSQUARE_SECRET
 
         // API call parameters
-        val location_string: String = "${location.latitude.toString()}, ${location.longitude.toString()}"
+        val location_string: String =
+            "${location.latitude.toString()}, ${location.longitude.toString()}"
         val radius = 300 // TODO set radius for query
         val limit = 200
         // TODO decide which categories to query
-        // comma-seperated list of Foursquare categoryIDs to query for
-        val categories = "4d4b7104d754a06370d81259,4d4b7105d754a06373d81259,4d4b7105d754a06374d81259,4d4b7105d754a06376d81259,4d4b7105d754a06377d81259"
+        // comma-separated list of Foursquare categoryIDs to query for
+        val categories =
+            "4d4b7104d754a06370d81259,4d4b7105d754a06373d81259,4d4b7105d754a06374d81259,4d4b7105d754a06376d81259,4d4b7105d754a06377d81259"
         val version = "20200420" // set date for API versioning here (see Foursquare API)
         val cacheDuration = 60
 
@@ -72,49 +79,59 @@ class DataController(private val geoCon: GeofencingController) {
 
         // Make API call
         val FoursquareAPI = retrofit.create(FoursquareAPI::class.java)
-        FoursquareAPI.searchVenues(location_string, categories, radius, limit).enqueue(object : retrofit2.Callback<FoursquareData> {
-            override fun onFailure(call: retrofit2.Call<FoursquareData>?, t: Throwable?) {
-                Log.e(TAG, "Error: could not receive response from Foursquare API. ${t?.message}")
+        FoursquareAPI.searchVenues(location_string, categories, radius, limit)
+            .enqueue(object : retrofit2.Callback<FoursquareData> {
+                override fun onFailure(call: retrofit2.Call<FoursquareData>?, t: Throwable?) {
+                    Log.e(
+                        TAG,
+                        "Error: could not receive response from Foursquare API. ${t?.message}"
+                    )
 
-            }
+                }
 
-            override fun onResponse(call: retrofit2.Call<FoursquareData>, response: retrofit2.Response<FoursquareData>) {
-                if (response.isSuccessful()) {
-                    val result = response.body()
-                    val venues = result!!.response.venues
-                    // For now, take the 100 closest POIs and make sure they aren't closer than 10 m
-                    /*
-                    val initVenues = initializeCategories(venus)
-                    val sampledVenues = recommendVenues(initVenues)
-                    val filteredVenues = handleOverlapGreedy(sampledVenues)
-                     */
-                    initializeCategories(venues)
-                    val recommendVenues = recommendVenues(venues, 50)
-                    val filteredVenues = filterOverlapGreedy(recommendVenues.toMutableList(), 200F) // Remove POIs if closer 200m of each other - google recommends minimum radius of 100m
-                    val radius = calculateRadius(filteredVenues.toTypedArray())
-                    Log.d(DATA_CON, "Radius: $radius m")
-                    for ((id, venue) in filteredVenues.withIndex()) {
-                        Log.d(DATA_CON, "ID: $id - Venue:" + venue.toString())
-                        val poi = poiBuilder(venue!!, id)
-                        // Create the geofence
-                        val gf = geoCon.createGeofence(
-                            poi.lat,
-                            poi.long,
-                            poi.id,
-                            radius,
-                            Geofence.NEVER_EXPIRE,
-                            Geofence.GEOFENCE_TRANSITION_ENTER
-                        )
-                        geoCon.addGeofence(gf, context, poi)
-                        // Add POI to the list of current POIs
-                        pois.put(poi.id, poi)
-                    }
-                    if(!pois.isEmpty()){
-                        displayData(pois.toList().get(0).second, venue_view)
+                override fun onResponse(
+                    call: retrofit2.Call<FoursquareData>,
+                    response: retrofit2.Response<FoursquareData>
+                ) {
+                    if (response.isSuccessful()) {
+                        val result = response.body()
+                        val venues = result!!.response.venues
+                        // For now, take the 100 closest POIs and make sure they aren't closer than 10 m
+                        /*
+                        val initVenues = initializeCategories(venus)
+                        val sampledVenues = recommendVenues(initVenues)
+                        val filteredVenues = handleOverlapGreedy(sampledVenues)
+                         */
+                        initializeCategories(venues)
+                        val recommendVenues = recommendVenues(venues, 50)
+                        val filteredVenues = filterOverlapGreedy(
+                            recommendVenues.toMutableList(),
+                            200F
+                        ) // Remove POIs if closer 200m of each other - google recommends minimum radius of 100m
+                        val radius = calculateRadius(filteredVenues.toTypedArray())
+                        Log.d(DATA_CON, "Radius: $radius m")
+                        for ((id, venue) in filteredVenues.withIndex()) {
+                            Log.d(DATA_CON, "ID: $id - Venue:" + venue.toString())
+                            val poi = poiBuilder(venue!!, id)
+                            // Create the geofence
+                            val gf = geoCon.createGeofence(
+                                poi.lat,
+                                poi.long,
+                                poi.id,
+                                radius,
+                                Geofence.NEVER_EXPIRE,
+                                Geofence.GEOFENCE_TRANSITION_ENTER
+                            )
+                            geoCon.addGeofence(gf, context, poi)
+                            // Add POI to the list of current POIs
+                            pois.put(poi.id, poi)
+                        }
+                        if (!pois.isEmpty()) {
+                            displayData(pois.toList().get(0).second, venue_view)
+                        }
                     }
                 }
-            }
-        })
+            })
     }
 
     fun getPOI(id: String): POI? {
@@ -132,20 +149,20 @@ class DataController(private val geoCon: GeofencingController) {
         var categoryID = ""
         for (cat in venue.categories) {
             categories = categories + cat.name
-            if(categoryID!= ""){
+            if (categoryID != "") {
                 categoryID = categoryID + ","  // Add delimiter between Ids
             }
             categoryID = categoryID + cat.id
         }
         return POI(
-            id.toString(),
-            name,
-            lat,
-            long,
-            distance,
-            address,
-            categories,
-            categoryID
+            id = id.toString(),
+            name = name,
+            lat = lat,
+            long = long,
+            distance = distance,
+            address = address,
+            category = categories,
+            categoryID = categoryID
         )
     }
 
@@ -178,29 +195,29 @@ class DataController(private val geoCon: GeofencingController) {
         val posterior = arrayOfNulls<Double>(venues.size)
         val fp = 0.5  // flat prior
         // 1. Perform inference of posterior probability for each POI
-        for (i in venues.indices){
+        for (i in venues.indices) {
             // TODO what to do with places having multiple categories? For now only handle single.
             var likes = 0.0
             var dislikes = 0.0
             var categoryID = ""
             // Some POIs have no registered category. Then set the probability to 50% that the
             // user likes the POI.
-            if(venues[i].categories.isEmpty()){
+            if (venues[i].categories.isEmpty()) {
                 likes = 1.0
                 dislikes = 1.0
-            }else{
+            } else {
                 categoryID = venues[i].categories[0].id
             }
 
-            for(cat in categoryTable){
-                if(cat.foursquareID == categoryID){
+            for (cat in categoryTable) {
+                if (cat.foursquareID == categoryID) {
                     likes = cat.likes.toDouble()
                     dislikes = cat.dislikes.toDouble()
                 }
             }
-            val ll = likes/(likes+dislikes) // Likelihood P(Category i | Liked)
-            val ld = dislikes/(likes+dislikes)
-            val pp = ll*fp / (ll*fp + ld*fp)
+            val ll = likes / (likes + dislikes) // Likelihood P(Category i | Liked)
+            val ld = dislikes / (likes + dislikes)
+            val pp = ll * fp / (ll * fp + ld * fp)
             posterior[i] = pp
             /* DEBUG
             if(i<2){
@@ -211,7 +228,7 @@ class DataController(private val geoCon: GeofencingController) {
         // 2. Select a subset of size N of the venues based on their posterior probabilities
         // Normalize posterior
         var normPosterior = normalize(posterior.toMutableList())
-        for(i in recommendedVenues.indices){
+        for (i in recommendedVenues.indices) {
             /* Draw a random POI. Do this by drawing a random value between 0 and 1, finding when
                this value is smaller than the cumulative sum of posteriors.
 
@@ -222,11 +239,11 @@ class DataController(private val geoCon: GeofencingController) {
             val urv = nextDouble()
             var cumSum = 0.0
             var ind = 0
-            while(cumSum<urv){
+            while (cumSum < urv) {
                 cumSum += normPosterior[ind]!!
                 ind += 1
             }
-            if(ind==mutableVenues.size){
+            if (ind == mutableVenues.size) {
                 // Sometimes the criteria isn't satisfied due to rounding errors (?). Wrap-in
                 // to the last element in that case.
                 ind -= 1
@@ -244,12 +261,12 @@ class DataController(private val geoCon: GeofencingController) {
     private fun normalize(l: MutableList<Double?>): MutableList<Double?> {
         var nl = l.toMutableList()
         var sum = 0.0
-        for (x in l){
+        for (x in l) {
             if (x != null) {
                 sum += x
             }
         }
-        for (i in l.indices){
+        for (i in l.indices) {
             nl[i] = l[i]?.div(sum)
         }
         return nl
@@ -263,7 +280,10 @@ class DataController(private val geoCon: GeofencingController) {
      * is chosen to simplify the code, and to get around the problem of one POI overlaping
      * multiple others.
      */
-    private fun filterOverlapGreedy(venues: MutableList<Venues?>, threshold: Float): MutableList<Venues?> {
+    private fun filterOverlapGreedy(
+        venues: MutableList<Venues?>,
+        threshold: Float
+    ): MutableList<Venues?> {
         //Log.i(DATA_CON, "Greedy: size=${venues.size}")
         var mutableVenues = venues.toMutableList()
         val overlappingIndices = arrayOfNulls<Int>(2)
@@ -271,7 +291,7 @@ class DataController(private val geoCon: GeofencingController) {
         var i = 0
         while (i < venues.size && !overlapFound) {
             var j = i + 1
-            while ( j < venues.size && !overlapFound) {
+            while (j < venues.size && !overlapFound) {
                 val venueA = venues[i]
                 val venueB = venues[j]
 
@@ -283,7 +303,7 @@ class DataController(private val geoCon: GeofencingController) {
                 locationB.longitude = venueB.location.lng
 
                 val distanceAB = locationA.distanceTo(locationB) // Distance between AB
-                if( distanceAB < threshold) {
+                if (distanceAB < threshold) {
                     overlappingIndices[0] = i
                     overlappingIndices[1] = j
                     overlapFound = true
@@ -293,7 +313,7 @@ class DataController(private val geoCon: GeofencingController) {
             }
             i += 1
         }
-        if (overlapFound){
+        if (overlapFound) {
             val i = overlappingIndices[0]!!
             val j = overlappingIndices[1]!!
             val scoreA = fetchCategoryScore(venues[i]!!)
@@ -301,32 +321,32 @@ class DataController(private val geoCon: GeofencingController) {
             //Log.i(DATA_CON, "Overlap between: ${venues[i]!!.name}, score = $scoreA and ${venues[j]!!.name} score = $scoreB")
             // Kinda boring but everything has score 0 atm since no likes and too many categories.
             // TODO: Maybe initialize DB better to get more plausible recommendations?
-            if (scoreA>scoreB){
+            if (scoreA > scoreB) {
                 mutableVenues.removeAt(j)
-            } else if (scoreA<scoreB){
+            } else if (scoreA < scoreB) {
                 mutableVenues.removeAt(i)
-            } else{
+            } else {
                 // make a random choice which to delete if they are the same
                 val x = nextDouble().roundToInt() // either 0 or 1
                 mutableVenues.removeAt(overlappingIndices[x]!!)
             }
             mutableVenues = filterOverlapGreedy(mutableVenues, threshold)
-        } else{
-          // Log.i(DATA_CON, "No overlaps found!")
+        } else {
+            // Log.i(DATA_CON, "No overlaps found!")
         }
         return mutableVenues
     }
 
     /**
-     * Cateogry score = likes-dislikes
+     * Category score = likes-dislikes
      */
     private fun fetchCategoryScore(venue: Venues): Int {
         var score = 0
-        if(!venue.categories.isEmpty()){
+        if (!venue.categories.isEmpty()) {
             var categoryID = venue.categories[0].id
-            for(cat in categoryTable){
+            for (cat in categoryTable) {
                 // Some POIs have no registered category. Then set their score to 0.
-                if(cat.foursquareID == categoryID){
+                if (cat.foursquareID == categoryID) {
                     score = cat.likes - cat.dislikes
                 }
             }
@@ -351,21 +371,21 @@ class DataController(private val geoCon: GeofencingController) {
                 }
             }
         }
-        return shortestDistance/2
+        return shortestDistance / 2
     }
 
-    private fun initializeCategories(venues: List<Venues>){
+    private fun initializeCategories(venues: List<Venues>) {
         // Check the DB for an entry for each category for each venue in the list of venues.
         // If a category doesn't exist, initializes it with likes=1, dislikes=1
-        for(v in venues){
-            for(cat in v.categories){
+        for (v in venues) {
+            for (cat in v.categories) {
                 var existInDB = false
-                for(dBCat in categoryTable){
+                for (dBCat in categoryTable) {
                     // This will be true if cat matches once in the database, which is what we want to check
                     //Log.i(DATA_CON, "\tcat.id==dBcat.foursquareID: ${cat.id}===${dBCat.foursquareID} = ${dBCat.foursquareID == cat.id}")
                     existInDB = existInDB || dBCat.foursquareID == cat.id
                 }
-                if(!existInDB){
+                if (!existInDB) {
                     categoryViewModel.insert(CategoryData(cat.id, cat.name, 1, 1))
                     categoryTable.add(CategoryData(cat.id, cat.name, 1, 1))
                     Log.i(DATA_CON, "Added Category ${cat.name} to database.")
@@ -374,7 +394,7 @@ class DataController(private val geoCon: GeofencingController) {
         }
     }
 
-    fun setCategoryScores(cats: List<CategoryData>){
+    fun setCategoryScores(cats: List<CategoryData>) {
         categoryTable = ArrayList(cats)
         //Log.i(DATA_CON, "Category scores set to: ${categoryTable}")
     }
