@@ -182,9 +182,10 @@ class GeofenceTriggeredActivity : AppCompatActivity() {
                         currentTimeString,
                         poi.lat,
                         poi.long,
-                        poi.wikipediaInfo?.description,
+                        poi.description,
                         poi.distance,
-                        poi.address
+                        poi.address,
+                        MainActivity.toJson(poi.wikipediaInfo)
                     )
                 )
                 isSaved = true

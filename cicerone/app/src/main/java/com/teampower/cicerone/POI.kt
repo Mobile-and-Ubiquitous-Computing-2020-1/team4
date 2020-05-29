@@ -21,6 +21,6 @@ data class POI(
     val distance: Int,
     val address: String,
     val category: String,
-    val description: String = "No description yet.",
+    val description: String = "",
     var wikipediaInfo: WikipediaPlaceInfo? = null
 )

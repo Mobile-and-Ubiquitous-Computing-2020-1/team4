@@ -14,6 +14,8 @@ abstract class POIData {
     abstract val description: String?
     abstract val distance: Int?
     abstract val address: String?
+    abstract val wikipediaInfoJSON: String?
+
 }
 
 @Entity(tableName = "poi_history_table")
@@ -26,7 +28,8 @@ data class POIHistoryData(
     @ColumnInfo(name = "longitude") override val longitude: Double,
     @ColumnInfo(name = "description") override val description: String?,
     @ColumnInfo(name = "distance") override val distance: Int?,
-    @ColumnInfo(name = "address") override val address: String?
+    @ColumnInfo(name = "address") override val address: String?,
+    @ColumnInfo(name = "wikipediaInfoJSON") override val wikipediaInfoJSON: String? = ""
 ) : POIData()
 
 @Entity(tableName = "poi_saved_table")
@@ -39,7 +42,8 @@ data class POISavedData(
     @ColumnInfo(name = "longitude") override val longitude: Double,
     @ColumnInfo(name = "description") override val description: String?,
     @ColumnInfo(name = "distance") override val distance: Int?,
-    @ColumnInfo(name = "address") override val address: String?
+    @ColumnInfo(name = "address") override val address: String?,
+    @ColumnInfo(name = "wikipediaInfoJSON") override val wikipediaInfoJSON: String? = ""
 ) : POIData()
 
 @Entity(tableName = "category_table")
