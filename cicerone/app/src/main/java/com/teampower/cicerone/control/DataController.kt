@@ -134,6 +134,7 @@ class DataController(private val geoCon: GeofencingController) {
         for (cat in venue.categories) {
             categories = categories + cat.name
         }
+
         return POI(
             id.toString(),
             name,

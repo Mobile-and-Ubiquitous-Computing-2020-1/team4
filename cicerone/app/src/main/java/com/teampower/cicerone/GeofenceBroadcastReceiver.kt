@@ -56,24 +56,22 @@ class GeofenceBroadcastReceiver() : BroadcastReceiver() {
 
     private fun sendNotification(
         context: Context,
-        title: String,
-        poiObject: POI,
-        placeDetailsJson: String
+        poiObject: POI
     ) {
         val contentText =
-            "You are close to ${poiObject.name} (${poiObject.distance}m). Want to go have a look?"
+            "You are close to ${poiObject.name}. Want to go have a look? It's ${poiObject.distance}m away."
         val notCon = NotificationsController()
         notCon.sendNotificationTriggeredGeofence(
             context,
-            title,
+            "New recommendation nearby!",
             contentText,
             1337,
-            placeDetailsJson
+            MainActivity.toJson(poiObject)
         )
     }
 
     private fun getPlaceInfoSendNotification(context: Context?): WikipediaPlaceInfo? {
-        var placeInfo: WikipediaPlaceInfo? = null
+        var wikiPlaceInfo: WikipediaPlaceInfo? = null
         // Query wikipedia
         val filterName = poiObject.name.split(" (")[0]
         api.getPlaceInfo(filterName)
@@ -82,30 +80,28 @@ class GeofenceBroadcastReceiver() : BroadcastReceiver() {
                     call: Call<WikipediaPlaceInfo>,
                     response: Response<WikipediaPlaceInfo>
                 ) {
-                    placeInfo = response.body()
+                    wikiPlaceInfo = response.body()
 
-                    println("placeInfo for ${poiObject.name}: $placeInfo")
+                    println("wikiPlaceInfo for ${poiObject.name}: $wikiPlaceInfo")
                     // Log the information
-                    Log.i(TAG, placeInfo.toString())
+                    Log.i(TAG, wikiPlaceInfo.toString())
 
                     // Combine info into one object
-                    val combinedInfo = PlaceDetails(poiObject, placeInfo)
+                    poiObject.wikipediaInfo = wikiPlaceInfo
 
                     // Send notification and log the transition details
                     if (context != null) {
                         sendNotification(
                             context,
-                            "Cicerone geofence",
-                            poiObject,
-                            MainActivity.toJson(combinedInfo)
+                            poiObject
                         )
                     }
-                    Log.i(TAG, "" + combinedInfo.wikipediaInfo?.extract)
+                    Log.i(TAG, "" + poiObject.wikipediaInfo?.extract)
                 }
 
                 override fun onFailure(call: Call<WikipediaPlaceInfo>, t: Throwable) =
                     t.printStackTrace()
             })
-        return placeInfo
+        return wikiPlaceInfo
     }
 }

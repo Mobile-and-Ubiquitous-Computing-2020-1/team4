@@ -50,7 +50,8 @@ class NotificationsController() {
         }
         val pendingIntent: PendingIntent = PendingIntent.getActivity(context, 0, intent, 0)
 
-        val builder = NotificationCompat.Builder(context,
+        val builder = NotificationCompat.Builder(
+            context,
             CHANNEL_ID
         )
             .setSmallIcon(R.drawable.googleg_standard_color_18)
@@ -75,11 +76,11 @@ class NotificationsController() {
      */
     fun sendNotificationTriggeredGeofence(
         context: Context, title: String,
-        content: String, notificationId: Int, placeDetails: String
+        content: String, notificationId: Int, poiDetailsJSON: String
     ) {
         // Create an Intent for the activity you want to start
         val geofenceIntent = Intent(context, GeofenceTriggeredActivity::class.java)
-        geofenceIntent.putExtra("PLACE_DETAILS", placeDetails)
+        geofenceIntent.putExtra("PLACE_DETAILS", poiDetailsJSON)
         // Create the TaskStackBuilder
         val geofencePendingIntent: PendingIntent? = TaskStackBuilder.create(context).run {
             // Add the intent, which inflates the back stack
@@ -88,12 +89,16 @@ class NotificationsController() {
             getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT)
         }
 
-        val builder = NotificationCompat.Builder(context,
+        val builder = NotificationCompat.Builder(
+            context,
             CHANNEL_ID
         )
             .setSmallIcon(R.drawable.common_full_open_on_phone)
             .setContentTitle(title)
-            .setContentText(content)
+            .setStyle(
+                NotificationCompat.BigTextStyle()
+                    .bigText(content)
+            )
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
             // Set the intent that fires when the user taps the notification
             .setContentIntent(geofencePendingIntent)

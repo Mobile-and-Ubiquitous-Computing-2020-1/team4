@@ -41,11 +41,10 @@ class GeofenceTriggeredActivity : AppCompatActivity() {
 
         poiSavedViewModel = ViewModelProvider(this).get(POISavedViewModel::class.java)
         // Extract the transitionDetails
-        val placeDetailsJson = intent.getStringExtra("PLACE_DETAILS") ?: ""
-        val placeDetails = MainActivity.fromJson<PlaceDetails>(placeDetailsJson)
-        val POI = placeDetails.poi
+        val poiObjectJSON = intent.getStringExtra("PLACE_DETAILS") ?: ""
+        val poi = MainActivity.fromJson<POI>(poiObjectJSON)
         MainScope().launch {
-            val result = poiSavedViewModel.loadPOI(POI.id).await()
+            val result = poiSavedViewModel.loadPOI(poi.id).await()
             isSaved = result !== null
             if (isSaved) {
                 DrawableCompat.setTint(
@@ -58,36 +57,36 @@ class GeofenceTriggeredActivity : AppCompatActivity() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true) // Home button to MainActivity
 
         // Update the view
-        title = POI.name
+        title = poi.name
         location_category.text = this.getString(
             R.string.location_category,
-            POI.category
+            poi.category
         )
         location_distance.text = this.getString(
             R.string.location_distance,
-            POI?.distance.toString()
+            poi.distance.toString()
         )
-        if (placeDetails.wikipediaInfo != null) {
+        if (poi.wikipediaInfo != null) {
             // For some reason didn't work to set proper type in WikipediaResponseModule.kt
             val url_list: LinkedTreeMap<String, LinkedTreeMap<String, String>> =
-                placeDetails.wikipediaInfo.content_urls as LinkedTreeMap<String, LinkedTreeMap<String, String>>
+                poi.wikipediaInfo?.content_urls as LinkedTreeMap<String, LinkedTreeMap<String, String>>
             Log.i(TRIG_TAG, "${url_list::class.simpleName}")
             Log.i(TRIG_TAG, "${url_list["mobile"]?.get("page")}")
             location_description.text = this.getString(
                 R.string.location_description_yes_wikipedia,
-                placeDetails.wikipediaInfo.extract
+                poi.wikipediaInfo?.extract
             )
-            wikipedia_link_url.setClickable(true)
-            wikipedia_link_url.setMovementMethod(LinkMovementMethod.getInstance())
+            wikipedia_link_url.isClickable = true
+            wikipedia_link_url.movementMethod = LinkMovementMethod.getInstance()
             val text =
                 "<a href='${url_list["mobile"]?.get("page")}'> Link to Wikipedia article </a>"
             wikipedia_link_url.text = Html.fromHtml(text, Html.FROM_HTML_MODE_COMPACT)
             tts_text = this.getString(
                 R.string.tts_text_yes_wikipedia,
-                POI.name,
-                POI.category,
-                POI.distance,
-                placeDetails.wikipediaInfo.extract
+                poi.name,
+                poi.category,
+                poi.distance,
+                poi.wikipediaInfo?.extract
             )
         } else {
             location_description.text = this.getString(
@@ -95,9 +94,9 @@ class GeofenceTriggeredActivity : AppCompatActivity() {
             )
             tts_text = this.getString(
                 R.string.tts_text_no_wikipedia,
-                POI.name,
-                POI.category,
-                POI.distance
+                poi.name,
+                poi.category,
+                poi.distance
             )
         }
 
@@ -151,7 +150,7 @@ class GeofenceTriggeredActivity : AppCompatActivity() {
             }
         }
 
-        favorite_button.setOnClickListener { toggleFavoritePOI(POI) }
+        favorite_button.setOnClickListener { toggleFavoritePOI(poi) }
         DrawableCompat.setTint(
             DrawableCompat.wrap(favorite_button.drawable),
             ContextCompat.getColor(applicationContext, android.R.color.darker_gray)
@@ -160,7 +159,7 @@ class GeofenceTriggeredActivity : AppCompatActivity() {
             DrawableCompat.wrap(tts_button.drawable),
             ContextCompat.getColor(applicationContext, android.R.color.white)
         )
-        Log.v(TRIG_TAG, POI.toString())
+        Log.v(TRIG_TAG, poi.toString())
 
         // Demo on how to update category score
         catViewModel = ViewModelProvider(this).get(CategoryViewModel::class.java)

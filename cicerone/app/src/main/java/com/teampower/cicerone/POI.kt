@@ -21,11 +21,6 @@ data class POI(
     val distance: Int,
     val address: String,
     val category: String,
-    val description: String = "No description yet."
-) {
-}
-
-data class PlaceDetails(
-    val poi: POI,
-    val wikipediaInfo: WikipediaPlaceInfo?
+    val description: String = "No description yet.",
+    var wikipediaInfo: WikipediaPlaceInfo? = null
 )
