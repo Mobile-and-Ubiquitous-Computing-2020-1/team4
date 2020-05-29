@@ -111,7 +111,7 @@
     <string name="empty_not_saved">Word not saved because it is empty.</string>
     <string name="add_word">Add word</string>
 
-    <string name="see_all_starred_places_label">See all starred places</string>
+    <string name="see_all_starred_places_label">See all</string>
     <string name="shortInfoTextView">\"The most interesting knowledge doesn\'t have to be very special...\"</string>
     <string name="list_item_sub_info">%1$s • %2$s</string>
     <string name="list_item_short_text">\"%1$s\"</string>
