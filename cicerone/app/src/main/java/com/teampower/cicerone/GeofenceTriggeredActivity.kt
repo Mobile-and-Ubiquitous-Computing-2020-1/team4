@@ -67,6 +67,7 @@ class GeofenceTriggeredActivity : AppCompatActivity() {
 
         // Update the view
         title = poi.name
+        shortFactsPlaceName.text = poi.name
         location_category.text = this.getString(
             R.string.location_category,
             poi.category
@@ -81,15 +82,15 @@ class GeofenceTriggeredActivity : AppCompatActivity() {
                 poi.wikipediaInfo?.content_urls as LinkedTreeMap<String, LinkedTreeMap<String, String>>
             Log.i(TRIG_TAG, "${url_list::class.simpleName}")
             Log.i(TRIG_TAG, "${url_list["mobile"]?.get("page")}")
-            location_description.text = this.getString(
+            wikipediaExtract.text = this.getString(
                 R.string.location_description_yes_wikipedia,
                 poi.wikipediaInfo?.extract
             )
-            wikipedia_link_url.isClickable = true
-            wikipedia_link_url.movementMethod = LinkMovementMethod.getInstance()
+            wikipediaArticleLink.isClickable = true
+            wikipediaArticleLink.movementMethod = LinkMovementMethod.getInstance()
             val text =
                 "<a href='${url_list["mobile"]?.get("page")}'> Link to Wikipedia article </a>"
-            wikipedia_link_url.text = Html.fromHtml(text, Html.FROM_HTML_MODE_COMPACT)
+            wikipediaArticleLink.text = Html.fromHtml(text, Html.FROM_HTML_MODE_COMPACT)
             tts_text = this.getString(
                 R.string.tts_text_yes_wikipedia,
                 poi.name,
@@ -98,7 +99,7 @@ class GeofenceTriggeredActivity : AppCompatActivity() {
                 poi.wikipediaInfo?.extract
             )
         } else {
-            location_description.text = this.getString(
+            wikipediaExtract.text = this.getString(
                 R.string.location_description_no_wikipedia
             )
             tts_text = this.getString(
@@ -140,20 +141,20 @@ class GeofenceTriggeredActivity : AppCompatActivity() {
                 Log.i(TRIG_TAG, "TTS Initialization failed")
             }
         })
-        tts_button.setOnClickListener {
+        ttsButton.setOnClickListener {
             if (speaking) {
                 tts.stop()
                 speaking = false
-                tts_button.setImageResource(R.drawable.ic_play_arrow_black_32dp)
+                ttsButton.setImageResource(R.drawable.ic_play_arrow_black_32dp)
                 DrawableCompat.setTint(
-                    DrawableCompat.wrap(tts_button.drawable),
+                    DrawableCompat.wrap(ttsButton.drawable),
                     ContextCompat.getColor(applicationContext, android.R.color.white)
                 )
             } else {
                 tts.speak(tts_text, TextToSpeech.QUEUE_FLUSH, null, "TRIG_TTS")
-                tts_button.setImageResource(R.drawable.ic_stop_black_32dp)
+                ttsButton.setImageResource(R.drawable.ic_stop_black_32dp)
                 DrawableCompat.setTint(
-                    DrawableCompat.wrap(tts_button.drawable),
+                    DrawableCompat.wrap(ttsButton.drawable),
                     ContextCompat.getColor(applicationContext, android.R.color.white)
                 )
             }
@@ -165,25 +166,24 @@ class GeofenceTriggeredActivity : AppCompatActivity() {
             ContextCompat.getColor(applicationContext, android.R.color.darker_gray)
         )
         DrawableCompat.setTint(
-            DrawableCompat.wrap(tts_button.drawable),
+            DrawableCompat.wrap(ttsButton.drawable),
             ContextCompat.getColor(applicationContext, android.R.color.white)
         )
         Log.v(TRIG_TAG, poi.toString())
 
         // User-feedback for recommendation
         catViewModel = ViewModelProvider(this).get(CategoryViewModel::class.java)
-        like_button.setOnClickListener {
+        feedbackLikeButton.setOnClickListener {
             catViewModel.like(poi.categoryID)
-            like_button.isEnabled = false
-            dislike_button.isEnabled = false
+            feedbackLikeButton.isEnabled = false
+            feedbackDislikeButton.isEnabled = false
         }
 
-        dislike_button.setOnClickListener {
+        feedbackDislikeButton.setOnClickListener {
             catViewModel.dislike(poi.categoryID)
-            like_button.isEnabled = false
-            dislike_button.isEnabled = false
+            feedbackLikeButton.isEnabled = false
+            feedbackDislikeButton.isEnabled = false
         }
-        // TODO table doesn't seem to update
     }
 
     private fun toggleFavoritePOI(poi: POI) {

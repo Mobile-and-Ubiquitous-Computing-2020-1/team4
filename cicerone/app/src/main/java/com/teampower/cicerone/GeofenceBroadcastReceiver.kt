@@ -6,7 +6,6 @@ import android.content.Intent
 import android.util.Log
 import com.google.android.gms.location.Geofence
 import com.google.android.gms.location.GeofencingEvent
-import com.teampower.cicerone.control.GeofencingController
 import com.teampower.cicerone.control.NotificationsController
 import com.teampower.cicerone.wikipedia.RestAPI
 import com.teampower.cicerone.wikipedia.WikipediaPlaceInfo
