@@ -183,7 +183,7 @@ class DetailedDataController() {
         // Set the Google Maps link
         map_link.isClickable = true
         map_link.movementMethod = LinkMovementMethod.getInstance()
-        val link_text = "<a href='https://www.google.com/maps?saddr=My+Location&daddr=${poi.lat},${poi.long}'> Get directions \uD83D\uDDFA </a>"
+        val link_text = "<a href='https://maps.google.com/?daddr=${poi.lat},${poi.long}'> Get directions \uD83D\uDDFA </a>"
         map_link.text = Html.fromHtml(link_text, Html.FROM_HTML_MODE_COMPACT)
         map_link.removeLinkStyle()
         map_link.visibility = View.VISIBLE
