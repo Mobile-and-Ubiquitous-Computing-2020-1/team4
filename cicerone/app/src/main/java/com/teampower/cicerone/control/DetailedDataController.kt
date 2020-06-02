@@ -151,30 +151,39 @@ class DetailedDataController() {
         val detailDesc = StringBuilder()
 
         // Generate string with basic POI information
-        generalDesc.append("Category: ${poi.category}").appendln()
+        generalDesc.append("Category: ${poi.category}")
         poi.rating?.let {
-            generalDesc.append("Rating: ${poi.rating}\uD83C\uDF1F").appendln()
+            generalDesc.appendln()
+            generalDesc.append("Rating: ${poi.rating}\uD83C\uDF1F")
         }
         poi.description?.let {
             generalDesc.appendln()
-            generalDesc.append("Description: ${poi.description}").appendln()
+            generalDesc.appendln()
+            generalDesc.append("Description: ${poi.description}")
         }
 
         // Generate string with detailed POI information if it is available
-        detailDesc.append("Address: ${poi.address}").appendln()
+        detailDesc.append("Address: ${poi.address}")
         poi.distance?.let {
-            detailDesc.append("Current distance: ${poi.distance}m").appendln()
+            detailDesc.appendln()
+            detailDesc.append("Current distance: ${poi.distance}m")
         }
         poi.hours?.let {
-            detailDesc.append("Opening hours: ${poi.hours}").appendln()
+            detailDesc.appendln()
+            detailDesc.append("Opening hours: ${poi.hours}")
         }
         poi.phone?.let {
-            detailDesc.append("Phone number: ${poi.phone}").appendln()
+            detailDesc.appendln()
+            detailDesc.append("Phone number: ${poi.phone}")
         }
         poi.website?.let {
-            detailDesc.append("Website: ${poi?.website}").appendln()
+            detailDesc.appendln()
+            detailDesc.append("Website: ${poi.website}")
         }
-
+        poi.ig?.let {
+            detailDesc.appendln()
+            detailDesc.append("Instagram: ${poi.ig}")
+        }
 
         // Finally set the text view string to the POI description we generated above
         venue_general_view.text = generalDesc
