@@ -201,13 +201,12 @@ class DetailedDataController() {
         Log.d(TAG, "Retrieved photo: ${poi.photo_url}")
 
         // Set the image view to the POI's image that we have retrieved
-        // TODO: set photo display size
         poi.photo_url?.let {
             Picasso.with(context)
                 .load(poi.photo_url)
                 .fit()
                 .centerCrop()
-                .error(R.drawable.common_google_signin_btn_icon_dark)
+                .error(R.drawable.toolbar_bg)
                 .into(venue_image_view)
         }
     }
