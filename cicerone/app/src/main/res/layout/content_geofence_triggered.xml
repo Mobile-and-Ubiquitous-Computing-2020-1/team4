@@ -1,124 +1,277 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/backgroundColor"
     app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-    <!--    <fragment-->
-    <!--        android:id="@+id/nav_host_fragment"-->
-    <!--        android:name="androidx.navigation.fragment.NavHostFragment"-->
-    <!--        android:layout_width="0dp"-->
-    <!--        android:layout_height="0dp"-->
-    <!--        app:defaultNavHost="true"-->
-    <!--        app:layout_constraintBottom_toBottomOf="parent"-->
-    <!--        app:layout_constraintLeft_toLeftOf="parent"-->
-    <!--        app:layout_constraintRight_toRightOf="parent"-->
-    <!--        app:layout_constraintTop_toTopOf="parent"-->
-    <!--        app:navGraph="@navigation/nav_graph" />-->
-    <LinearLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:layout_marginBottom="55dp">
 
         <TextView
-            android:id="@+id/venue_details"
+            android:id="@+id/shortFactsCardLabel"
+            style="@style/cardLabels"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_margin="@dimen/text_margin"
-            android:text="Venue information" />
-
-
-        <TextView
-            android:id="@+id/location_description"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="32dp"
-            android:text="@string/location_description_no_wikipedia"
-            android:textStyle="italic"
-            app:layout_constraintEnd_toStartOf="@+id/guideline"
-            app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintStart_toStartOf="@+id/guideline2"
+            android:layout_marginHorizontal="@dimen/small_padding"
+            android:layout_marginVertical="@dimen/big_padding"
+            android:text="@string/card_short_facts_label"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-
-        <TextView
-            android:id="@+id/wikipedia_link_url"
-            android:layout_width="wrap_content"
+        <androidx.cardview.widget.CardView
+            android:id="@+id/shortFactsCardView"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:text=""
-            app:layout_constraintStart_toStartOf="@+id/location_description"
-            app:layout_constraintTop_toBottomOf="@+id/location_description" />
+            android:layout_marginHorizontal="@dimen/small_padding"
+            android:layout_marginVertical="4dp"
+            android:orientation="vertical"
+            app:cardBackgroundColor="@color/colorSecondary"
+            app:cardCornerRadius="13dp"
+            app:layout_constraintTop_toBottomOf="@+id/shortFactsCardLabel"
+            tools:layout_editor_absoluteX="8dp">
 
-        <TextView
-            android:id="@+id/tts_label"
-            android:layout_width="200dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="48dp"
-            android:text="@string/tts_button_label"
-            app:layout_constraintStart_toStartOf="@+id/location_description"
-            app:layout_constraintTop_toTopOf="@+id/wikipedia_link_url" />
-
-        <ImageButton
-            android:id="@+id/tts_button"
-            android:layout_width="wrap_content"
-            android:layout_height="0dp"
-            android:backgroundTint="@color/colorAccent"
-            android:contentDescription="play button"
-            app:layout_constraintStart_toStartOf="@+id/tts_label"
-            app:layout_constraintTop_toBottomOf="@+id/tts_label"
-            app:srcCompat="@drawable/ic_play_arrow_black_32dp" />
-
-        <TextView
-            android:id="@+id/vote_label"
-            android:layout_width="250dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="64dp"
-            android:text="@string/vote_button_label"
-            app:layout_constraintStart_toStartOf="@+id/tts_label"
-            app:layout_constraintTop_toTopOf="@+id/tts_button" />
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            app:layout_constraintStart_toStartOf="@+id/vote_label"
-            app:layout_constraintTop_toBottomOf="@+id/vote_label">
-
-            <Button
-                android:id="@+id/like_button"
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:backgroundTint="#009688"
-                android:contentDescription="Like button"
-                android:text="Like" />
+                android:orientation="vertical"
+                android:paddingHorizontal="@dimen/card_horizontal_padding"
+                android:paddingVertical="@dimen/card_vertical_padding">
 
-            <Button
-                android:id="@+id/dislike_button"
-                android:layout_width="wrap_content"
+                <TextView
+                    android:id="@+id/shortFactsPlaceName"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="The Most Wonderful University"
+                    android:textIsSelectable="true"
+                    android:textSize="@dimen/biggerText"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/shortFactsContent"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Lots of handy quick info"
+                    android:textIsSelectable="true" />
+
+                <TextView
+                    android:id="@+id/shortFactsMapLink"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/small_padding"
+                    android:text="See in maps"
+                    android:textStyle="italic"
+                    android:visibility="gone" />
+            </LinearLayout>
+
+
+        </androidx.cardview.widget.CardView>
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/ttsCardView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/small_padding"
+            android:layout_marginVertical="@dimen/card_horizontal_padding"
+            app:cardBackgroundColor="@color/colorSecondary"
+            app:cardCornerRadius="13dp"
+            app:layout_constraintTop_toBottomOf="@+id/shortFactsCardView"
+            tools:layout_editor_absoluteX="8dp">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="#FFFFFF"
-                android:backgroundTint="#009688"
-                android:contentDescription="Dislike button"
-                android:text="Dislike" />
-        </LinearLayout>
+                android:paddingHorizontal="@dimen/card_horizontal_padding"
+                android:paddingVertical="@dimen/card_vertical_padding">
 
-    </LinearLayout>
+                <ImageButton
+                    android:id="@+id/ttsButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:backgroundTint="@color/green"
+                    android:contentDescription="play button"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:srcCompat="@drawable/ic_play_arrow_black_32dp" />
 
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/guideline"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        app:layout_constraintGuide_end="16dp" />
+                <TextView
+                    android:id="@+id/ttsLabel"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/big_padding"
+                    android:layout_marginEnd="50dp"
+                    android:letterSpacing="0.05"
+                    android:text="@string/tts_button_label"
+                    android:textColor="@color/colorPrimaryDark"
+                    android:textStyle="bold"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="0.2"
+                    app:layout_constraintStart_toEndOf="@+id/ttsButton"
+                    app:layout_constraintTop_toTopOf="parent" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </androidx.cardview.widget.CardView>
 
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/guideline2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        app:layout_constraintGuide_end="391dp" />
+        <ImageView
+            android:id="@+id/photograph"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/small_padding"
+            android:visibility="gone"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/ttsCardView" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+        <TextView
+            android:id="@+id/wikipediaCardLabel"
+            style="@style/cardLabels"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/small_padding"
+            android:layout_marginVertical="@dimen/big_padding"
+            android:text="@string/card_wikipedia_label"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/photograph" />
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/wikipediaCardView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/small_padding"
+            android:layout_marginVertical="4dp"
+            android:orientation="vertical"
+            app:cardBackgroundColor="@color/colorSecondary"
+            app:cardCornerRadius="13dp"
+            app:layout_constraintTop_toBottomOf="@+id/wikipediaCardLabel"
+            tools:layout_editor_absoluteX="8dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingHorizontal="@dimen/card_horizontal_padding"
+                android:paddingVertical="@dimen/card_vertical_padding">
+
+                <TextView
+                    android:id="@+id/wikipediaExtract"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/location_description_no_wikipedia"
+                    android:textIsSelectable="true"
+                    android:textStyle="italic" />
+
+                <TextView
+                    android:id="@+id/wikipediaArticleLink"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/small_padding"
+                    android:text="@string/wikipedia_article_link"
+                    android:textIsSelectable="true"
+                    android:visibility="gone" />
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+        <TextView
+            android:id="@+id/detailedFactsCardLabel"
+            style="@style/cardLabels"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/small_padding"
+            android:layout_marginVertical="@dimen/big_padding"
+            android:text="@string/card_detailed_facts_label"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/wikipediaCardView" />
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/detailedFactsCardView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/small_padding"
+            android:layout_marginVertical="4dp"
+            android:orientation="vertical"
+            app:cardBackgroundColor="@color/colorSecondary"
+            app:cardCornerRadius="13dp"
+            app:layout_constraintTop_toBottomOf="@+id/detailedFactsCardLabel"
+            tools:layout_editor_absoluteX="8dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingHorizontal="@dimen/card_horizontal_padding"
+                android:paddingVertical="@dimen/card_vertical_padding">
+
+                <TextView
+                    android:id="@+id/detailedFactsContent"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="More detailed facts you might find interesting"
+                    android:textIsSelectable="true" />
+
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/feedbackCard"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="40dp"
+            android:background="@color/colorPrimaryDark"
+            android:padding="@dimen/small_padding"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/detailedFactsCardView"
+            app:layout_constraintVertical_bias="1.0"
+            tools:layout_editor_absoluteX="8dp">
+
+            <TextView
+                android:id="@+id/feedbackVoteLabel"
+                android:layout_width="191dp"
+                android:layout_height="49dp"
+                android:layout_marginStart="@dimen/card_horizontal_padding"
+                android:text="@string/vote_button_label"
+                android:textColor="@android:color/white"
+                android:textSize="@dimen/biggerText"
+                android:textStyle="italic"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:orientation="horizontal"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/feedbackVoteLabel"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <ImageButton
+                    android:id="@+id/feedbackDislikeButton"
+                    android:layout_width="80dp"
+                    android:layout_height="80dp"
+                    android:background="@null"
+                    android:contentDescription="Dislike button"
+                    android:foreground="?attr/selectableItemBackground"
+                    android:padding="@dimen/big_padding"
+                    android:scaleType="fitXY"
+                    app:srcCompat="@drawable/ic_thumb_down" />
+
+                <ImageButton
+                    android:id="@+id/feedbackLikeButton"
+                    android:layout_width="80dp"
+                    android:layout_height="80dp"
+                    android:background="@null"
+                    android:contentDescription="Like button"
+                    android:foreground="?attr/selectableItemBackground"
+                    android:padding="@dimen/big_padding"
+                    android:scaleType="fitXY"
+                    app:srcCompat="@drawable/ic_thumb_up" />
+            </LinearLayout>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.core.widget.NestedScrollView>

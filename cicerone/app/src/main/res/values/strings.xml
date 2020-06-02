@@ -97,20 +97,28 @@
     <string name="channel_name">Cicerone</string>
     <string name="channel_description">Notifications channel for the Cicerone app</string>
     <string name="title_activity_geofence_triggered">Arg: %1$s</string>
-    <string name="location_category">Category: %1$s</string>
-    <string name="location_distance">Distance: %1$s m</string>
+    <string name="location_category">%1$s</string>
+    <string name="location_distance">%1$s meters away</string>
     <string name="location_description_yes_wikipedia">\"%1$s\" \n Cited from Wikipedia.</string>
     <string name="location_description_no_wikipedia">No information available from Wikipedia</string>
     <string name="tts_text_yes_wikipedia">You are close to %1$s, a %2$s %3$d meters away. Here is an excerpt from Wikipedia. %4$s. If you liked this recommendation, smash like and subscribe.</string>
     <string name="tts_text_no_wikipedia">You are close to %1$s, a %2$s %3$d meters away.</string>
     <string name="location_description">\"%1$s\" \n from Wikipedia</string>
-    <string name="tts_button_label">Listen to information</string>
-    <string name='vote_button_label'>Was this recommendation helpful?</string>
+    <string name="tts_button_label">Listen to information about this place</string>
+    <string name='vote_button_label'>Did you like this recommendation?</string>
 
     <string name="hint_word">Word…</string>
     <string name="button_save">Save</string>
     <string name="empty_not_saved">Word not saved because it is empty.</string>
     <string name="add_word">Add word</string>
 
-    <string name="see_all_starred_places_label">See all starred places</string>
+    <string name="see_all_starred_places_label">See all</string>
+    <string name="shortInfoTextView">\"The most interesting knowledge doesn\'t have to be very special...\"</string>
+    <string name="list_item_sub_info">%1$s • %2$s</string>
+    <string name="list_item_short_text">\"%1$s\"</string>
+    <string name="card_short_facts_label">Short facts</string>
+    <string name="card_wikipedia_label">Wikipedia</string>
+    <string name="card_detailed_facts_label">Detailed facts</string>
+    <string name="wikipedia_article_link">Link to full Wikipedia article</string>
+
 </resources>

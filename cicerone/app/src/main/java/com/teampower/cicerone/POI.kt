@@ -7,7 +7,7 @@ import com.teampower.cicerone.wikipedia.WikipediaPlaceInfo
  * @param lat Latitude of POI
  * @param long Longitude of POI
  * @param id Unique ID of POI (for now this is the Foursquare ID)
- * @param name Name of teh POI
+ * @param name Name of the POI
  * @param distance Current distance from POI in meters (at time of data retrieval)
  * @param address Address of the POI
  * @param category Category name for the POI
@@ -19,7 +19,7 @@ data class POI(
     val lat: Double,
     val long: Double,
     val distance: Int?,
-    val address: String,
+    val address: String?,
     val category: String,
     val categoryID: String,
     val description: String? = null,
@@ -31,11 +31,6 @@ data class POI(
     val ig: String? = null,
     val photo_url: String? = null,
     val website: String? = null,
-    val tip: String? = null
-) {
-}
-
-data class PlaceDetails(
-    val poi: POI,
-    val wikipediaInfo: WikipediaPlaceInfo?
+    val tip: String? = null,
+    var wikipediaInfo: WikipediaPlaceInfo? = null
 )
