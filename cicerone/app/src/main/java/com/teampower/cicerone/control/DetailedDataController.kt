@@ -10,7 +10,9 @@ import android.text.style.URLSpan
 import android.util.Log
 import android.view.View
 import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.cardview.widget.CardView
 import com.squareup.picasso.Picasso
 import com.teampower.cicerone.*
 import com.teampower.cicerone.foursquare.premium.FoursquarePremiumData
@@ -24,7 +26,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 import kotlin.math.round
 
 class DetailedDataController() {
-    fun requestVenueDetails(venueID: String, venue_general_view: TextView, venue_detail_view: TextView, map_link: TextView, venue_image_view: ImageView, context: Context) {
+    fun requestVenueDetails(venueID: String, venue_general_view: TextView, venue_detail_view: TextView, tip_label_view: TextView, tip_view: CardView, map_link: TextView, venue_image_view: ImageView, context: Context) {
 
         // Loads client ID and secret from "secret.properties" file in BuildConfig
         val foursquare_id = BuildConfig.FOURSQUARE_ID
@@ -83,6 +85,8 @@ class DetailedDataController() {
                             poi,
                             venue_general_view,
                             venue_detail_view,
+                            tip_label_view,
+                            tip_view,
                             map_link,
                             venue_image_view,
                             context
@@ -142,9 +146,11 @@ class DetailedDataController() {
         )
     }
 
-    private fun displayData(poi: POI, venue_general_view: TextView, venue_detail_view: TextView, map_link: TextView, venue_image_view: ImageView, context: Context) {
-        // Generate string with basic POI information
+    private fun displayData(poi: POI, venue_general_view: TextView, venue_detail_view: TextView, tip_label_view: TextView, tip_view: CardView, map_link: TextView, venue_image_view: ImageView, context: Context) {
         val generalDesc = StringBuilder()
+        val detailDesc = StringBuilder()
+
+        // Generate string with basic POI information
         generalDesc.append("Category: ${poi.category}").appendln()
         poi.rating?.let {
             generalDesc.append("Rating: ${poi.rating}\uD83C\uDF1F").appendln()
@@ -155,7 +161,6 @@ class DetailedDataController() {
         }
 
         // Generate string with detailed POI information if it is available
-        val detailDesc = StringBuilder()
         detailDesc.append("Address: ${poi.address}").appendln()
         poi.distance?.let {
             detailDesc.append("Current distance: ${poi.distance}m").appendln()
@@ -169,16 +174,21 @@ class DetailedDataController() {
         poi.website?.let {
             detailDesc.append("Website: ${poi?.website}").appendln()
         }
-        poi.tip?.let {
-            detailDesc.appendln()
-            detailDesc.append("Did you know?").appendln()
-            detailDesc.append("${poi.tip}")
-        }
+
 
         // Finally set the text view string to the POI description we generated above
         venue_general_view.text = generalDesc
         venue_detail_view.text = detailDesc
         venue_detail_view.removeLinkStyle()
+
+        // Show "did you know" string if information is available
+        poi.tip?.let {
+            val linear_layout = tip_view.getChildAt(0) as LinearLayout
+            val content_view = linear_layout.getChildAt(0) as TextView
+            content_view.text = poi.tip
+            tip_view.visibility = View.VISIBLE
+            tip_label_view.visibility = View.VISIBLE
+        }
 
         // Set the Google Maps link
         map_link.isClickable = true

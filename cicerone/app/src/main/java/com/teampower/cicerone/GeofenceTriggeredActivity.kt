@@ -81,6 +81,8 @@ class GeofenceTriggeredActivity : AppCompatActivity() {
                 poi.id,
                 shortFactsContent,
                 detailedFactsContent,
+                tipCardLabel,
+                tipCardView,
                 shortFactsMapLink,
                 venueImageView,
                 this@GeofenceTriggeredActivity
