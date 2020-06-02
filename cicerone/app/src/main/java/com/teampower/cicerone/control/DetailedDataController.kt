@@ -159,7 +159,7 @@ class DetailedDataController() {
         poi.description?.let {
             generalDesc.appendln()
             generalDesc.appendln()
-            generalDesc.append("Description: ${poi.description}")
+            generalDesc.append("${poi.description}")
         }
 
         // Generate string with detailed POI information if it is available
@@ -182,7 +182,7 @@ class DetailedDataController() {
         }
         poi.ig?.let {
             detailDesc.appendln()
-            detailDesc.append("Instagram: ${poi.ig}")
+            detailDesc.append("Instagram: https://instagram.com/${poi.ig}")
         }
 
         // Finally set the text view string to the POI description we generated above
