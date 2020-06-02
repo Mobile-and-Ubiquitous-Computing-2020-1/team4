@@ -30,7 +30,7 @@
                 app:layout_collapseMode="pin">
 
                 <ImageView
-                    android:id="@+id/venue_image"
+                    android:id="@+id/venueImageView"
                     android:layout_width="match_parent"
                     android:layout_height="240dp"
                     android:adjustViewBounds="true"

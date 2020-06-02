@@ -6,16 +6,20 @@ import android.os.Bundle
 import android.speech.tts.TextToSpeech
 import android.speech.tts.UtteranceProgressListener
 import android.text.Html
+import android.text.SpannableString
+import android.text.TextPaint
 import android.text.method.LinkMovementMethod
+import android.text.style.URLSpan
 import android.util.Log
+import android.view.View
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.DrawableCompat
 import androidx.lifecycle.ViewModelProvider
 import com.google.gson.internal.LinkedTreeMap
-import com.teampower.cicerone.control.DataController
-import com.teampower.cicerone.control.GeofencingController
+import com.teampower.cicerone.control.DetailedDataController
 import com.teampower.cicerone.viewmodels.CategoryViewModel
 import com.teampower.cicerone.viewmodels.POISavedViewModel
 import kotlinx.android.synthetic.main.activity_geofence_triggered.*
@@ -37,9 +41,7 @@ class GeofenceTriggeredActivity : AppCompatActivity() {
     private var speaking = false
     private var tts_text = ""
     private var isSaved = false
-    private var geoCon =
-        GeofencingController() // TODO: this sucks, we need to somehow pass the controllers to this activity
-    private var dataCon = DataController(geoCon) // TODO: replace this
+    private var detailCon = DetailedDataController()
 
     companion object {
         // Whenever we want to create this Activity, we use it via this intent creation function.
@@ -75,10 +77,12 @@ class GeofenceTriggeredActivity : AppCompatActivity() {
         // Request detailed data for the POI from Foursquare in a non-blocking manner
         GlobalScope.launch {
             // Get the current location
-            dataCon.requestVenueDetails(
+            detailCon.requestVenueDetails(
                 poi.id,
                 shortFactsContent,
-                venue_image,
+                detailedFactsContent,
+                shortFactsMapLink,
+                venueImageView,
                 this@GeofenceTriggeredActivity
             )
             Log.d(TAG, "Finished retrieving data from Foursquare")
@@ -102,15 +106,19 @@ class GeofenceTriggeredActivity : AppCompatActivity() {
                 poi.wikipediaInfo?.content_urls as LinkedTreeMap<String, LinkedTreeMap<String, String>>
             Log.i(TRIG_TAG, "${url_list::class.simpleName}")
             Log.i(TRIG_TAG, "${url_list["mobile"]?.get("page")}")
-            wikipediaExtract.text = this.getString(
+            // It's possible to add "From Wikipedia" using R.string.location_description_yes_wikipedia to the String below, but kind of redundant since the link implies this anyway
+            /*wikipediaExtract.text = this.getString(
                 R.string.location_description_yes_wikipedia,
                 poi.wikipediaInfo?.extract
-            )
+            )*/
+            wikipediaExtract.text = poi.wikipediaInfo?.extract
             wikipediaArticleLink.isClickable = true
             wikipediaArticleLink.movementMethod = LinkMovementMethod.getInstance()
             val text =
-                "<a href='${url_list["mobile"]?.get("page")}'> Link to Wikipedia article </a>"
+                "<a href='${url_list["mobile"]?.get("page")}'> Read more on Wikipedia </a>"
             wikipediaArticleLink.text = Html.fromHtml(text, Html.FROM_HTML_MODE_COMPACT)
+            wikipediaArticleLink.removeLinkStyle()
+            wikipediaArticleLink.visibility = View.VISIBLE
             tts_text = this.getString(
                 R.string.tts_text_yes_wikipedia,
                 poi.name,
@@ -204,6 +212,19 @@ class GeofenceTriggeredActivity : AppCompatActivity() {
             feedbackLikeButton.isEnabled = false
             feedbackDislikeButton.isEnabled = false
         }
+    }
+
+    private fun TextView.removeLinkStyle() {
+        val spannable = SpannableString(text)
+        for (u in spannable.getSpans(0, spannable.length, URLSpan::class.java)) {
+            spannable.setSpan(object : URLSpan(u.url) {
+                override fun updateDrawState(ds: TextPaint) {
+                    super.updateDrawState(ds)
+                    ds.isUnderlineText = false
+                }
+            }, spannable.getSpanStart(u), spannable.getSpanEnd(u), 0)
+        }
+        text = spannable
     }
 
     private fun toggleFavoritePOI(poi: POI) {

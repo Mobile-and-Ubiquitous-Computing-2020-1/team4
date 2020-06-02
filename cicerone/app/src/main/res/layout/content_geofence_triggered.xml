@@ -63,7 +63,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/small_padding"
-                    android:text="See in maps"
+                    android:text="Get directions 🗺️"
                     android:textStyle="italic"
                     android:visibility="gone" />
             </LinearLayout>
@@ -170,6 +170,7 @@
                     android:layout_marginTop="@dimen/small_padding"
                     android:text="@string/wikipedia_article_link"
                     android:textIsSelectable="true"
+                    android:textColorLink="@color/colorPrimary"
                     android:visibility="gone" />
             </LinearLayout>
         </androidx.cardview.widget.CardView>
@@ -209,7 +210,9 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="More detailed facts you might find interesting"
-                    android:textIsSelectable="true" />
+                    android:autoLink="web"
+                    android:textIsSelectable="true"
+                    android:textColorLink="@color/colorPrimary" />
 
             </LinearLayout>
         </androidx.cardview.widget.CardView>
