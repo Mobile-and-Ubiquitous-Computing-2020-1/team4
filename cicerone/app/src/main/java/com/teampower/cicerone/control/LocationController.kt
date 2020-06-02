@@ -16,13 +16,19 @@ import com.google.android.gms.tasks.Task
 import com.teampower.cicerone.MY_PERMISSIONS_REQUEST_LOCATION_ID
 import com.teampower.cicerone.MainActivity
 import com.teampower.cicerone.TAG
+import kotlinx.android.synthetic.main.content_scrolling.*
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
 class LocationController() {
+    private val LOC_TAG = "LocationController"
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private lateinit var locationRequest: LocationRequest
     private lateinit var locationCallback: LocationCallback
     private lateinit var lastLocation: android.location.Location
     private var requestingLocationUpdates = true
+    private var lastFoursquareCallTime = 0L
+    private var timeBetweenFoursquareUpdates = 60000
 
     fun startLocation(context: Context, activity: MainActivity, dataCon: DataController) {
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(context)
@@ -31,6 +37,17 @@ class LocationController() {
             override fun onLocationResult(locationResult: LocationResult?) {
                 locationResult ?: return
                 lastLocation = locationResult.lastLocation
+                var currentTime = System.currentTimeMillis()
+                if(currentTime - lastFoursquareCallTime > timeBetweenFoursquareUpdates) {
+                    //Log.i(LOC_TAG, "Timedelta: ${currentTime-lastFoursquareCallTime} - Last foursquare call at: $lastFoursquareCallTime, now at $currentTime")
+                    // Get last location and use it to make data request to API, then display the retrieved data
+                    // var curr_location = "38.8897,-77.0089"
+                    GlobalScope.launch {
+                        Log.d(TAG, "Current location: ${lastLocation}. Requesting data...")
+                        dataCon.requestData(lastLocation, activity)
+                    }
+                    lastFoursquareCallTime = currentTime
+                }
             }
         }
     }

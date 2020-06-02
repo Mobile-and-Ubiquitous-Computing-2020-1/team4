@@ -124,14 +124,6 @@ class MainActivity : AppCompatActivity() {
         seeAllSavedSpotsBtn.setOnClickListener {
             startActivity(Intent(this, ListSavedPOIActivity()::class.java))
         }
-
-        // Get last location and use it to make data request to API, then display the retrieved data
-        // var curr_location = "38.8897,-77.0089"
-        GlobalScope.launch {
-            var currLocation: android.location.Location = latCon.getLocation()
-            Log.d(TAG, "Current location: ${currLocation}. Requesting data...")
-            dataCon.requestData(currLocation, venue_description, this@MainActivity)
-        }
     }
 
     @RequiresApi(Build.VERSION_CODES.Q)

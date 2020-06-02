@@ -31,7 +31,6 @@ class DataController(private val geoCon: GeofencingController) {
 
     fun requestData(
         location: android.location.Location,
-        venue_view: TextView,
         mainContext: Context
     ) {
         // Set context
@@ -127,7 +126,7 @@ class DataController(private val geoCon: GeofencingController) {
                             pois.put(poi.id, poi)
                         }
                         if (!pois.isEmpty()) {
-                            displayData(pois.toList().get(0).second, venue_view)
+                            displayData(pois.toList().get(0).second)
                         }
                     }
                 }
@@ -166,7 +165,7 @@ class DataController(private val geoCon: GeofencingController) {
         )
     }
 
-    private fun displayData(poi: POI, venue_view: TextView) {
+    private fun displayData(poi: POI) {
         val poi_string = StringBuilder()
         poi_string.append("Name: ${poi.name}").appendln()
         poi_string.append("Location: ${poi.lat}, ${poi.long}").appendln()
@@ -174,7 +173,7 @@ class DataController(private val geoCon: GeofencingController) {
         poi_string.append("Category: ${poi.category}").appendln()
         poi_string.append("CategoryIDs: ${poi.categoryID}").appendln()
         poi_string.append("Current distance: ${poi.distance}m")
-        venue_view.text = poi_string
+        Log.i(DATA_CON, poi_string.toString())
     }
 
     /**
