@@ -27,7 +27,8 @@ public abstract class CiceroneAppDatabase : RoomDatabase() {
                     //************* POI History table *************
                     val poiHDao = database.poiHistoryDao()
                     // Delete all content here.
-                    poiHDao.deleteAll()
+                    // poiHDao.deleteAll()
+                    /*
                     // Add sample POI.
                     val poiH = POIHistoryData(
                         foursquareID = "1337XD",
@@ -41,7 +42,7 @@ public abstract class CiceroneAppDatabase : RoomDatabase() {
                         distance = 20,
                         address = "Galaxyroad 18, 290192x PoIS, Sunnyland"
                     )
-                    poiHDao.insert(poiH)
+                    poiHDao.insert(poiH)*/
 
                     //************* Category table *************
                     val catDao = database.categoryDao()

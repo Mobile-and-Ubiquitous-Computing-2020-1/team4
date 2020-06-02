@@ -90,6 +90,8 @@ class MainActivity : AppCompatActivity() {
         poiHistoryViewModel.allPOI.observe(this, Observer { pois ->
             // Update the cached copy of the words in the adapter.
             pois?.let { historyAdapter.setPOIs(it) }
+            // Set POI history in DataController to filter out previous POIs
+            dataCon.setPOIHistory(pois)
         })
 
         // List saved POIs
@@ -110,7 +112,6 @@ class MainActivity : AppCompatActivity() {
             dataCon.setCategoryScores(cats)
         })
         dataCon.setCatViewModel(catViewModel)
-
 
         // Setup location services
         latCon.startLocation(this, this@MainActivity, dataCon)
