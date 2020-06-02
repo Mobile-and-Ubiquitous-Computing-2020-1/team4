@@ -262,13 +262,13 @@ class DataController(private val geoCon: GeofencingController) {
         val categoryID = venue.categories.joinToString { it.id }
         val description = venue.description
         val rating = venue.rating
-        val hours = venue.hours.status
-        val phone = venue.contact.formattedPhone
-        val facebook = venue.contact.facebook
-        val twitter = venue.contact.twitter
-        val ig = venue.contact.instagram
+        val hours = venue.hours?.status
+        val phone = venue.contact?.formattedPhone
+        val facebook = venue.contact?.facebook
+        val twitter = venue.contact?.twitter
+        val ig = venue.contact?.instagram
         val photo =
-            venue.bestPhoto?.prefix + "original" + venue.bestPhoto.suffix // TODO: instead of original size, set the photo dimensions that we want to retrieve
+            venue.bestPhoto?.prefix + "original" + venue.bestPhoto?.suffix // TODO: instead of original size, set the photo dimensions that we want to retrieve
         val website = venue.url
         val tip = venue.tips.groups.getOrNull(0)?.items?.getOrNull(0)?.text
 

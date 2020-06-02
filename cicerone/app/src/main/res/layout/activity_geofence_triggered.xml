@@ -18,10 +18,26 @@
             android:id="@+id/toolbar_layout"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:background="@drawable/toolbar_bg"
             android:fitsSystemWindows="true"
             app:contentScrim="?attr/colorPrimary"
             app:layout_scrollFlags="scroll|exitUntilCollapsed"
             app:toolbarId="@+id/toolbar">
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                app:layout_collapseMode="pin">
+
+                <ImageView
+                    android:id="@+id/venue_image"
+                    android:layout_width="match_parent"
+                    android:layout_height="240dp"
+                    android:adjustViewBounds="true"
+                    android:fitsSystemWindows="true"
+                    android:scaleType="fitStart"
+                    app:layout_collapseMode="pin" />
+            </FrameLayout>
 
             <androidx.appcompat.widget.Toolbar
                 android:id="@+id/toolbar"
@@ -29,13 +45,6 @@
                 android:layout_height="?attr/actionBarSize"
                 app:layout_collapseMode="pin"
                 app:popupTheme="@style/AppTheme.PopupOverlay" />
-
-            <ImageView
-                android:id="@+id/venue_image"
-                android:layout_width="match_parent"
-                android:layout_height="240dp"
-                android:adjustViewBounds="true"
-                android:scaleType="fitStart" />
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -49,7 +58,13 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="@string/location_category"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
+                    android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                    android:letterSpacing="-0.04" />
+                    <!-- shadows for better readability?
+                    android:shadowColor="#000000"
+                    android:shadowDx="2"
+                    android:shadowDy="2"
+                    android:shadowRadius="2" -->
 
                 <TextView
                     android:id="@+id/location_distance"
@@ -57,26 +72,31 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="@string/location_distance"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
-            </LinearLayout>
+                    android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+                    android:letterSpacing="-0.04" />
+                    <!-- shadows for better readability?
+                    android:shadowColor="#000000"
+                    android:shadowDx="2"
+                    android:shadowDy="2"
+                    android:shadowRadius="2" -->
 
+        </LinearLayout>
+    </com.google.android.material.appbar.CollapsingToolbarLayout>
+</com.google.android.material.appbar.AppBarLayout>
 
-        </com.google.android.material.appbar.CollapsingToolbarLayout>
-    </com.google.android.material.appbar.AppBarLayout>
+<include layout="@layout/content_geofence_triggered" />
 
-    <include layout="@layout/content_geofence_triggered" />
-
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/favorite_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="@dimen/fab_margin"
-        android:scaleType="center"
-        app:fabCustomSize="65dp"
-        app:layout_anchor="@id/app_bar"
-        app:layout_anchorGravity="bottom|end"
-        app:maxImageSize="38dp"
-        app:srcCompat="@drawable/ic_star_black_32dp" />
+<com.google.android.material.floatingactionbutton.FloatingActionButton
+    android:id="@+id/favorite_button"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_margin="@dimen/fab_margin"
+    android:scaleType="center"
+    app:fabCustomSize="65dp"
+    app:layout_anchor="@id/app_bar"
+    app:layout_anchorGravity="bottom|end"
+    app:maxImageSize="38dp"
+    app:srcCompat="@drawable/ic_star_black_32dp" />
 
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
