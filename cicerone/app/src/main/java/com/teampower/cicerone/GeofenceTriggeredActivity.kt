@@ -15,6 +15,7 @@ import androidx.core.graphics.drawable.DrawableCompat
 import androidx.lifecycle.ViewModelProvider
 import com.google.gson.internal.LinkedTreeMap
 import com.teampower.cicerone.viewmodels.CategoryViewModel
+import com.teampower.cicerone.viewmodels.POIHistoryViewModel
 import com.teampower.cicerone.viewmodels.POISavedViewModel
 import kotlinx.android.synthetic.main.activity_geofence_triggered.*
 import kotlinx.android.synthetic.main.activity_scrolling.toolbar
@@ -30,6 +31,7 @@ class GeofenceTriggeredActivity : AppCompatActivity() {
     private val TRIG_TAG = "POIActivity"
     private lateinit var catViewModel: CategoryViewModel
     private lateinit var poiSavedViewModel: POISavedViewModel
+    private lateinit var poiHistoryViewModel: POIHistoryViewModel
     lateinit var tts: TextToSpeech
     private var speaking = false
     private var tts_text = ""
@@ -47,8 +49,10 @@ class GeofenceTriggeredActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_geofence_triggered)
         setSupportActionBar(toolbar)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true) // Home button to MainActivity
 
         poiSavedViewModel = ViewModelProvider(this).get(POISavedViewModel::class.java)
+        poiHistoryViewModel = ViewModelProvider(this).get(POIHistoryViewModel::class.java)
         // Extract the transitionDetails
         val poiObjectJSON = intent.getStringExtra(POI_DETAILS) ?: ""
         val poi = MainActivity.fromJson<POI>(poiObjectJSON)
@@ -63,7 +67,8 @@ class GeofenceTriggeredActivity : AppCompatActivity() {
             }
         }
 
-        supportActionBar?.setDisplayHomeAsUpEnabled(true) // Home button to MainActivity
+        // Save the recommended POI to the history - added here since GeofenceBroadCastReceiver is not a viewModelStoreOwner
+        poiHistoryViewModel.insert(poi)
 
         // Update the view
         title = poi.name
