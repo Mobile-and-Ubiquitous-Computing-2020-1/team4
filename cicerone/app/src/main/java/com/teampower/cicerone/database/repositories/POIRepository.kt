@@ -25,6 +25,10 @@ class POIRepository<T>(private val poiDao: POIDao<T>) {
         return poiDao.loadPOI(foursquareID)
     }
 
+    suspend fun getAll(): List<T> {
+        return poiDao.getAll()
+    }
+
     suspend fun removePOI(foursquareID: String) {
         poiDao.deletePOIbyId(foursquareID)
     }

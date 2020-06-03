@@ -23,6 +23,7 @@ import kotlinx.coroutines.*
 import org.threeten.bp.ZonedDateTime
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.collections.HashSet
 import kotlin.coroutines.CoroutineContext
 
 const val TAG = "POIViewModel"

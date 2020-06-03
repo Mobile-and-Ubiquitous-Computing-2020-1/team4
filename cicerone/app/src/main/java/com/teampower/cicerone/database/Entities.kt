@@ -18,6 +18,10 @@ interface POIData {
     val wikipediaInfoJSON: String?
 }
 
+interface Ids {
+    val foursquareID: String
+}
+
 @Entity(tableName = "poi_history_table")
 data class POIHistoryData(
     @PrimaryKey override val foursquareID: String,
@@ -47,6 +51,16 @@ data class POISavedData(
     @ColumnInfo(name = "address") override val address: String?,
     @ColumnInfo(name = "wikipedia_info_json") override val wikipediaInfoJSON: String? = ""
 ) : POIData
+
+@Entity(tableName = "poi_history_table")
+data class POIHistoryIds(
+    @PrimaryKey override val foursquareID: String
+) : Ids
+
+@Entity(tableName = "poi_saved_table")
+data class POISavedIds(
+    @PrimaryKey override val foursquareID: String
+) : Ids
 
 @Entity(tableName = "category_table")
 data class CategoryData(

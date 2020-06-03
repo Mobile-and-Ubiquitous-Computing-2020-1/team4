@@ -16,7 +16,6 @@ import com.google.android.gms.tasks.Task
 import com.teampower.cicerone.MY_PERMISSIONS_REQUEST_LOCATION_ID
 import com.teampower.cicerone.MainActivity
 import com.teampower.cicerone.TAG
-import kotlinx.android.synthetic.main.content_scrolling.*
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
@@ -42,6 +41,7 @@ class LocationController() {
                     //Log.i(LOC_TAG, "Timedelta: ${currentTime-lastFoursquareCallTime} - Last foursquare call at: $lastFoursquareCallTime, now at $currentTime")
                     // Get last location and use it to make data request to API, then display the retrieved data
                     // var curr_location = "38.8897,-77.0089"
+                    Log.d(TAG, "Current time: ${currentTime}. Last call time: ${lastFoursquareCallTime}. Diff: ${currentTime-lastFoursquareCallTime}. Time between updates: ${timeBetweenFoursquareUpdates}.")
                     GlobalScope.launch {
                         Log.d(TAG, "Current location: ${lastLocation}. Requesting data...")
                         dataCon.requestData(lastLocation, activity)

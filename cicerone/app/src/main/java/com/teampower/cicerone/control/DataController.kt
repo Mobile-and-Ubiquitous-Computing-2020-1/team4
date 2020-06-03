@@ -3,14 +3,11 @@ package com.teampower.cicerone.control
 import android.content.Context
 import android.location.Location
 import android.util.Log
-import android.view.View
-import android.widget.TextView
 import com.google.android.gms.location.Geofence
 import com.teampower.cicerone.*
 import com.teampower.cicerone.database.CategoryData
 import com.teampower.cicerone.database.POIData
 import com.teampower.cicerone.viewmodels.CategoryViewModel
-import kotlinx.coroutines.*
 import okhttp3.OkHttpClient
 import okhttp3.internal.toImmutableList
 import okhttp3.logging.HttpLoggingInterceptor
@@ -46,7 +43,7 @@ class DataController(private val geoCon: GeofencingController) {
         // API call parameters
         val location_string: String =
             "${location.latitude.toString()}, ${location.longitude.toString()}"
-        val radius = 10000
+        val radius = 30
         val limit = 50 // Foursquare API returns up to 50 results
         // comma-separated list of Foursquare categoryIDs to query for
         val categories = "4bf58dd8d48988d181941735,4d4b7105d754a06374d81259,4bf58dd8d48988d116941735,50327c8591d4c4b30a586d5d,4bf58dd8d48988d1e2941735,4bf58dd8d48988d163941735,52e81612bcbc57f1066b7a14,50aaa49e4b90af0d42d5de11,4bf58dd8d48988d164941735,4bf58dd8d48988d1e2931735,56aa371be4b08b9a8d573532,52e81612bcbc57f1066b7a22,56aa371be4b08b9a8d573562,56aa371be4b08b9a8d573544,4eb1d4dd4b900d56c88a45fd,4bf58dd8d48988d133951735,4bf58dd8d48988d165941735,4bf58dd8d48988d12f941735"
