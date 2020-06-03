@@ -121,5 +121,8 @@
     <string name="card_tip_label">Did you know?</string>
     <string name="card_tip_default">Most of the Earth’s longest-surviving species are found in the ocean. While cyanobacterias are technically the oldest living organisms on Earth, having appeared 2.8 billion years ago, the ocean sponge has also been on Earth for 580 million years, and jellyfish have been here for 550 million years.</string>
     <string name="wikipedia_article_link">Open in Wikipedia</string>
-
+    <plurals name="numberPOI">
+        <item quantity="one">"There is currently %1$s place near you. To begin exploring right now just start walking!"</item>
+        <item quantity="other">"There are currently %1$s places near you. To begin exploring them right now just start walking!"</item>
+    </plurals>
 </resources>

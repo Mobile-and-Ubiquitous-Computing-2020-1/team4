@@ -3,16 +3,16 @@ package com.teampower.cicerone.control
 import android.content.Context
 import android.location.Location
 import android.util.Log
-import android.widget.ImageView
+import android.view.View
 import android.widget.TextView
 import com.google.android.gms.location.Geofence
-import com.squareup.picasso.Picasso
 import com.teampower.cicerone.*
 import com.teampower.cicerone.database.CategoryData
-import com.teampower.cicerone.foursquare.premium.FoursquarePremiumData
-import com.teampower.cicerone.foursquare.premium.Venue
+import com.teampower.cicerone.database.POIData
 import com.teampower.cicerone.viewmodels.CategoryViewModel
+import kotlinx.coroutines.*
 import okhttp3.OkHttpClient
+import okhttp3.internal.toImmutableList
 import okhttp3.logging.HttpLoggingInterceptor
 import okhttp3.logging.HttpLoggingInterceptor.Level
 import retrofit2.Retrofit
@@ -20,7 +20,6 @@ import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
 import java.util.*
 import kotlin.collections.ArrayList
-import kotlin.math.round
 import kotlin.math.roundToInt
 import kotlin.random.Random.Default.nextDouble
 
@@ -28,14 +27,13 @@ class DataController(private val geoCon: GeofencingController) {
     private val DATA_CON = "DataController"
     private lateinit var categoryTable: ArrayList<CategoryData>
     private lateinit var categoryViewModel: CategoryViewModel
+    private lateinit var poiHistory: List<POIData>
     private val pois =
         mutableMapOf<String, POI>() // We can store all POIs in this map, indexed by ID
-    private val uniformRandom = Random() // seed 1 - TODO remove seed
+    private val uniformRandom = Random(1) // seed 1 - TODO remove seed
 
     fun requestData(
-        location: Location,
-        venue_view: TextView,
-        image_view: ImageView,
+        location: android.location.Location,
         mainContext: Context
     ) {
         // Set context
@@ -48,9 +46,8 @@ class DataController(private val geoCon: GeofencingController) {
         // API call parameters
         val location_string: String =
             "${location.latitude.toString()}, ${location.longitude.toString()}"
-        val radius = 30 // TODO set radius for query
+        val radius = 10000
         val limit = 50 // Foursquare API returns up to 50 results
-        // TODO decide which categories to query
         // comma-separated list of Foursquare categoryIDs to query for
         val categories = "4bf58dd8d48988d181941735,4d4b7105d754a06374d81259,4bf58dd8d48988d116941735,50327c8591d4c4b30a586d5d,4bf58dd8d48988d1e2941735,4bf58dd8d48988d163941735,52e81612bcbc57f1066b7a14,50aaa49e4b90af0d42d5de11,4bf58dd8d48988d164941735,4bf58dd8d48988d1e2931735,56aa371be4b08b9a8d573532,52e81612bcbc57f1066b7a22,56aa371be4b08b9a8d573562,56aa371be4b08b9a8d573544,4eb1d4dd4b900d56c88a45fd,4bf58dd8d48988d133951735,4bf58dd8d48988d165941735,4bf58dd8d48988d12f941735"
         val version = "20200420" // set date for API versioning here (see Foursquare API)
@@ -98,30 +95,24 @@ class DataController(private val geoCon: GeofencingController) {
                     if (response.isSuccessful()) {
                         val result = response.body()
                         val venues = result!!.response.venues
-                        // For now, take the 100 closest POIs and make sure they aren't closer than 10 m
-                        /*
-                        val initVenues = initializeCategories(venus)
-                        val sampledVenues = recommendVenues(initVenues)
-                        val filteredVenues = handleOverlapGreedy(sampledVenues)
-                         */
-                        initializeCategories(venues)
+                        val filteredVenues = filterVenuesPOIHistory(venues)
+                        initializeCategories(filteredVenues)
                         val recommendVenues = recommendVenues(venues, 50)
-                        val filteredVenues = filterOverlapGreedy(
+                        val nonOverlappingVenues = filterOverlapGreedy(
                             recommendVenues.toMutableList(),
                             200F
                         ) // Remove POIs if closer 200m of each other - google recommends minimum radius of 100m
-                        val radius = calculateRadius(filteredVenues.toTypedArray())
+                        val radius = calculateRadius(nonOverlappingVenues.toTypedArray())
                         Log.d(DATA_CON, "Radius: $radius m")
-                        //for ((id, venue) in filteredVenues.withIndex()) {
-                        for (venue in filteredVenues) {
+                        for ((id, venue) in nonOverlappingVenues.withIndex()) {
                             val id = venue?.id
                             Log.d(DATA_CON, "ID: $id - Venue:" + venue.toString())
-                            val poi = poiBuilder(venue!!, id)
+                            val poi = poiBuilder(venue!!)
                             // Create the geofence
                             val gf = geoCon.createGeofence(
                                 poi.lat,
                                 poi.long,
-                                poi.id,
+                                id.toString(),
                                 radius,
                                 Geofence.NEVER_EXPIRE,
                                 Geofence.GEOFENCE_TRANSITION_ENTER
@@ -130,98 +121,14 @@ class DataController(private val geoCon: GeofencingController) {
                             // Add POI to the list of current POIs
                             pois.put(poi.id, poi)
                         }
-                        if (!pois.isEmpty()) {
-                            displayData(
-                                pois.toList().get(0).second,
-                                venue_view,
-                                image_view,
-                                mainContext
-                            )
-
-                        }
                     }
                 }
             })
     }
 
-    fun requestVenueDetails(
-        venueID: String,
-        venue_detail_view: TextView,
-        venue_image_view: ImageView,
-        context: Context
-    ) {
-        // Loads client ID and secret from "secret.properties" file in BuildConfig
-        val foursquare_id = BuildConfig.FOURSQUARE_ID
-        val foursquare_secret = BuildConfig.FOURSQUARE_SECRET
-
-        // API call parameters
-        val version =
-            "20200420" // set date for API versioning here (see Foursquare API)
-        val cacheDuration = 60
-
-        // Set up HTTP client
-        val client = OkHttpClient().newBuilder()
-            .addInterceptor(
-                FoursquareRequestInterceptor(
-                    foursquare_id,
-                    foursquare_secret,
-                    version,
-                    cacheDuration
-                )
-            )
-            .addInterceptor(HttpLoggingInterceptor().apply {
-                level = if (BuildConfig.DEBUG) Level.BODY else Level.NONE
-            })
-            .build()
-
-        // Set up retrofit
-        val retrofit = Retrofit.Builder()
-            .baseUrl("https://api.foursquare.com")
-            .client(client)
-            .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-            .addConverterFactory(GsonConverterFactory.create())
-            .build()
-
-        // Make API call
-        val FoursquareAPI = retrofit.create(FoursquareAPI::class.java)
-        FoursquareAPI.getVenueDetails(venueID)
-            .enqueue(object : retrofit2.Callback<FoursquarePremiumData> {
-                override fun onFailure(
-                    call: retrofit2.Call<FoursquarePremiumData>?,
-                    t: Throwable?
-                ) {
-                    Log.e(
-                        TAG,
-                        "Error: could not receive response from Foursquare API. ${t?.message}"
-                    )
-
-                }
-
-                override fun onResponse(
-                    call: retrofit2.Call<FoursquarePremiumData>,
-                    response: retrofit2.Response<FoursquarePremiumData>
-                ) {
-                    if (response.isSuccessful()) {
-                        val result = response.body()
-                        val venue = result!!.response.venue
-                        val poi = poiDetailBuilder(venue, venueID)
-                        displayData(
-                            poi,
-                            venue_detail_view,
-                            venue_image_view,
-                            context
-                        )
-                    }
-                }
-            })
-    }
-
-    fun getPOI(id: String): POI? {
-        return pois.get(id)
-    }
-
-    private fun poiBuilder(venue: Venues, id: String?): POI {
+    private fun poiBuilder(venue: Venues): POI {
         // val id = venue.id # Replace this with a running id, to let Geofences be replaced
+        val id = venue.id
         val name = venue.name
         val lat = venue.location.lat
         val long = venue.location.lng
@@ -237,7 +144,7 @@ class DataController(private val geoCon: GeofencingController) {
             categoryID += cat.id
         }
         return POI(
-            id = id.toString(),
+            id = id,
             name = name,
             lat = lat,
             long = long,
@@ -246,117 +153,6 @@ class DataController(private val geoCon: GeofencingController) {
             category = categories,
             categoryID = categoryID
         )
-    }
-
-    private fun poiDetailBuilder(
-        venue: Venue,
-        id: String?,
-        user_location: android.location.Location? = null
-    ): POI {
-        val name = venue.name
-        val lat = venue.location.lat
-        val long = venue.location.lng
-        val address = venue.location.formattedAddress.joinToString()
-        val categories = venue.categories.joinToString { it.name }
-        val categoryID = venue.categories.joinToString { it.id }
-        val description = venue.description
-        val rating = venue.rating
-        val hours = venue.hours?.status
-        val phone = venue.contact?.formattedPhone
-        val facebook = venue.contact?.facebook
-        val twitter = venue.contact?.twitter
-        val ig = venue.contact?.instagram
-        val photo =
-            venue.bestPhoto?.prefix + "original" + venue.bestPhoto?.suffix // TODO: instead of original size, set the photo dimensions that we want to retrieve
-        val website = venue.url
-        val tip = venue.tips.groups.getOrNull(0)?.items?.getOrNull(0)?.text
-
-        // Compute distance to the venue if we passed the user location
-        var distance: Int? = null
-        user_location?.let {
-            val venue_location = Location("")
-            venue_location.latitude = lat
-            venue_location.longitude = long
-            distance = round(user_location.distanceTo(venue_location)).toInt()
-        }
-
-        // Create and return the POI object
-        return POI(
-            id = id.toString(),
-            name = name,
-            lat = lat,
-            long = long,
-            distance = distance,
-            address = address,
-            category = categories,
-            categoryID = categoryID,
-            description = description,
-            rating = rating,
-            hours = hours,
-            phone = phone,
-            facebook = facebook,
-            twitter = twitter,
-            ig = ig,
-            photo_url = photo,
-            website = website,
-            tip = tip
-        )
-    }
-
-    private fun displayData(
-        poi: POI,
-        venue_view: TextView,
-        venue_image_view: ImageView,
-        context: Context
-    ) {
-        // Generate string with basic POI information
-        val poi_string = StringBuilder()
-        poi_string.append("Name: ${poi.name}").appendln()
-        poi_string.append("Location: ${poi.lat}, ${poi.long}").appendln()
-        poi_string.append("Address: ${poi.address}").appendln()
-        poi_string.append("Category: ${poi.category}").appendln()
-        poi_string.append("CategoryIDs: ${poi.categoryID}").appendln()
-        poi.distance?.let {
-            poi_string.append("Current distance: ${poi.distance}m").appendln()
-        }
-
-        // If we have detail information execute code below
-        poi.description?.let {
-            poi_string.append("Description: ${poi.description}").appendln()
-        }
-        poi.rating?.let {
-            poi_string.append("Rating: ${poi.rating}").appendln()
-        }
-        poi.hours?.let {
-            poi_string.append("Opening hours: ${poi.hours}").appendln()
-        }
-        poi.phone?.let {
-            poi_string.append("Phone number: ${poi.phone}").appendln()
-        }
-        poi.website?.let {
-            poi_string.append("Website: ${poi?.website}").appendln()
-        }
-        poi.tip?.let {
-            poi_string.appendln()
-            poi_string.append("Did you know?").appendln()
-            poi_string.append("${poi.tip}")
-        }
-
-        // Finally set the text view string to the POI description we generated above
-        venue_view.text = poi_string
-
-        Log.d(TAG, "Retrieved photo: ${poi.photo_url}")
-
-        // Set the image view to the POI's image that we have retrieved
-        // TODO: set photo display size
-        poi.photo_url?.let {
-            Picasso.with(context)
-                .load(poi.photo_url)
-                .fit()
-                .centerCrop()
-                .error(R.drawable.common_google_signin_btn_icon_dark)
-                .into(venue_image_view)
-        }
     }
 
     /**
@@ -418,7 +214,7 @@ class DataController(private val geoCon: GeofencingController) {
                rand > 0.2 but less than 0.7. Thus it falls in the bin of size 0.5 corresponding to
                the second element.
             */
-            val urv = nextDouble()
+            val urv = uniformRandom.nextDouble()
             var cumSum = 0.0
             var ind = 0
             while (cumSum < urv) {
@@ -577,6 +373,25 @@ class DataController(private val geoCon: GeofencingController) {
         }
     }
 
+    /**
+     * Filter out POIs that are in the history, i.e. have been recommended before
+     */
+    private fun filterVenuesPOIHistory(venues: List<Venues>): List<Venues> {
+        val filteredVenues = ArrayList<Venues>()
+        for (venue in venues){
+            var inHistory = false
+            for ( poiH in poiHistory ){
+                inHistory = inHistory || poiH.foursquareID == venue.id
+            }
+            if (inHistory) {
+                Log.i(DATA_CON, "Venue ${venue.name} is already in the history. Skipping")
+            } else{
+                filteredVenues.add(venue)
+            }
+        }
+        return filteredVenues.toImmutableList()
+    }
+
     fun setCategoryScores(cats: List<CategoryData>) {
         categoryTable = ArrayList(cats)
         //Log.i(DATA_CON, "Category scores set to: ${categoryTable}")
@@ -584,6 +399,10 @@ class DataController(private val geoCon: GeofencingController) {
 
     fun setCatViewModel(catViewModel: CategoryViewModel) {
         categoryViewModel = catViewModel
+    }
+
+    fun setPOIHistory(pois: List<POIData>){
+        poiHistory = pois
     }
 
 }

@@ -4,9 +4,12 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.util.Log
+import androidx.lifecycle.ViewModelProvider
 import com.google.android.gms.location.Geofence
 import com.google.android.gms.location.GeofencingEvent
 import com.teampower.cicerone.control.NotificationsController
+import com.teampower.cicerone.viewmodels.POIHistoryViewModel
+import com.teampower.cicerone.viewmodels.POISavedViewModel
 import com.teampower.cicerone.wikipedia.RestAPI
 import com.teampower.cicerone.wikipedia.WikipediaPlaceInfo
 import retrofit2.Call
@@ -45,7 +48,6 @@ class GeofenceBroadcastReceiver() : BroadcastReceiver() {
             poiObject = MainActivity.fromJson(poiSerialized)
             Log.i(TAG, "id" + triggeringGeofence.requestId + " got the poi name " + poiObject.name)
             getPlaceInfoSendNotification(context)
-
         } else {
             // Log the error
             Log.e(TAG, "Error in geofencer - geofence transition not interesting")

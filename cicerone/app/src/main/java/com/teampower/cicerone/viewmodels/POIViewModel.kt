@@ -21,6 +21,8 @@ import com.teampower.cicerone.database.repositories.POIRepository
 import com.teampower.cicerone.wikipedia.WikipediaPlaceInfo
 import kotlinx.coroutines.*
 import org.threeten.bp.ZonedDateTime
+import java.text.SimpleDateFormat
+import java.util.*
 import kotlin.coroutines.CoroutineContext
 
 const val TAG = "POIViewModel"
@@ -114,6 +116,16 @@ abstract class POIViewModel<T>(application: Application) : AndroidViewModel(appl
         }
     }
 
+    fun insert(poiData: T) {
+        launch(Dispatchers.IO) {
+            // Add to history
+            repository.insert(poiData)
+            Log.i(TAG, "Added POI to history")
+
+
+        }
+    }
+
     fun convertPOIDataToPOI(data: POIData): POI {
         return POI(
             id = data.foursquareID,
@@ -131,7 +143,6 @@ abstract class POIViewModel<T>(application: Application) : AndroidViewModel(appl
                 )
             })
     }
-
 }
 
 
@@ -187,5 +198,24 @@ class POIHistoryViewModel(application: Application) : POIViewModel<POIHistoryDat
         repository = POIRepository(poisDao)
         recentSavedPOIs = repository.recentSavedPOIs
         allPOI = repository.allPOI
+    }
+
+    fun insert(poi: POI) {
+        val currentTimeString = ZonedDateTime.now().toString()
+
+        val poiData = POIHistoryData(
+            foursquareID = poi.id,
+            name = poi.name,
+            category = poi.category,
+            categoryID = poi.categoryID,
+            timeTriggered = currentTimeString,
+            latitude = poi.lat,
+            longitude = poi.long,
+            description = poi.description,
+            distance = poi.distance,
+            address = poi.address,
+            wikipediaInfoJSON = MainActivity.toJson(poi.wikipediaInfo)
+        )
+        super.insert(poiData)
     }
 }
