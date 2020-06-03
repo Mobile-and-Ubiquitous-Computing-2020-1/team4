@@ -7,8 +7,10 @@ import android.widget.TextView
 import com.google.android.gms.location.Geofence
 import com.teampower.cicerone.*
 import com.teampower.cicerone.database.CategoryData
+import com.teampower.cicerone.database.POIData
 import com.teampower.cicerone.viewmodels.CategoryViewModel
 import okhttp3.OkHttpClient
+import okhttp3.internal.toImmutableList
 import okhttp3.logging.HttpLoggingInterceptor
 import okhttp3.logging.HttpLoggingInterceptor.Level
 import retrofit2.Retrofit
@@ -24,14 +26,14 @@ class DataController(private val geoCon: GeofencingController) {
     private val DATA_CON = "DataController"
     private lateinit var categoryTable: ArrayList<CategoryData>
     private lateinit var categoryViewModel: CategoryViewModel
+    private lateinit var poiHistory: List<POIData>
     private val pois =
         mutableMapOf<String, POI>() // We can store all POIs in this map, indexed by ID
-    private val uniformRandom = Random() // seed 1 - TODO remove seed
+    private val uniformRandom = Random(1) // seed 1 - TODO remove seed
 
 
     fun requestData(
         location: android.location.Location,
-        venue_view: TextView,
         mainContext: Context
     ) {
         // Set context
@@ -96,28 +98,23 @@ class DataController(private val geoCon: GeofencingController) {
                     if (response.isSuccessful()) {
                         val result = response.body()
                         val venues = result!!.response.venues
-                        // For now, take the 100 closest POIs and make sure they aren't closer than 10 m
-                        /*
-                        val initVenues = initializeCategories(venus)
-                        val sampledVenues = recommendVenues(initVenues)
-                        val filteredVenues = handleOverlapGreedy(sampledVenues)
-                         */
-                        initializeCategories(venues)
+                        val filteredVenues = filterVenuesPOIHistory(venues)
+                        initializeCategories(filteredVenues)
                         val recommendVenues = recommendVenues(venues, 50)
-                        val filteredVenues = filterOverlapGreedy(
+                        val nonOverlappingVenues = filterOverlapGreedy(
                             recommendVenues.toMutableList(),
                             200F
                         ) // Remove POIs if closer 200m of each other - google recommends minimum radius of 100m
-                        val radius = calculateRadius(filteredVenues.toTypedArray())
+                        val radius = calculateRadius(nonOverlappingVenues.toTypedArray())
                         Log.d(DATA_CON, "Radius: $radius m")
-                        for ((id, venue) in filteredVenues.withIndex()) {
+                        for ((id, venue) in nonOverlappingVenues.withIndex()) {
                             Log.d(DATA_CON, "ID: $id - Venue:" + venue.toString())
-                            val poi = poiBuilder(venue!!, id)
+                            val poi = poiBuilder(venue!!)
                             // Create the geofence
                             val gf = geoCon.createGeofence(
                                 poi.lat,
                                 poi.long,
-                                poi.id,
+                                id.toString(),
                                 radius,
                                 Geofence.NEVER_EXPIRE,
                                 Geofence.GEOFENCE_TRANSITION_ENTER
@@ -126,9 +123,9 @@ class DataController(private val geoCon: GeofencingController) {
                             // Add POI to the list of current POIs
                             pois.put(poi.id, poi)
                         }
-                        if (!pois.isEmpty()) {
-                            displayData(pois.toList().get(0).second, venue_view)
-                        }
+//                        if (!pois.isEmpty()) {
+//                            displayData(pois.toList().get(0).second)
+//                        }
                     }
                 }
             })
@@ -138,8 +135,9 @@ class DataController(private val geoCon: GeofencingController) {
         return pois.get(id)
     }
 
-    private fun poiBuilder(venue: Venues, id: Int): POI {
+    private fun poiBuilder(venue: Venues): POI {
         // val id = venue.id # Replace this with a running id, to let Geofences be replaced
+        val id = venue.id
         val name = venue.name
         val lat = venue.location.lat
         val long = venue.location.lng
@@ -155,7 +153,7 @@ class DataController(private val geoCon: GeofencingController) {
             categoryID = categoryID + cat.id
         }
         return POI(
-            id = id.toString(),
+            id = id,
             name = name,
             lat = lat,
             long = long,
@@ -166,7 +164,7 @@ class DataController(private val geoCon: GeofencingController) {
         )
     }
 
-    private fun displayData(poi: POI, venue_view: TextView) {
+    private fun displayData(poi: POI) {
         val poi_string = StringBuilder()
         poi_string.append("Name: ${poi.name}").appendln()
         poi_string.append("Location: ${poi.lat}, ${poi.long}").appendln()
@@ -174,7 +172,7 @@ class DataController(private val geoCon: GeofencingController) {
         poi_string.append("Category: ${poi.category}").appendln()
         poi_string.append("CategoryIDs: ${poi.categoryID}").appendln()
         poi_string.append("Current distance: ${poi.distance}m")
-        venue_view.text = poi_string
+        Log.i(DATA_CON, poi_string.toString())
     }
 
     /**
@@ -236,7 +234,7 @@ class DataController(private val geoCon: GeofencingController) {
                rand > 0.2 but less than 0.7. Thus it falls in the bin of size 0.5 corresponding to
                the second element.
             */
-            val urv = nextDouble()
+            val urv = uniformRandom.nextDouble()
             var cumSum = 0.0
             var ind = 0
             while (cumSum < urv) {
@@ -394,6 +392,25 @@ class DataController(private val geoCon: GeofencingController) {
         }
     }
 
+    /**
+     * Filter out POIs that are in the history, i.e. have been recommended before
+     */
+    private fun filterVenuesPOIHistory(venues: List<Venues>): List<Venues> {
+        val filteredVenues = ArrayList<Venues>()
+        for (venue in venues){
+            var inHistory = false
+            for ( poiH in poiHistory ){
+                inHistory = inHistory || poiH.foursquareID == venue.id
+            }
+            if (inHistory) {
+                Log.i(DATA_CON, "Venue ${venue.name} is already in the history. Skipping")
+            } else{
+                filteredVenues.add(venue)
+            }
+        }
+        return filteredVenues.toImmutableList()
+    }
+
     fun setCategoryScores(cats: List<CategoryData>) {
         categoryTable = ArrayList(cats)
         //Log.i(DATA_CON, "Category scores set to: ${categoryTable}")
@@ -401,6 +418,10 @@ class DataController(private val geoCon: GeofencingController) {
 
     fun setCatViewModel(catViewModel: CategoryViewModel) {
         categoryViewModel = catViewModel
+    }
+
+    fun setPOIHistory(pois: List<POIData>){
+        poiHistory = pois
     }
 
 }

@@ -90,6 +90,8 @@ class MainActivity : AppCompatActivity() {
         poiHistoryViewModel.allPOI.observe(this, Observer { pois ->
             // Update the cached copy of the words in the adapter.
             pois?.let { historyAdapter.setPOIs(it) }
+            // Set POI history in DataController to filter out previous POIs
+            dataCon.setPOIHistory(pois)
         })
 
         // List saved POIs
@@ -111,7 +113,6 @@ class MainActivity : AppCompatActivity() {
         })
         dataCon.setCatViewModel(catViewModel)
 
-
         // Setup location services
         latCon.startLocation(this, this@MainActivity, dataCon)
 
@@ -123,14 +124,6 @@ class MainActivity : AppCompatActivity() {
 
         seeAllSavedSpotsBtn.setOnClickListener {
             startActivity(Intent(this, ListSavedPOIActivity()::class.java))
-        }
-
-        // Get last location and use it to make data request to API, then display the retrieved data
-        // var curr_location = "38.8897,-77.0089"
-        GlobalScope.launch {
-            var currLocation: android.location.Location = latCon.getLocation()
-            Log.d(TAG, "Current location: ${currLocation}. Requesting data...")
-            dataCon.requestData(currLocation, venue_description, this@MainActivity)
         }
     }
 
