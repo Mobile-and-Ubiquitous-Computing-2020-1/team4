@@ -10,6 +10,7 @@ import androidx.room.*
 
 
 interface POIDao<T> {
+    suspend fun getAll(): List<@JvmSuppressWildcards T>
     fun getAllByAscTimeTriggered(): LiveData<List<T>>
     fun getAllByDescTimeTriggered(): LiveData<List<T>>
     fun getRecentlyTriggered(): LiveData<List<T>>
@@ -23,6 +24,9 @@ interface POIDao<T> {
 // Saved poi table interface
 @Dao
 interface POISavedDao : POIDao<POISavedData> {
+    @Query("SELECT * FROM poi_saved_table")
+    override suspend fun getAll(): List<POISavedData>
+
     @Query("SELECT * FROM poi_saved_table ORDER BY time_triggered ASC")
     override fun getAllByAscTimeTriggered(): LiveData<List<POISavedData>>
 
@@ -51,6 +55,9 @@ interface POISavedDao : POIDao<POISavedData> {
 // History/saved places table interface
 @Dao
 interface POIHistoryDao : POIDao<POIHistoryData> {
+    @Query("SELECT * FROM poi_history_table")
+    override suspend fun getAll(): List<POIHistoryData>
+
     @Query("SELECT * FROM poi_history_table ORDER BY time_triggered ASC")
     override fun getAllByAscTimeTriggered(): LiveData<List<POIHistoryData>>
 

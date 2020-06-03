@@ -12,10 +12,14 @@ interface POIData {
     val timeTriggered: String
     val latitude: Double
     val longitude: Double
-    val description: String
+    val description: String?
     val distance: Int?
     val address: String?
     val wikipediaInfoJSON: String?
+}
+
+interface Ids {
+    val foursquareID: String
 }
 
 @Entity(tableName = "poi_history_table")
@@ -27,7 +31,7 @@ data class POIHistoryData(
     @ColumnInfo(name = "time_triggered") override val timeTriggered: String,
     @ColumnInfo(name = "latitude") override val latitude: Double,
     @ColumnInfo(name = "longitude") override val longitude: Double,
-    @ColumnInfo(name = "description") override val description: String,
+    @ColumnInfo(name = "description") override val description: String?,
     @ColumnInfo(name = "distance") override val distance: Int?,
     @ColumnInfo(name = "address") override val address: String?,
     @ColumnInfo(name = "wikipedia_info_json") override val wikipediaInfoJSON: String? = ""
@@ -42,7 +46,7 @@ data class POISavedData(
     @ColumnInfo(name = "time_triggered") override val timeTriggered: String,
     @ColumnInfo(name = "latitude") override val latitude: Double,
     @ColumnInfo(name = "longitude") override val longitude: Double,
-    @ColumnInfo(name = "description") override val description: String,
+    @ColumnInfo(name = "description") override val description: String?,
     @ColumnInfo(name = "distance") override val distance: Int?,
     @ColumnInfo(name = "address") override val address: String?,
     @ColumnInfo(name = "wikipedia_info_json") override val wikipediaInfoJSON: String? = ""

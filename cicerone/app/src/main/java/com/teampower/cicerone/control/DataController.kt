@@ -3,7 +3,6 @@ package com.teampower.cicerone.control
 import android.content.Context
 import android.location.Location
 import android.util.Log
-import android.widget.TextView
 import com.google.android.gms.location.Geofence
 import com.teampower.cicerone.*
 import com.teampower.cicerone.database.CategoryData
@@ -21,7 +20,6 @@ import kotlin.collections.ArrayList
 import kotlin.math.roundToInt
 import kotlin.random.Random.Default.nextDouble
 
-
 class DataController(private val geoCon: GeofencingController) {
     private val DATA_CON = "DataController"
     private lateinit var categoryTable: ArrayList<CategoryData>
@@ -30,7 +28,6 @@ class DataController(private val geoCon: GeofencingController) {
     private val pois =
         mutableMapOf<String, POI>() // We can store all POIs in this map, indexed by ID
     private val uniformRandom = Random(1) // seed 1 - TODO remove seed
-
 
     fun requestData(
         location: android.location.Location,
@@ -41,18 +38,15 @@ class DataController(private val geoCon: GeofencingController) {
 
         // Loads client ID and secret from "secret.properties" file in BuildConfig
         val foursquare_id = BuildConfig.FOURSQUARE_ID
-        val foursquare_secret =
-            BuildConfig.FOURSQUARE_SECRET
+        val foursquare_secret = BuildConfig.FOURSQUARE_SECRET
 
         // API call parameters
         val location_string: String =
             "${location.latitude.toString()}, ${location.longitude.toString()}"
-        val radius = 300 // TODO set radius for query
-        val limit = 200
-        // TODO decide which categories to query
+        val radius = 30
+        val limit = 50 // Foursquare API returns up to 50 results
         // comma-separated list of Foursquare categoryIDs to query for
-        val categories =
-            "4d4b7104d754a06370d81259,4d4b7105d754a06373d81259,4d4b7105d754a06374d81259,4d4b7105d754a06376d81259,4d4b7105d754a06377d81259"
+        val categories = "4bf58dd8d48988d181941735,4d4b7105d754a06374d81259,4bf58dd8d48988d116941735,50327c8591d4c4b30a586d5d,4bf58dd8d48988d1e2941735,4bf58dd8d48988d163941735,52e81612bcbc57f1066b7a14,50aaa49e4b90af0d42d5de11,4bf58dd8d48988d164941735,4bf58dd8d48988d1e2931735,56aa371be4b08b9a8d573532,52e81612bcbc57f1066b7a22,56aa371be4b08b9a8d573562,56aa371be4b08b9a8d573544,4eb1d4dd4b900d56c88a45fd,4bf58dd8d48988d133951735,4bf58dd8d48988d165941735,4bf58dd8d48988d12f941735"
         val version = "20200420" // set date for API versioning here (see Foursquare API)
         val cacheDuration = 60
 
@@ -108,6 +102,7 @@ class DataController(private val geoCon: GeofencingController) {
                         val radius = calculateRadius(nonOverlappingVenues.toTypedArray())
                         Log.d(DATA_CON, "Radius: $radius m")
                         for ((id, venue) in nonOverlappingVenues.withIndex()) {
+                            val id = venue?.id
                             Log.d(DATA_CON, "ID: $id - Venue:" + venue.toString())
                             val poi = poiBuilder(venue!!)
                             // Create the geofence
@@ -123,16 +118,9 @@ class DataController(private val geoCon: GeofencingController) {
                             // Add POI to the list of current POIs
                             pois.put(poi.id, poi)
                         }
-//                        if (!pois.isEmpty()) {
-//                            displayData(pois.toList().get(0).second)
-//                        }
                     }
                 }
             })
-    }
-
-    fun getPOI(id: String): POI? {
-        return pois.get(id)
     }
 
     private fun poiBuilder(venue: Venues): POI {
@@ -146,11 +134,11 @@ class DataController(private val geoCon: GeofencingController) {
         var categories = ""
         var categoryID = ""
         for (cat in venue.categories) {
-            categories = categories + cat.name
+            categories += cat.name
             if (categoryID != "") {
-                categoryID = categoryID + ","  // Add delimiter between Ids
+                categoryID += ","  // Add delimiter between Ids
             }
-            categoryID = categoryID + cat.id
+            categoryID += cat.id
         }
         return POI(
             id = id,
@@ -162,17 +150,6 @@ class DataController(private val geoCon: GeofencingController) {
             category = categories,
             categoryID = categoryID
         )
-    }
-
-    private fun displayData(poi: POI) {
-        val poi_string = StringBuilder()
-        poi_string.append("Name: ${poi.name}").appendln()
-        poi_string.append("Location: ${poi.lat}, ${poi.long}").appendln()
-        poi_string.append("Address: ${poi.address}").appendln()
-        poi_string.append("Category: ${poi.category}").appendln()
-        poi_string.append("CategoryIDs: ${poi.categoryID}").appendln()
-        poi_string.append("Current distance: ${poi.distance}m")
-        Log.i(DATA_CON, poi_string.toString())
     }
 
     /**
@@ -300,7 +277,8 @@ class DataController(private val geoCon: GeofencingController) {
                 locationB.latitude = venueB!!.location.lat
                 locationB.longitude = venueB.location.lng
 
-                val distanceAB = locationA.distanceTo(locationB) // Distance between AB
+                val distanceAB =
+                    locationA.distanceTo(locationB) // Distance between AB
                 if (distanceAB < threshold) {
                     overlappingIndices[0] = i
                     overlappingIndices[1] = j

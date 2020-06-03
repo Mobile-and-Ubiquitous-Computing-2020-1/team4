@@ -16,7 +16,6 @@ import com.google.android.gms.tasks.Task
 import com.teampower.cicerone.MY_PERMISSIONS_REQUEST_LOCATION_ID
 import com.teampower.cicerone.MainActivity
 import com.teampower.cicerone.TAG
-import kotlinx.android.synthetic.main.content_scrolling.*
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
