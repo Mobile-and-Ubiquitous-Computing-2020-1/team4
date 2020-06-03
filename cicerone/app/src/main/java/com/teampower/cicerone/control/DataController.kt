@@ -27,7 +27,7 @@ class DataController(private val geoCon: GeofencingController) {
     private lateinit var poiHistory: List<POIData>
     private val pois =
         mutableMapOf<String, POI>() // We can store all POIs in this map, indexed by ID
-    private val uniformRandom = Random(1) // seed 1 - TODO remove seed
+    private val uniformRandom = Random(1L) // seed 1 - TODO remove seed
 
     fun requestData(
         location: android.location.Location,
@@ -92,9 +92,10 @@ class DataController(private val geoCon: GeofencingController) {
                     if (response.isSuccessful()) {
                         val result = response.body()
                         val venues = result!!.response.venues
-                        val filteredVenues = filterVenuesPOIHistory(venues)
+                        Log.i(DATA_CON, venues.toString())
+                        val filteredVenues = filterVenuesPOIHistory(listOf(venues[0]))
                         initializeCategories(filteredVenues)
-                        val recommendVenues = recommendVenues(venues, 50)
+                        val recommendVenues = recommendVenues(filteredVenues, 50)
                         val nonOverlappingVenues = filterOverlapGreedy(
                             recommendVenues.toMutableList(),
                             200F
