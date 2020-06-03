@@ -76,7 +76,7 @@ class GeofenceTriggeredActivity : AppCompatActivity() {
         }
 
         // Save the recommended POI to the history - added here since GeofenceBroadCastReceiver is not a viewModelStoreOwner
-        poiHistoryViewModel.insert(poi)
+        //poiHistoryViewModel.insert(poi)
 
         Log.d(TAG, "Requesting detailed data from Foursquare")
         // Request detailed data for the POI from Foursquare in a non-blocking manner

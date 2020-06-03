@@ -31,12 +31,19 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
 
 
 const val MY_PERMISSIONS_REQUEST_LOCATION_ID = 99
 const val CHANNEL_ID = "CiceroneComms1337"
 const val TAG = "Cicerone"
 const val TAG_GEO = "Geofencer"
+
+// Use these to keep track of when the last recommendation has been set globally
+// We can limit the number of notifications sent to the user with the timeBetweenRecommendations interval (in ms)
+var mutex = Mutex()
+var lastRecommendationTime = 0L
+var timeBetweenRecommendations = 60000
 
 class MainActivity : AppCompatActivity() {
     private val latCon = LocationController()
