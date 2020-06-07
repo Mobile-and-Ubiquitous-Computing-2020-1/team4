@@ -44,7 +44,7 @@ class DataController(private val geoCon: GeofencingController) {
         val location_string: String =
             "${location.latitude.toString()}, ${location.longitude.toString()}"
         val radius = 30
-        val limit = 50 // Foursquare API returns up to 50 results
+        val limit = 1 // Foursquare API returns up to 50 results
         // comma-separated list of Foursquare categoryIDs to query for
         val categories = "4bf58dd8d48988d181941735,4d4b7105d754a06374d81259,4bf58dd8d48988d116941735,50327c8591d4c4b30a586d5d,4bf58dd8d48988d1e2941735,4bf58dd8d48988d163941735,52e81612bcbc57f1066b7a14,50aaa49e4b90af0d42d5de11,4bf58dd8d48988d164941735,4bf58dd8d48988d1e2931735,56aa371be4b08b9a8d573532,52e81612bcbc57f1066b7a22,56aa371be4b08b9a8d573562,56aa371be4b08b9a8d573544,4eb1d4dd4b900d56c88a45fd,4bf58dd8d48988d133951735,4bf58dd8d48988d165941735,4bf58dd8d48988d12f941735"
         val version = "20200420" // set date for API versioning here (see Foursquare API)
