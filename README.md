@@ -3,6 +3,10 @@
 
 <img src="https://raw.githubusercontent.com/Mobile-and-Ubiquitous-Computing-2020-1/team4/master/Designs/logo.svg" height="auto" width="250px">
 
+## Compatibility
+
+This app requires Android 10.
+
 ## Building the app
 
 In order to build the project you have to store your Foursquare Places API keys in cicerone/secrets.properties like so
