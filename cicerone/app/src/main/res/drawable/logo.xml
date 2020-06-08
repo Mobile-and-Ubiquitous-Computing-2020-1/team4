@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="160dp"
+    android:height="160dp"
+    android:viewportWidth="160"
+    android:viewportHeight="160">
+
+    <path
+        android:name="background.accent"
+        android:fillColor="#c1eaf2"
+        android:fillType="evenOdd"
+        android:strokeWidth="1"
+        android:pathData="M0,0 L160,0 L160,160 L0,160 L0,0 Z" />
+    <path
+        android:name="shape.primary"
+        android:fillColor="#191ba9"
+        android:strokeWidth="1"
+        android:pathData="M23,23 L23,137 L137,137 L137,23 L23,23 Z M21,21 L139,21 L139,139 L21,139 L21,21
+Z" />
+    <path
+        android:name="Rectangle-14"
+        android:fillType="evenOdd"
+        android:strokeWidth="1"
+        android:pathData="M0,0 L96,0 L96,22 L0,22 L0,0 Z" />
+    <path
+        android:name="icon.primary"
+        android:fillColor="#191ba9"
+        android:fillType="evenOdd"
+        android:strokeWidth="1"
+        android:pathData="M110,86 L128,86 L128,104 L110,104 L110,86 Z" />
+    <path
+        android:name="shape.primary"
+        android:fillColor="#191ba9"
+        android:fillType="evenOdd"
+        android:strokeWidth="1"
+        android:pathData="M52,108 L128,108 L128,110 L52,110 L52,108 Z" />
+    <path
+        android:fillColor="#191ba9"
+        android:fillType="evenOdd"
+        android:strokeWidth="1"
+        android:pathData="M16,3 C14.3555,3,13,4.35547,13,6 L13,13.3438 L4.59375,17.0938 L4,17.3438
+L4,22.125 L13,21.125 L13,22.9688 L10.4375,24.6875 L10,24.9688 L10,29.2188
+L11.1875,28.9688 L16,28 L20.8125,28.9688 L22,29.2188 L22,24.9688
+L21.5625,24.6875 L19,22.9688 L19,21.125 L28,22.125 L28,17.3438 L27.4063,17.0938
+L19,13.3438 L19,6 C19,4.35547,17.6445,3,16,3 Z M16,5 C16.5664,5,17,5.43359,17,6
+L17,14.6563 L17.5938,14.9063 L26,18.6563 L26,19.875 L17,18.875 L17,24.0625
+L17.4375,24.3438 L20,26.0625 L20,26.7813 L16.1875,26.0313 L16,25.9688
+L15.8125,26.0313 L12,26.7813 L12,26.0625 L14.5625,24.3438 L15,24.0625 L15,18.875
+L6,19.875 L6,18.6563 L14.4063,14.9063 L15,14.6563 L15,6
+C15,5.43359,15.4336,5,16,5 Z" />
+</vector>

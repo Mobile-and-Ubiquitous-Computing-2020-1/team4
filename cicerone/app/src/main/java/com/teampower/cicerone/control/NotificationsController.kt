@@ -92,7 +92,7 @@ class NotificationsController() {
             context,
             CHANNEL_ID
         )
-            .setSmallIcon(R.drawable.common_full_open_on_phone)
+            .setSmallIcon(R.drawable.ic_notification)
             .setContentTitle(title)
             .setStyle(
                 NotificationCompat.BigTextStyle()
