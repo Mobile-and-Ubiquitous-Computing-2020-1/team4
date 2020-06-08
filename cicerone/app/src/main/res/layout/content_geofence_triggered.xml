@@ -134,8 +134,10 @@
             android:layout_marginHorizontal="@dimen/small_padding"
             android:layout_marginVertical="@dimen/big_padding"
             android:text="@string/card_wikipedia_label"
+            android:visibility="gone"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/photograph" />
+            app:layout_constraintTop_toBottomOf="@+id/photograph"
+            tools:visibility="visible" />
 
         <androidx.cardview.widget.CardView
             android:id="@+id/wikipediaCardView"
@@ -144,10 +146,12 @@
             android:layout_marginHorizontal="@dimen/small_padding"
             android:layout_marginVertical="4dp"
             android:orientation="vertical"
+            android:visibility="gone"
             app:cardBackgroundColor="@color/colorSecondary"
             app:cardCornerRadius="13dp"
             app:layout_constraintTop_toBottomOf="@+id/wikipediaCardLabel"
-            tools:layout_editor_absoluteX="8dp">
+            tools:layout_editor_absoluteX="8dp"
+            tools:visibility="visible">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -170,8 +174,8 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/small_padding"
                     android:text="@string/wikipedia_article_link"
-                    android:textIsSelectable="true"
                     android:textColorLink="@color/colorPrimary"
+                    android:textIsSelectable="true"
                     android:visibility="gone" />
             </LinearLayout>
         </androidx.cardview.widget.CardView>
@@ -210,10 +214,10 @@
                     android:id="@+id/detailedFactsContent"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="More detailed facts you might find interesting"
                     android:autoLink="web"
-                    android:textIsSelectable="true"
-                    android:textColorLink="@color/colorPrimary" />
+                    android:text="More detailed facts you might find interesting"
+                    android:textColorLink="@color/colorPrimary"
+                    android:textIsSelectable="true" />
 
             </LinearLayout>
         </androidx.cardview.widget.CardView>
@@ -226,9 +230,9 @@
             android:layout_marginHorizontal="@dimen/small_padding"
             android:layout_marginVertical="@dimen/big_padding"
             android:text="@string/card_tip_label"
+            android:visibility="gone"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/detailedFactsCardView"
-            android:visibility="gone" />
+            app:layout_constraintTop_toBottomOf="@+id/detailedFactsCardView" />
 
         <androidx.cardview.widget.CardView
             android:id="@+id/tipCardView"
@@ -237,11 +241,11 @@
             android:layout_marginHorizontal="@dimen/small_padding"
             android:layout_marginVertical="4dp"
             android:orientation="vertical"
+            android:visibility="gone"
             app:cardBackgroundColor="@color/colorSecondary"
             app:cardCornerRadius="13dp"
             app:layout_constraintTop_toBottomOf="@+id/tipCardLabel"
-            tools:layout_editor_absoluteX="8dp"
-            android:visibility="gone" >
+            tools:layout_editor_absoluteX="8dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -254,10 +258,10 @@
                     android:id="@+id/tipContent"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/card_tip_default"
                     android:autoLink="web"
-                    android:textIsSelectable="true"
-                    android:textColorLink="@color/colorPrimary" />
+                    android:text="@string/card_tip_default"
+                    android:textColorLink="@color/colorPrimary"
+                    android:textIsSelectable="true" />
 
             </LinearLayout>
         </androidx.cardview.widget.CardView>
