@@ -5,8 +5,6 @@ import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.Menu
-import android.view.MenuItem
-import android.view.View
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
@@ -27,9 +25,7 @@ import com.teampower.cicerone.viewmodels.POIHistoryViewModel
 import com.teampower.cicerone.viewmodels.POISavedViewModel
 import kotlinx.android.synthetic.main.activity_scrolling.*
 import kotlinx.android.synthetic.main.content_scrolling.*
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.MainScope
-import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 
@@ -82,7 +78,11 @@ class MainActivity : AppCompatActivity() {
             { poi, holder ->
                 val convertedPOI = poiSavedViewModel.convertPOIDataToPOI(poi)
                 MainScope().launch {
-                    poiSavedViewModel.toggleFavorite(convertedPOI, applicationContext, holder.starImage)
+                    poiSavedViewModel.toggleFavorite(
+                        convertedPOI,
+                        applicationContext,
+                        holder.starImage
+                    )
                 }
             }
 
@@ -96,7 +96,7 @@ class MainActivity : AppCompatActivity() {
         historyRecyclerView.adapter = historyAdapter
         historyRecyclerView.layoutManager = LinearLayoutManager(this)
 
-        poiHistoryViewModel.allPOI.observe(this, Observer { pois ->
+        poiHistoryViewModel.recentSavedPOIs.observe(this, Observer { pois ->
             // Update the cached copy of the words in the adapter.
             pois?.let { historyAdapter.setPOIs(it) }
             // Set POI history in DataController to filter out previous POIs
@@ -105,7 +105,8 @@ class MainActivity : AppCompatActivity() {
 
         // List saved POIs
         val savedRecyclerView = findViewById<RecyclerView>(R.id.savedrecyclerview)
-        val savedAdapter = POIListAdapter(this, onListItemInfoClicked, onListItemStarClicked, poiSavedViewModel)
+        val savedAdapter =
+            POIListAdapter(this, onListItemInfoClicked, onListItemStarClicked, poiSavedViewModel)
         savedRecyclerView.adapter = savedAdapter
         savedRecyclerView.layoutManager = LinearLayoutManager(this)
 
@@ -148,7 +149,7 @@ class MainActivity : AppCompatActivity() {
         menuInflater.inflate(R.menu.menu_scrolling, menu)
         return true
     }
-
+/*
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
@@ -157,7 +158,7 @@ class MainActivity : AppCompatActivity() {
             R.id.action_settings -> true
             else -> super.onOptionsItemSelected(item)
         }
-    }
+    }*/
 
     // TODO Refactor this
     //  Define a wrapper function for the onRequestPermissionsResults in LocationController
