@@ -108,6 +108,8 @@ class GeofenceTriggeredActivity : AppCompatActivity() {
             poi.distance.toString()
         )
         if (poi.wikipediaInfo != null) {
+            wikipediaCardLabel.visibility = View.VISIBLE
+            wikipediaCardView.visibility = View.VISIBLE
             // For some reason didn't work to set proper type in WikipediaResponseModule.kt
             val url_list: LinkedTreeMap<String, LinkedTreeMap<String, String>> =
                 poi.wikipediaInfo?.content_urls as LinkedTreeMap<String, LinkedTreeMap<String, String>>

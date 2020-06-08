@@ -30,7 +30,7 @@ class DataController(private val geoCon: GeofencingController) {
     private val uniformRandom = Random(1) // seed 1 - TODO remove seed
 
     fun requestData(
-        location: android.location.Location,
+        location: Location,
         mainContext: Context
     ) {
         // Set context
@@ -41,12 +41,13 @@ class DataController(private val geoCon: GeofencingController) {
         val foursquare_secret = BuildConfig.FOURSQUARE_SECRET
 
         // API call parameters
-        val location_string: String =
-            "${location.latitude.toString()}, ${location.longitude.toString()}"
-        val radius = 30
+        val location_string =
+            "${location.latitude}, ${location.longitude}"
+        val radius = 300
         val limit = 1 // Foursquare API returns up to 50 results
         // comma-separated list of Foursquare categoryIDs to query for
-        val categories = "4bf58dd8d48988d181941735,4d4b7105d754a06374d81259,4bf58dd8d48988d116941735,50327c8591d4c4b30a586d5d,4bf58dd8d48988d1e2941735,4bf58dd8d48988d163941735,52e81612bcbc57f1066b7a14,50aaa49e4b90af0d42d5de11,4bf58dd8d48988d164941735,4bf58dd8d48988d1e2931735,56aa371be4b08b9a8d573532,52e81612bcbc57f1066b7a22,56aa371be4b08b9a8d573562,56aa371be4b08b9a8d573544,4eb1d4dd4b900d56c88a45fd,4bf58dd8d48988d133951735,4bf58dd8d48988d165941735,4bf58dd8d48988d12f941735"
+        val categories =
+            "4bf58dd8d48988d181941735,4d4b7105d754a06374d81259,4bf58dd8d48988d116941735,50327c8591d4c4b30a586d5d,4bf58dd8d48988d1e2941735,4bf58dd8d48988d163941735,52e81612bcbc57f1066b7a14,50aaa49e4b90af0d42d5de11,4bf58dd8d48988d164941735,4bf58dd8d48988d1e2931735,56aa371be4b08b9a8d573532,52e81612bcbc57f1066b7a22,56aa371be4b08b9a8d573562,56aa371be4b08b9a8d573544,4eb1d4dd4b900d56c88a45fd,4bf58dd8d48988d133951735,4bf58dd8d48988d165941735,4bf58dd8d48988d12f941735"
         val version = "20200420" // set date for API versioning here (see Foursquare API)
         val cacheDuration = 60
 
@@ -375,14 +376,14 @@ class DataController(private val geoCon: GeofencingController) {
      */
     private fun filterVenuesPOIHistory(venues: List<Venues>): List<Venues> {
         val filteredVenues = ArrayList<Venues>()
-        for (venue in venues){
+        for (venue in venues) {
             var inHistory = false
-            for ( poiH in poiHistory ){
+            for (poiH in poiHistory) {
                 inHistory = inHistory || poiH.foursquareID == venue.id
             }
             if (inHistory) {
                 Log.i(DATA_CON, "Venue ${venue.name} is already in the history. Skipping")
-            } else{
+            } else {
                 filteredVenues.add(venue)
             }
         }
@@ -398,7 +399,7 @@ class DataController(private val geoCon: GeofencingController) {
         categoryViewModel = catViewModel
     }
 
-    fun setPOIHistory(pois: List<POIData>){
+    fun setPOIHistory(pois: List<POIData>) {
         poiHistory = pois
     }
 

@@ -27,7 +27,7 @@ class LocationController() {
     private lateinit var lastLocation: android.location.Location
     private var requestingLocationUpdates = true
     private var lastFoursquareCallTime = 0L
-    private var timeBetweenFoursquareUpdates = 300000
+    private var timeBetweenFoursquareUpdates = 5 * 60 * 1000
 
     fun startLocation(context: Context, activity: MainActivity, dataCon: DataController) {
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(context)
@@ -37,7 +37,7 @@ class LocationController() {
                 locationResult ?: return
                 lastLocation = locationResult.lastLocation
                 var currentTime = System.currentTimeMillis()
-                if(currentTime - lastFoursquareCallTime > timeBetweenFoursquareUpdates) {
+                if (currentTime - lastFoursquareCallTime > timeBetweenFoursquareUpdates) {
                     //Log.i(LOC_TAG, "Timedelta: ${currentTime-lastFoursquareCallTime} - Last foursquare call at: $lastFoursquareCallTime, now at $currentTime")
                     // Get last location and use it to make data request to API, then display the retrieved data
                     // var curr_location = "38.8897,-77.0089"
