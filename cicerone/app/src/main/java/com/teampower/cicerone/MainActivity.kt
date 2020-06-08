@@ -43,7 +43,7 @@ const val TAG_GEO = "Geofencer"
 // We can limit the number of notifications sent to the user with the timeBetweenRecommendations interval (in ms)
 var mutex = Mutex()
 var lastRecommendationTime = 0L
-var timeBetweenRecommendations = 60000
+var timeBetweenRecommendations = 15*60*10000
 
 class MainActivity : AppCompatActivity() {
     private val latCon = LocationController()

@@ -27,7 +27,7 @@ class LocationController() {
     private lateinit var lastLocation: android.location.Location
     private var requestingLocationUpdates = true
     private var lastFoursquareCallTime = 0L
-    private var timeBetweenFoursquareUpdates = 60000
+    private var timeBetweenFoursquareUpdates = 300000
 
     fun startLocation(context: Context, activity: MainActivity, dataCon: DataController) {
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(context)
